@@ -1,0 +1,450 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../**/*.jsx';
+
+@custom-variant dark (&:where([class~="dark"], [class~="dark"] *));
+
+@theme {
+    --font-sans: 'Cairo', 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Base Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Dark Mode Defaults - Deep Midnight Navy & Solid Violet Space */
+html.dark {
+    color-scheme: dark;
+}
+
+html.dark body {
+    background-color: #080B22;
+    color: #F8FAFC;
+}
+
+/* Light Mode Core */
+html.light {
+    color-scheme: light;
+}
+
+html.light body {
+    background-color: #F8FAFC;
+    color: #0F172A;
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+    background: #0A0D28;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+    background: #252D5E;
+    border-radius: 9999px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+    background: #6320EE;
+}
+
+html.light ::-webkit-scrollbar-track {
+    background: #F1F5F9;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 9999px;
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+    background: #6320EE;
+}
+
+/* Hide scrollbar utilities */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.no-scrollbar,
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Glassmorphism utility classes - Dark */
+html.dark .glass-panel {
+    background: #0E1232;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(124, 58, 237, 0.16);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+}
+
+html.dark .glass-panel-card {
+    background: #161C48;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+}
+
+/* Glassmorphism utility classes - Light */
+html.light .glass-panel {
+    background: #FFFFFF;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 10px 30px -5px rgba(99, 32, 238, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+html.light .glass-panel-card {
+    background: #FFFFFF;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 4px 14px -2px rgba(99, 32, 238, 0.04);
+}
+
+/* Glow Effects - GoTransTech Brand Glows */
+.glow-violet,
+.glow-primary {
+    box-shadow: 0 0 25px -4px rgba(99, 32, 238, 0.45);
+}
+
+.glow-orange,
+.glow-accent {
+    box-shadow: 0 0 25px -4px rgba(255, 107, 0, 0.45);
+}
+
+.glow-brand {
+    box-shadow: 0 0 30px -5px rgba(99, 32, 238, 0.4), 0 0 20px -5px rgba(255, 107, 0, 0.25);
+}
+
+.glow-blue {
+    box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.3);
+}
+
+.glow-amber {
+    box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.3);
+}
+
+/* Legacy alias backward compatibility */
+.glow-emerald {
+    box-shadow: 0 0 25px -4px rgba(99, 32, 238, 0.4);
+}
+
+/* Animations */
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.85; }
+}
+
+.animate-pulse-glow {
+    animation: pulseGlow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* =========================================================================
+   LIGHT MODE OVERRIDES FOR ADMIN DASHBOARDS & CONTROL PANELS
+   ========================================================================= */
+
+/* Headers & Layout Structure in Light Mode */
+html.light header {
+    background-color: #FFFFFF !important;
+    border-color: #E2E8F0 !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Sidebar in Light Mode */
+html.light aside,
+html:not(.dark) aside {
+    background-color: #FFFFFF !important;
+    border-color: #E2E8F0 !important;
+}
+
+/* Sidebar Group Headings in Light Mode */
+html.light aside nav > div > div:first-child,
+html:not(.dark) aside nav > div > div:first-child {
+    color: #475569 !important;
+}
+
+/* Inactive Sidebar Links: Deep readable Slate */
+html.light aside nav a:not(.active-nav-link):not([data-active="true"]),
+html:not(.dark) aside nav a:not(.active-nav-link):not([data-active="true"]) {
+    color: #334155 !important;
+    background-color: transparent !important;
+}
+
+html.light aside nav a:not(.active-nav-link):not([data-active="true"]) span,
+html:not(.dark) aside nav a:not(.active-nav-link):not([data-active="true"]) span {
+    color: #334155 !important;
+}
+
+html.light aside nav a:not(.active-nav-link):not([data-active="true"]) svg,
+html:not(.dark) aside nav a:not(.active-nav-link):not([data-active="true"]) svg {
+    color: #6320EE !important;
+}
+
+html.light aside nav a:not(.active-nav-link):not([data-active="true"]):hover,
+html:not(.dark) aside nav a:not(.active-nav-link):not([data-active="true"]):hover {
+    background-color: #F1F5F9 !important;
+    color: #0F172A !important;
+}
+
+html.light aside nav a:not(.active-nav-link):not([data-active="true"]):hover span,
+html:not(.dark) aside nav a:not(.active-nav-link):not([data-active="true"]):hover span {
+    color: #0F172A !important;
+}
+
+/* Active Sidebar Navigation Link: Pure White text on Solid Violet */
+html.light aside nav a.active-nav-link,
+html.light aside nav a[data-active="true"],
+html:not(.dark) aside nav a.active-nav-link,
+html:not(.dark) aside nav a[data-active="true"] {
+    background-color: #6320EE !important;
+    color: #FFFFFF !important;
+}
+
+html.light aside nav a.active-nav-link *,
+html.light aside nav a[data-active="true"] *,
+html:not(.dark) aside nav a.active-nav-link *,
+html:not(.dark) aside nav a[data-active="true"] * {
+    color: #FFFFFF !important;
+}
+
+/* Solid Brand Buttons: Pure White Text */
+html.light button.btn-primary,
+html.light .btn-primary,
+html.light button[type="submit"]:not(.btn-secondary):not(.btn-ghost),
+html.light .bg-brand-solid,
+html.light .bg-orange-solid,
+html:not(.dark) button.btn-primary,
+html:not(.dark) .btn-primary,
+html:not(.dark) button[type="submit"]:not(.btn-secondary):not(.btn-ghost),
+html:not(.dark) .bg-brand-solid,
+html:not(.dark) .bg-orange-solid {
+    color: #FFFFFF !important;
+}
+
+/* Global Light Mode Typography & Headings */
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light h5,
+html.light h6,
+html:not(.dark) h1,
+html:not(.dark) h2,
+html:not(.dark) h3,
+html:not(.dark) h4,
+html:not(.dark) h5,
+html:not(.dark) h6 {
+    color: #0F172A !important;
+}
+
+/* Normalize text-white on light cards & tables to high contrast dark slate */
+html.light .glass-panel h1.text-white,
+html.light .glass-panel h2.text-white,
+html.light .glass-panel h3.text-white,
+html.light .glass-panel h4.text-white,
+html.light .glass-panel p.text-white,
+html.light .glass-panel span.text-white:not(button *):not(.active-nav-link *):not(.badge-white *),
+html.light .glass-panel-card h1.text-white,
+html.light .glass-panel-card h2.text-white,
+html.light .glass-panel-card h3.text-white,
+html.light .glass-panel-card h4.text-white,
+html.light .glass-panel-card p.text-white,
+html.light .glass-panel-card span.text-white:not(button *):not(.active-nav-link *):not(.badge-white *),
+html.light table span.text-white:not(button *):not(.active-nav-link *),
+html.light table td.text-white,
+html.light table th.text-white,
+html:not(.dark) .glass-panel h1.text-white,
+html:not(.dark) .glass-panel h2.text-white,
+html:not(.dark) .glass-panel h3.text-white,
+html:not(.dark) .glass-panel h4.text-white,
+html:not(.dark) .glass-panel p.text-white,
+html:not(.dark) .glass-panel span.text-white:not(button *):not(.active-nav-link *):not(.badge-white *),
+html:not(.dark) .glass-panel-card h1.text-white,
+html:not(.dark) .glass-panel-card h2.text-white,
+html:not(.dark) .glass-panel-card h3.text-white,
+html:not(.dark) .glass-panel-card h4.text-white,
+html:not(.dark) .glass-panel-card p.text-white,
+html:not(.dark) .glass-panel-card span.text-white:not(button *):not(.active-nav-link *):not(.badge-white *),
+html:not(.dark) table span.text-white:not(button *):not(.active-nav-link *),
+html:not(.dark) table td.text-white,
+html:not(.dark) table th.text-white {
+    color: #0F172A !important;
+}
+
+html.light .text-slate-100,
+html:not(.dark) .text-slate-100 {
+    color: #1E293B !important;
+}
+
+html.light .text-slate-200,
+html:not(.dark) .text-slate-200 {
+    color: #334155 !important;
+}
+
+html.light .text-slate-300,
+html:not(.dark) .text-slate-300 {
+    color: #475569 !important;
+}
+
+html.light .text-slate-400,
+html:not(.dark) .text-slate-400 {
+    color: #64748B !important;
+}
+
+html.light .text-slate-500,
+html:not(.dark) .text-slate-500 {
+    color: #64748B !important;
+}
+
+/* Hardcoded Dark Hex Palette to Clean Light Equivalents */
+html.light .bg-\[\#070A1E\],
+html.light .bg-\[\#080B22\] {
+    background-color: #F8FAFC !important;
+    color: #0F172A !important;
+}
+
+html.light .bg-\[\#0B0F2A\],
+html.light .bg-\[\#0B0F2A\]\/90,
+html.light .bg-\[\#0B0F2A\]\/95,
+html.light .bg-\[\#0E1338\],
+html.light .bg-\[\#0E1232\] {
+    background-color: #FFFFFF !important;
+    border-color: #E2E8F0 !important;
+}
+
+html.light .bg-\[\#161C48\],
+html.light .bg-\[\#161C48\]\/60,
+html.light .bg-\[\#161C48\]\/62 {
+    background-color: #F1F5F9 !important;
+    border-color: #E2E8F0 !important;
+}
+
+html.light .border-violet-900\/30,
+html.light .border-violet-900\/40,
+html.light .border-violet-800\/40,
+html.light .border-violet-800\/50,
+html.light .border-violet-700\/50 {
+    border-color: #E2E8F0 !important;
+}
+
+html.light .bg-violet-950\/30,
+html.light .bg-violet-950\/40,
+html.light .bg-violet-950\/50 {
+    background-color: #F1F5F9 !important;
+    color: #1E293B !important;
+}
+
+/* Slate Background Overrides in Light Mode */
+html.light .bg-slate-950 {
+    background-color: #F8FAFC !important;
+}
+
+html.light .bg-slate-950\/70,
+html.light .bg-slate-950\/80 {
+    background-color: rgba(248, 250, 252, 0.9) !important;
+}
+
+html.light .bg-slate-900 {
+    background-color: #ffffff !important;
+}
+
+html.light .bg-slate-900\/90,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/50 {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+html.light .bg-slate-900\/40 {
+    background-color: #f8fafc !important;
+}
+
+html.light .bg-slate-800 {
+    background-color: #f1f5f9 !important;
+}
+
+html.light .bg-slate-800\/80,
+html.light .bg-slate-800\/60,
+html.light .bg-slate-800\/40 {
+    background-color: rgba(241, 245, 249, 0.8) !important;
+}
+
+/* Border Overrides in Light Mode */
+html.light .border-slate-800,
+html.light .border-slate-800\/80,
+html.light .border-slate-800\/60,
+html.light .border-slate-800\/90 {
+    border-color: #e2e8f0 !important;
+}
+
+html.light .border-slate-700,
+html.light .border-slate-700\/80 {
+    border-color: #cbd5e1 !important;
+}
+
+html.light .divide-slate-800,
+html.light .divide-slate-800\/60 {
+    border-color: #e2e8f0 !important;
+}
+
+/* Form Inputs, Selects & Textareas in Light Mode */
+html.light input:not([type="checkbox"]):not([type="radio"]),
+html.light select,
+html.light textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+html.light input:focus,
+html.light select:focus,
+html.light textarea:focus {
+    border-color: #6320EE !important;
+    outline-color: #6320EE !important;
+}
+
+/* Tables & Headings in Light Mode */
+html.light thead {
+    background-color: #f8fafc !important;
+    color: #475569 !important;
+    border-color: #e2e8f0 !important;
+}
+
+html.light tbody tr:hover {
+    background-color: #f1f5f9 !important;
+}
+
+/* Code & Pre in Light Mode */
+html.light pre {
+    background-color: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+/* Modals & Dropdowns in Light Mode */
+html.light .modal-container,
+html.light .dialog-container {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
