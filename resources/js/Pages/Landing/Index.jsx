@@ -707,10 +707,10 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                             <ShieldCheck className="w-6 h-6" />
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">
-                            أمان محاسبي ونظام قيود مزدوجة
+                            {featuresSection?.pillar1_title || 'أمان محاسبي ونظام قيود مزدوجة'}
                         </h3>
                         <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                            تدقيق محاسبي غير قابل للتلاعب (Double-Entry Ledger) يضمن سلامة كل هللة في النظام وتطابقها التام.
+                            {featuresSection?.pillar1_desc || 'تدقيق محاسبي غير قابل للتلاعب (Double-Entry Ledger) يضمن سلامة كل هللة في النظام وتطابقها التام.'}
                         </p>
                     </div>
 
@@ -719,10 +719,10 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                             <TrendingUp className="w-6 h-6" />
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">
-                            عوائد أرباح فورية وموثقة
+                            {featuresSection?.pillar2_title || 'عوائد أرباح فورية وموثقة'}
                         </h3>
                         <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                            تحصل على نسبتك من أرباح العمولة مباشرة في محفظتك لحظة تمويل المهمة دون انتظار انتهاء فترة التوصيل.
+                            {featuresSection?.pillar2_desc || 'تحصل على نسبتك من أرباح العمولة مباشرة في محفظتك لحظة تمويل المهمة دون انتظار انتهاء فترة التوصيل.'}
                         </p>
                     </div>
 
@@ -731,10 +731,10 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                             <Zap className="w-6 h-6 text-orange-400" />
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">
-                            ربط برمجي فائق السرعة
+                            {featuresSection?.pillar3_title || 'ربط برمجي فائق السرعة'}
                         </h3>
                         <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                            واجهات برمجية RESTful مهيأة وموثقة للربط المباشر مع أنظمة تخطيط الموارد وسجلات الشحنات بسهولة تامة.
+                            {featuresSection?.pillar3_desc || 'واجهات برمجية RESTful مهيأة وموثقة للربط المباشر مع أنظمة تخطيط الموارد وسجلات الشحنات بسهولة تامة.'}
                         </p>
                     </div>
                 </div>
@@ -753,10 +753,10 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                                 </span>
                             </div>
                             <h3 className="text-xl sm:text-2xl font-black text-white mb-3">
-                                استثمار ذكي وآمن في مهام النقل اللوجستي
+                                {featuresSection?.investor_card_title || 'استثمار ذكي وآمن في مهام النقل اللوجستي'}
                             </h3>
                             <p className="text-xs sm:text-sm text-slate-400 mb-6 leading-relaxed">
-                                نوفر للمستثمر بيئة آمنة توفر سيولة مباشرة لمهام نقل حقيقية بعوائد فورية وإدارة متكاملة للمحفظة.
+                                {featuresSection?.investor_card_desc || 'نوفر للمستثمر بيئة آمنة توفر سيولة مباشرة لمهام نقل حقيقية بعوائد فورية وإدارة متكاملة للمحفظة.'}
                             </p>
                             <ul className="space-y-3.5 mb-8">
                                 {displayInvestorFeatures.map((feat, idx) => (
@@ -788,10 +788,10 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                                 </span>
                             </div>
                             <h3 className="text-xl sm:text-2xl font-black text-white mb-3">
-                                سيولة نقدية تشغيلية فورية وتوسع بلا قيود
+                                {featuresSection?.company_card_title || 'سيولة نقدية تشغيلية فورية وتوسع بلا قيود'}
                             </h3>
                             <p className="text-xs sm:text-sm text-slate-400 mb-6 leading-relaxed">
-                                حلول تمويلية فورية تغطي مصاريف التشغيل والوقود والصيانة لكل رحلة مع ربط تقني سلس عبر الـ API.
+                                {featuresSection?.company_card_desc || 'حلول تمويلية فورية تغطي مصاريف التشغيل والوقود والصيانة لكل رحلة مع ربط تقني سلس عبر الـ API.'}
                             </p>
                             <ul className="space-y-3.5 mb-8">
                                 {displayCompanyFeatures.map((feat, idx) => (

@@ -160,6 +160,16 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
         subtitle_ar: featuresSec.subtitle_ar || '',
         subtitle_en: featuresSec.subtitle_en || '',
         content: {
+            investor_card_title: featuresSec.content?.investor_card_title || 'استثمار ذكي وآمن في مهام النقل اللوجستي',
+            investor_card_desc: featuresSec.content?.investor_card_desc || 'نوفر للمستثمر بيئة آمنة توفر سيولة مباشرة لمهام نقل حقيقية بعوائد فورية وإدارة متكاملة للمحفظة.',
+            company_card_title: featuresSec.content?.company_card_title || 'سيولة نقدية تشغيلية فورية وتوسع بلا قيود',
+            company_card_desc: featuresSec.content?.company_card_desc || 'حلول تمويلية فورية تغطي مصاريف التشغيل والوقود والصيانة لكل رحلة مع ربط تقني سلس عبر الـ API.',
+            pillar1_title: featuresSec.content?.pillar1_title || 'أمان محاسبي ونظام قيود مزدوجة',
+            pillar1_desc: featuresSec.content?.pillar1_desc || 'تدقيق محاسبي غير قابل للتلاعب (Double-Entry Ledger) يضمن سلامة كل هللة في النظام وتطابقها التام.',
+            pillar2_title: featuresSec.content?.pillar2_title || 'عوائد أرباح فورية وموثقة',
+            pillar2_desc: featuresSec.content?.pillar2_desc || 'تحصل على نسبتك من أرباح العمولة مباشرة في محفظتك لحظة تمويل المهمة دون انتظار انتهاء فترة التوصيل.',
+            pillar3_title: featuresSec.content?.pillar3_title || 'ربط برمجي فائق السرعة',
+            pillar3_desc: featuresSec.content?.pillar3_desc || 'واجهات برمجية RESTful مهيأة وموثقة للربط المباشر مع أنظمة تخطيط الموارد وسجلات الشحنات بسهولة تامة.',
             investor_features: featuresSec.content?.investor_features || [],
             company_features: featuresSec.content?.company_features || [],
         },
@@ -1150,10 +1160,97 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                 </div>
                             </div>
 
+                            {/* 3 Core Highlight Pillars Customization */}
+                            <div className="space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                                <h4 className="font-bold text-xs text-slate-700 dark:text-slate-300">البطاقات التمهيدية الثلاث (ركائز الأمان والقيمة):</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div className="space-y-1.5 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                        <label className="block text-[11px] font-bold text-violet-600 dark:text-violet-400">الركيزة 1 (الأمان المحاسبي)</label>
+                                        <input
+                                            type="text"
+                                            value={featuresForm.data.content.pillar1_title}
+                                            onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar1_title: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
+                                            placeholder="العنوان"
+                                        />
+                                        <textarea
+                                            value={featuresForm.data.content.pillar1_desc}
+                                            onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar1_desc: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white resize-none"
+                                            rows="2"
+                                            placeholder="الوصف"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1.5 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                        <label className="block text-[11px] font-bold text-orange-500">الركيزة 2 (العوائد الفورية)</label>
+                                        <input
+                                            type="text"
+                                            value={featuresForm.data.content.pillar2_title}
+                                            onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar2_title: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
+                                            placeholder="العنوان"
+                                        />
+                                        <textarea
+                                            value={featuresForm.data.content.pillar2_desc}
+                                            onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar2_desc: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white resize-none"
+                                            rows="2"
+                                            placeholder="الوصف"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1.5 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                        <label className="block text-[11px] font-bold text-violet-400">الركيزة 3 (الربط البرمجي)</label>
+                                        <input
+                                            type="text"
+                                            value={featuresForm.data.content.pillar3_title}
+                                            onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar3_title: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
+                                            placeholder="العنوان"
+                                        />
+                                        <textarea
+                                            value={featuresForm.data.content.pillar3_desc}
+                                            onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar3_desc: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white resize-none"
+                                            rows="2"
+                                            placeholder="الوصف"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Investor Features */}
-                            <div className="space-y-3">
+                            <div className="space-y-3 pt-2">
+                                <div className="p-3.5 rounded-2xl bg-violet-50/50 dark:bg-violet-950/20 border border-violet-200/60 dark:border-violet-800/40 space-y-2.5">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-[11px] font-bold text-violet-700 dark:text-violet-300 mb-1">
+                                                عنوان بطاقة بوابة المستثمرين
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={featuresForm.data.content.investor_card_title}
+                                                onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, investor_card_title: e.target.value })}
+                                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500 font-bold"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[11px] font-bold text-violet-700 dark:text-violet-300 mb-1">
+                                                الوصف التوضيحي للبطاقة
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={featuresForm.data.content.investor_card_desc}
+                                                onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, investor_card_desc: e.target.value })}
+                                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="flex items-center justify-between">
-                                    <h4 className="font-bold text-sm text-[#6320EE]">مميزات المستثمرين:</h4>
+                                    <h4 className="font-bold text-sm text-[#6320EE]">قائمة مميزات المستثمرين:</h4>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -1198,8 +1295,35 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
 
                             {/* Company Features */}
                             <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                <div className="p-3.5 rounded-2xl bg-orange-50/50 dark:bg-orange-950/20 border border-orange-200/60 dark:border-orange-800/40 space-y-2.5">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-[11px] font-bold text-orange-700 dark:text-orange-300 mb-1">
+                                                عنوان بطاقة بوابة الشركات اللوجستية
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={featuresForm.data.content.company_card_title}
+                                                onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, company_card_title: e.target.value })}
+                                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 font-bold"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[11px] font-bold text-orange-700 dark:text-orange-300 mb-1">
+                                                الوصف التوضيحي للبطاقة
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={featuresForm.data.content.company_card_desc}
+                                                onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, company_card_desc: e.target.value })}
+                                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="flex items-center justify-between">
-                                    <h4 className="font-bold text-sm text-[#FF6B00]">مميزات الشركات اللوجستية:</h4>
+                                    <h4 className="font-bold text-sm text-[#FF6B00]">قائمة مميزات الشركات اللوجستية:</h4>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -1224,7 +1348,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                                     updated[idx] = e.target.value;
                                                     featuresForm.setData('content', { ...featuresForm.data.content, company_features: updated });
                                                 }}
-                                                className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
+                                                className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
                                             />
                                             <button
                                                 type="button"
