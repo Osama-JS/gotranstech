@@ -94,43 +94,6 @@ export default function Login() {
                             )}
                         </button>
                     </form>
-
-                    {/* Quick Demo Access Pills */}
-                    <div className="mt-6 pt-6 border-t border-slate-200 dark:border-violet-900/30 text-center">
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400 block mb-2 font-medium">حسابات تجريبية سريعة للتجربة:</span>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setData('email', 'admin@gotech.com');
-                                    setData('password', 'password');
-                                }}
-                                className="px-2.5 py-1 text-[11px] font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-violet-950/40 dark:hover:bg-violet-900/60 text-slate-700 dark:text-violet-300 rounded-lg border border-slate-200 dark:border-violet-800/40 transition-colors"
-                            >
-                                مدير المنصة
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setData('email', 'investor@gotech.com');
-                                    setData('password', 'password');
-                                }}
-                                className="px-2.5 py-1 text-[11px] font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-orange-950/40 dark:hover:bg-orange-900/60 text-slate-700 dark:text-orange-400 rounded-lg border border-slate-200 dark:border-orange-800/40 transition-colors"
-                            >
-                                مستثمر
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setData('email', 'company@fastlogistics.com');
-                                    setData('password', 'password');
-                                }}
-                                className="px-2.5 py-1 text-[11px] font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-indigo-300 rounded-lg border border-slate-200 dark:border-indigo-800/40 transition-colors"
-                            >
-                                شركة لوجستية
-                            </button>
-                        </div>
-                    </div>
                 </div>
 
                 {/* Footer link */}
