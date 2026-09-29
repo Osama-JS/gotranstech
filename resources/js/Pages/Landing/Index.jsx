@@ -813,34 +813,34 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                 </div>
             </section>
 
-            {/* API Integration Section */}
+            {/* Land Logistics & Transport Network Section */}
             <section id="api" className="py-20 bg-[#080B22]/80 border-y border-violet-950/40">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div>
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-orange-500/10 border border-orange-500/25 text-orange-400 text-xs font-bold mb-4">
-                                <Code className="w-4 h-4" />
-                                <span>للمطورين والشركات اللوجستية</span>
+                                <Truck className="w-4 h-4" />
+                                <span>للشركات اللوجستية ومزودي النقل</span>
                             </div>
                             <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
-                                بوابة برمجية متكاملة لربط أنظمة التوصيل والنقل
+                                بنية رقمية وهندسية متكاملة لتمويل أساطيل النقل البري
                             </h2>
                             <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                                وفر لعملياتك اللوجستية السيولة الفورية المطلوبة عن طريق ربط منصتك مع GoTransTech API. أرسل المهام واستقبل إشعارات الـ Webhook الموقعة لحظياً عند تمويل كل مهمة.
+                                وفر لعملياتك اللوجستية تدفقاً نقدياً فورياً لتغطية مصاريف الوقود والتشغيل والصيانة لكل رحلة. بنية تحتية ذكية تضمن الربط السريع، حوكمة مسارات الشحن، وتأمين السيولة قبل انطلاق الشاحنة.
                             </p>
 
                             <ul className="space-y-3 mb-8 text-sm">
                                 <li className="flex items-center gap-2 text-slate-300">
                                     <CheckCircle2 className="w-4 h-4 text-orange-400 shrink-0" />
-                                    <span>توثيق قوي عبر مفاتيح API Keys وتشفير HMAC Signatures</span>
+                                    <span>تغطية هندسية شاملة للمسارات ومحاور النقل البري بين كافة مدن المملكة</span>
                                 </li>
                                 <li className="flex items-center gap-2 text-slate-300">
                                     <CheckCircle2 className="w-4 h-4 text-violet-400 shrink-0" />
-                                    <span>إشعارات Webhooks فورية لحالات التمويل وسحب الأرصدة</span>
+                                    <span>حوكمة رقمية وسندات قبض ودين فورية لحماية حقوق الأسطول والمستثمر</span>
                                 </li>
                                 <li className="flex items-center gap-2 text-slate-300">
                                     <CheckCircle2 className="w-4 h-4 text-orange-400 shrink-0" />
-                                    <span>لوحة تحكم متكاملة لمراقبة الرصيد، المهام، والديون المستحقة</span>
+                                    <span>لوحة تحكم مركزية لمراقبة حركة الشحنات، الرصيد المتاح، والمطابقات المالية</span>
                                 </li>
                             </ul>
 
@@ -848,33 +848,233 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                                 href={user ? dashboardUrl : route('register')}
                                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold text-sm shadow-lg shadow-orange-500/20 transition-all hover:scale-105"
                             >
-                                <span>{user ? 'الانتقال إلى لوحة التحكم' : 'تسجيل شركة وطلب مفاتيح الربط'}</span>
+                                <span>{user ? 'الانتقال إلى لوحة التحكم' : 'تسجيل شركة وطلب الربط اللوجستي'}</span>
                                 <ArrowLeft className="w-4 h-4" />
                             </Link>
                         </div>
 
-                        {/* Code Preview Box */}
-                        <div className="glass-panel p-5 rounded-2xl border border-violet-800/40 font-mono text-xs overflow-x-auto shadow-2xl bg-[#090C28]/95">
-                            <div className="flex items-center justify-between pb-3 mb-3 border-b border-violet-900/40 text-slate-400">
-                                <span className="text-orange-400 font-bold">POST /api/v1/tasks</span>
-                                <span className="text-[10px] bg-violet-950/80 text-violet-300 border border-violet-800/50 px-2 py-0.5 rounded font-mono">Bearer Auth</span>
+                        {/* Pure Geometric Land Transport & Logistics Art (No text, No names, No stats) */}
+                        <div className="relative p-6 sm:p-10 rounded-3xl border border-violet-800/40 bg-[#090C28]/95 overflow-hidden shadow-2xl flex items-center justify-center min-h-[420px]">
+                            {/* Subtle Ambient Glow Behind Illustration */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-violet-600/15 blur-[100px] pointer-events-none rounded-full" />
+                            <div className="absolute bottom-8 right-8 w-48 h-48 bg-orange-500/15 blur-[80px] pointer-events-none rounded-full" />
+
+                            {/* Background Grid Pattern */}
+                            <div className="absolute inset-0 pointer-events-none opacity-20">
+                                <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <pattern id="logistics-grid-clean" width="32" height="32" patternUnits="userSpaceOnUse">
+                                            <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#6320EE" strokeWidth="0.7" strokeDasharray="3 3" />
+                                            <circle cx="32" cy="32" r="1.2" fill="#FF6B00" />
+                                        </pattern>
+                                    </defs>
+                                    <rect width="100%" height="100%" fill="url(#logistics-grid-clean)" />
+                                </svg>
                             </div>
-                            <pre className="text-slate-300 leading-relaxed overflow-x-auto">
-{`// إرسال مهمة جديدة للتمويل
-curl -X POST https://api.gotranstech.sa/api/v1/tasks \\
-  -H "Authorization: Bearer gtt_live_9988776655..." \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "external_task_id": "ORD-RYD-9982",
-    "title": "شحنة معدات وخوادم تقنية",
-    "funding_amount": 5000.00,
-    "pickup_city": "الرياض",
-    "pickup_address": "حي الصحافة",
-    "dropoff_city": "الرياض",
-    "dropoff_address": "حي العليا",
-    "duration_minutes": 45
-  }'`}
-                            </pre>
+
+                            {/* Master Geometric Land Freight Vector Composition */}
+                            <div className="relative z-10 w-full max-w-lg mx-auto">
+                                <svg viewBox="0 0 540 400" className="w-full h-auto drop-shadow-2xl">
+                                    <defs>
+                                        {/* Gradients for geometric facets */}
+                                        <linearGradient id="violetPlane" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stopColor="#6320EE" stopOpacity="0.4" />
+                                            <stop offset="100%" stopColor="#1E0B4E" stopOpacity="0.8" />
+                                        </linearGradient>
+                                        <linearGradient id="roadGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                                            <stop offset="0%" stopColor="#12173E" />
+                                            <stop offset="50%" stopColor="#1F2868" />
+                                            <stop offset="100%" stopColor="#12173E" />
+                                        </linearGradient>
+                                    </defs>
+
+                                    {/* Base Isometric Ground Grid Platters */}
+                                    <polygon points="270,360 490,240 270,120 50,240" fill="url(#violetPlane)" stroke="#6320EE" strokeWidth="1.5" strokeOpacity="0.6" />
+                                    <polygon points="270,335 450,235 270,140 90,235" fill="none" stroke="#FF6B00" strokeWidth="1" strokeDasharray="6 6" strokeOpacity="0.4" />
+
+                                    {/* Radar / Telemetry Concentric Wave Rings at Platform Center */}
+                                    <ellipse cx="270" cy="235" rx="140" ry="75" fill="none" stroke="#6320EE" strokeWidth="1" strokeOpacity="0.25" />
+                                    <ellipse cx="270" cy="235" rx="95" ry="50" fill="none" stroke="#FF6B00" strokeWidth="1" strokeDasharray="4 4" strokeOpacity="0.4" />
+                                    <ellipse cx="270" cy="235" rx="45" ry="24" fill="none" stroke="#6320EE" strokeWidth="1.5" strokeOpacity="0.6" />
+
+                                    {/* Geometric Highway Arteries */}
+                                    {/* Highway 1: South-West to North-East */}
+                                    <polygon points="65,245 85,255 475,75 455,65" fill="url(#roadGrad)" stroke="#6320EE" strokeWidth="1.2" />
+                                    <path d="M 75 250 L 465 70" stroke="#FF6B00" strokeWidth="2" strokeDasharray="8 6" strokeOpacity="0.9" />
+
+                                    {/* Highway 2: North-West to South-East */}
+                                    <polygon points="110,95 130,85 435,275 415,285" fill="url(#roadGrad)" stroke="#6320EE" strokeWidth="1.2" />
+                                    <path d="M 120 90 L 425 280" stroke="#6320EE" strokeWidth="2" strokeDasharray="8 6" strokeOpacity="0.8" />
+
+                                    {/* Elevated Highway Flyover Arch */}
+                                    <path d="M 140 250 Q 270 140 400 230" fill="none" stroke="#FF6B00" strokeWidth="3" strokeOpacity="0.75" />
+                                    <path d="M 140 250 Q 270 140 400 230" fill="none" stroke="#FFA043" strokeWidth="1.5" strokeDasharray="5 5" />
+
+                                    {/* ======================================================== */}
+                                    {/* GEOMETRIC ISOMETRIC TRUCK 1 (Heading North-East on Highway 1) */}
+                                    {/* ======================================================== */}
+                                    <g transform="translate(190, 165)">
+                                        {/* Truck Shadow */}
+                                        <polygon points="0,20 70,-15 50,-25 -20,10" fill="#030514" fillOpacity="0.8" />
+
+                                        {/* Cargo Trailer Body (Long Isometric 3D Prism) */}
+                                        {/* Top Face */}
+                                        <polygon points="10,-28 60,-53 45,-60 -5,-35" fill="#FF8833" />
+                                        {/* Left Face */}
+                                        <polygon points="-5,-35 10,-28 10,-8 -5,-15" fill="#FF6B00" />
+                                        {/* Right Face */}
+                                        <polygon points="10,-28 60,-53 60,-33 10,-8" fill="#D45500" />
+
+                                        {/* Truck Cabin (Front Cab) */}
+                                        {/* Top Face */}
+                                        <polygon points="60,-53 78,-62 70,-66 52,-57" fill="#8444F6" />
+                                        {/* Left Face */}
+                                        <polygon points="52,-57 60,-53 60,-39 52,-43" fill="#6320EE" />
+                                        {/* Right Face */}
+                                        <polygon points="60,-53 78,-62 78,-48 60,-39" fill="#4B12C2" />
+                                        {/* Windshield Glass */}
+                                        <polygon points="63,-53 75,-59 75,-54 63,-48" fill="#0A0E2E" />
+
+                                        {/* Wheels */}
+                                        <circle cx="5" cy="-7" r="4.5" fill="#0A0E2E" stroke="#FF6B00" strokeWidth="1.2" />
+                                        <circle cx="28" cy="-19" r="4.5" fill="#0A0E2E" stroke="#FF6B00" strokeWidth="1.2" />
+                                        <circle cx="48" cy="-29" r="4.5" fill="#0A0E2E" stroke="#FF6B00" strokeWidth="1.2" />
+                                        <circle cx="70" cy="-40" r="4.5" fill="#0A0E2E" stroke="#6320EE" strokeWidth="1.2" />
+
+                                        {/* Headlight Beams */}
+                                        <polygon points="78,-53 115,-62 105,-72 78,-58" fill="#FF6B00" fillOpacity="0.25" />
+                                    </g>
+
+                                    {/* ======================================================== */}
+                                    {/* GEOMETRIC ISOMETRIC TRUCK 2 (Heading South-East on Highway 2) */}
+                                    {/* ======================================================== */}
+                                    <g transform="translate(310, 195)">
+                                        {/* Truck Shadow */}
+                                        <polygon points="-30,-15 35,22 15,30 -50,-8" fill="#030514" fillOpacity="0.8" />
+
+                                        {/* Cargo Trailer Body */}
+                                        {/* Top Face */}
+                                        <polygon points="-40,-15 10,12 2,-2 -48,-28" fill="#8444F6" />
+                                        {/* Left Face */}
+                                        <polygon points="-48,-28 2,-2 2,18 -48,-8" fill="#6320EE" />
+                                        {/* Right Face */}
+                                        <polygon points="2,-2 10,12 10,32 2,18" fill="#4B12C2" />
+
+                                        {/* Truck Cabin (Front Cab) */}
+                                        {/* Top Face */}
+                                        <polygon points="10,12 28,21 24,14 6,5" fill="#FF8833" />
+                                        {/* Left Face */}
+                                        <polygon points="6,5 24,14 24,28 6,19" fill="#FF6B00" />
+                                        {/* Right Face */}
+                                        <polygon points="24,14 28,21 28,35 24,28" fill="#D45500" />
+
+                                        {/* Wheels */}
+                                        <circle cx="-35" cy="-3" r="4" fill="#0A0E2E" stroke="#6320EE" strokeWidth="1.2" />
+                                        <circle cx="-15" cy="8" r="4" fill="#0A0E2E" stroke="#6320EE" strokeWidth="1.2" />
+                                        <circle cx="16" cy="24" r="4" fill="#0A0E2E" stroke="#FF6B00" strokeWidth="1.2" />
+                                    </g>
+
+                                    {/* ======================================================== */}
+                                    {/* CENTRAL LOGISTICS ELEVATED HUB (Geometric Hexagonal Tower) */}
+                                    {/* ======================================================== */}
+                                    <g transform="translate(270, 150)">
+                                        {/* Hexagon Ground Pillar */}
+                                        <polygon points="0,40 30,22 30,-8 0,-26 -30,-8 -30,22" fill="#0B0F33" stroke="#6320EE" strokeWidth="2" />
+                                        {/* Mid Hexagon Ring */}
+                                        <polygon points="0,30 22,17 22,-6 0,-19 -22,-6 -22,17" fill="#18134B" stroke="#FF6B00" strokeWidth="1.5" />
+                                        {/* Top Core Prism */}
+                                        <polygon points="0,-19 22,-6 0,7 -22,-6" fill="#8444F6" />
+                                        <polygon points="-22,-6 0,7 0,25 -22,12" fill="#6320EE" />
+                                        <polygon points="0,7 22,-6 22,12 0,25" fill="#4B12C2" />
+
+                                        {/* Core Glowing Beacon Node */}
+                                        <circle cx="0" cy="-6" r="6" fill="#FF6B00" />
+                                        <circle cx="0" cy="-6" r="11" fill="none" stroke="#FF6B00" strokeWidth="1.5" strokeDasharray="3 3" />
+                                    </g>
+
+                                    {/* ======================================================== */}
+                                    {/* GEOMETRIC CARGO CRATES & LOGISTICS PALLETS (Isometric Blocks) */}
+                                    {/* ======================================================== */}
+                                    {/* Stack 1: Left Flank Logistics Staging */}
+                                    <g transform="translate(130, 270)">
+                                        {/* Cube 1 (Orange Cargo Container) */}
+                                        <polygon points="0,-16 16,-7 0,2 -16,-7" fill="#FF8833" />
+                                        <polygon points="-16,-7 0,2 0,20 -16,11" fill="#FF6B00" />
+                                        <polygon points="0,2 16,-7 16,11 0,20" fill="#D45500" />
+
+                                        {/* Cube 2 (Stacked Behind - Violet) */}
+                                        <g transform="translate(20, -12)">
+                                            <polygon points="0,-16 16,-7 0,2 -16,-7" fill="#8444F6" />
+                                            <polygon points="-16,-7 0,2 0,20 -16,11" fill="#6320EE" />
+                                            <polygon points="0,2 16,-7 16,11 0,20" fill="#4B12C2" />
+                                        </g>
+
+                                        {/* Cube 3 (Stacked On Top - Orange) */}
+                                        <g transform="translate(10, -28)">
+                                            <polygon points="0,-12 12,-5 0,2 -12,-5" fill="#FFA043" />
+                                            <polygon points="-12,-5 0,2 0,16 -12,9" fill="#FF6B00" />
+                                            <polygon points="0,2 12,-5 12,9 0,16" fill="#D45500" />
+                                        </g>
+                                    </g>
+
+                                    {/* Stack 2: Right Flank Cargo Staging */}
+                                    <g transform="translate(390, 240)">
+                                        {/* Cube A */}
+                                        <polygon points="0,-16 16,-7 0,2 -16,-7" fill="#8444F6" />
+                                        <polygon points="-16,-7 0,2 0,20 -16,11" fill="#6320EE" />
+                                        <polygon points="0,2 16,-7 16,11 0,20" fill="#4B12C2" />
+
+                                        {/* Cube B */}
+                                        <g transform="translate(-16, -10)">
+                                            <polygon points="0,-16 16,-7 0,2 -16,-7" fill="#FF8833" />
+                                            <polygon points="-16,-7 0,2 0,20 -16,11" fill="#FF6B00" />
+                                            <polygon points="0,2 16,-7 16,11 0,20" fill="#D45500" />
+                                        </g>
+                                    </g>
+
+                                    {/* ======================================================== */}
+                                    {/* FLOATING GEOMETRIC LOGISTICS WAYPOINTS & BEACONS */}
+                                    {/* ======================================================== */}
+                                    {/* Waypoint Diamond 1 (West Node) */}
+                                    <g transform="translate(80, 160)">
+                                        <polygon points="0,-14 12,0 0,14 -12,0" fill="#0E1339" stroke="#6320EE" strokeWidth="2" />
+                                        <circle cx="0" cy="0" r="4" fill="#6320EE" />
+                                        <line x1="0" y1="14" x2="0" y2="40" stroke="#6320EE" strokeWidth="1" strokeDasharray="3 3" opacity="0.6" />
+                                        <ellipse cx="0" cy="40" rx="10" ry="5" fill="none" stroke="#6320EE" strokeWidth="1" opacity="0.5" />
+                                    </g>
+
+                                    {/* Waypoint Diamond 2 (East Node) */}
+                                    <g transform="translate(450, 130)">
+                                        <polygon points="0,-14 12,0 0,14 -12,0" fill="#0E1339" stroke="#FF6B00" strokeWidth="2" />
+                                        <circle cx="0" cy="0" r="4" fill="#FF6B00" />
+                                        <line x1="0" y1="14" x2="0" y2="45" stroke="#FF6B00" strokeWidth="1" strokeDasharray="3 3" opacity="0.6" />
+                                        <ellipse cx="0" cy="45" rx="10" ry="5" fill="none" stroke="#FF6B00" strokeWidth="1" opacity="0.5" />
+                                    </g>
+
+                                    {/* Waypoint Diamond 3 (North-Central Node) */}
+                                    <g transform="translate(200, 65)">
+                                        <polygon points="0,-12 10,0 0,12 -10,0" fill="#0E1339" stroke="#6320EE" strokeWidth="1.8" />
+                                        <circle cx="0" cy="0" r="3.5" fill="#FF6B00" />
+                                    </g>
+
+                                    {/* Floating Geometric Particle Cubes / Nav Dots */}
+                                    <g transform="translate(360, 80)">
+                                        <polygon points="0,-8 8,-3 0,2 -8,-3" fill="#FF8833" />
+                                        <polygon points="-8,-3 0,2 0,10 -8,5" fill="#FF6B00" />
+                                        <polygon points="0,2 8,-3 8,5 0,10" fill="#D45500" />
+                                    </g>
+                                    <g transform="translate(150, 110)">
+                                        <polygon points="0,-7 7,-2 0,3 -7,-2" fill="#8444F6" />
+                                        <polygon points="-7,-2 0,3 0,9 -7,4" fill="#6320EE" />
+                                        <polygon points="0,3 7,-2 7,4 0,9" fill="#4B12C2" />
+                                    </g>
+
+                                    {/* Constellation / Route Network Interconnect Vector Lines */}
+                                    <line x1="80" y1="160" x2="200" y2="65" stroke="#6320EE" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+                                    <line x1="200" y1="65" x2="270" y2="150" stroke="#FF6B00" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+                                    <line x1="270" y1="150" x2="450" y2="130" stroke="#6320EE" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </div>
