@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
     Truck,
@@ -64,6 +64,35 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
     const { auth, branding } = usePage().props;
     const user = auth?.user;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll();
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    useEffect(() => {
+        if (mobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [mobileMenuOpen]);
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') setMobileMenuOpen(false);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     const getDashboardUrl = () => {
         if (!user) return route('login');
@@ -113,17 +142,23 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
         : defaultFaqs;
 
     return (
-        <div className="min-h-screen bg-[#06081B] text-slate-100 selection:bg-violet-600 selection:text-white font-sans overflow-hidden">
+        <div className="relative min-h-screen w-full max-w-full bg-[#06081B] text-slate-100 selection:bg-violet-600 selection:text-white font-sans overflow-x-hidden">
             <Head title="GoTransTech | نمول حركة الغد - منصة الاستثمار والتمويل اللوجستي" />
 
-            {/* Background glowing orbs in GoTransTech Brand Colors */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[480px] bg-violet-600/10 blur-[140px] rounded-full pointer-events-none -z-10" />
-            <div className="absolute top-[550px] -right-40 w-[600px] h-[400px] bg-orange-500/10 blur-[150px] rounded-full pointer-events-none -z-10" />
-            <div className="absolute top-[1200px] -left-40 w-[550px] h-[450px] bg-violet-600/10 blur-[160px] rounded-full pointer-events-none -z-10" />
+            {/* Background glowing orbs in GoTransTech Brand Colors - Strictly Contained with Zero Overflow */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 select-none">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] max-w-full h-[480px] bg-violet-600/10 blur-[140px] rounded-full" />
+                <div className="absolute top-[500px] right-0 translate-x-1/4 w-[500px] h-[400px] bg-orange-500/10 blur-[150px] rounded-full" />
+                <div className="absolute top-[1200px] left-0 -translate-x-1/4 w-[500px] h-[450px] bg-violet-600/10 blur-[160px] rounded-full" />
+            </div>
 
-            {/* Navigation */}
-            <header className="sticky top-0 z-50 bg-[#06081B]/85 backdrop-blur-xl border-b border-violet-900/30">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            {/* Persistent Fixed Header */}
+            <header className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
+                scrolled 
+                    ? 'bg-[#06081B]/95 backdrop-blur-xl border-b border-violet-900/50 shadow-2xl shadow-black/60 py-3.5' 
+                    : 'bg-[#06081B]/85 backdrop-blur-md border-b border-violet-900/20 py-4 sm:py-5'
+            }`}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3 group">
                         <BrandLogo size="md" showSlogan={false} displayMode={branding?.navbar_brand_display || 'both'} textClassName="text-white" />
                     </Link>
@@ -141,7 +176,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                         {user ? (
                             <Link
                                 href={dashboardUrl}
-                                className="px-5 py-2.5 rounded-xl text-sm font-bold bg-[#6320EE] hover:bg-[#5217D4] text-white shadow-md shadow-violet-600/30 transition-all hover:scale-[1.02] flex items-center gap-2"
+                                className="px-5 py-2.5 rounded-xl text-sm font-bold bg-[#6320EE] hover:bg-[#5217D4] text-white shadow-md shadow-violet-600/30 transition-all hover:scale-[1.02] flex items-center gap-2 cursor-pointer"
                             >
                                 <LayoutDashboard className="w-4 h-4" />
                                 <span>لوحة التحكم</span>
@@ -150,13 +185,13 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                             <>
                                 <Link
                                     href={route('login')}
-                                    className="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition-colors"
+                                    className="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition-colors cursor-pointer"
                                 >
                                     تسجيل الدخول
                                 </Link>
                                 <Link
                                     href={route('register')}
-                                    className="px-5 py-2.5 rounded-xl text-sm font-bold bg-[#6320EE] hover:bg-[#5217D4] text-white shadow-md shadow-violet-600/30 transition-all hover:scale-[1.02]"
+                                    className="px-5 py-2.5 rounded-xl text-sm font-bold bg-[#6320EE] hover:bg-[#5217D4] text-white shadow-md shadow-violet-600/30 transition-all hover:scale-[1.02] cursor-pointer"
                                 >
                                     إنشاء حساب جديد
                                 </Link>
@@ -185,7 +220,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(true)}
-                            className="w-10 h-10 rounded-xl bg-slate-900/90 border border-violet-900/50 text-slate-200 hover:text-white hover:border-[#6320EE] flex items-center justify-center transition-all focus:outline-none"
+                            className="w-10 h-10 rounded-xl bg-slate-900/90 border border-violet-900/50 text-slate-200 hover:text-white hover:border-[#6320EE] flex items-center justify-center transition-all focus:outline-none cursor-pointer"
                             aria-label="فتح القائمة الرئيسية"
                         >
                             <Menu className="w-5 h-5 text-orange-400" />
@@ -195,34 +230,42 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
             </header>
 
             {/* Mobile Slide-Over Drawer Navigation */}
-            {mobileMenuOpen && (
-                <div
-                    className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm transition-opacity duration-300 md:hidden"
-                    onClick={() => setMobileMenuOpen(false)}
-                />
-            )}
-
+            {/* Backdrop */}
             <div
-                className={`fixed inset-y-0 right-0 z-50 w-full max-w-[320px] sm:max-w-[360px] bg-[#070A24] border-s border-violet-900/60 shadow-2xl flex flex-col justify-between p-5 sm:p-6 transition-all duration-300 ease-in-out md:hidden overflow-y-auto ${
+                className={`fixed inset-0 z-50 bg-black/80 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+                    mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+                aria-hidden="true"
+            />
+
+            {/* Slide-in Drawer Container */}
+            <aside
+                className={`fixed inset-y-0 right-0 z-50 w-[300px] sm:w-[350px] max-w-[85vw] bg-[#070A24] border-s border-violet-900/60 shadow-2xl flex flex-col justify-between transition-all duration-300 ease-out md:hidden ${
                     mobileMenuOpen 
-                        ? 'translate-x-0 opacity-100 pointer-events-auto' 
-                        : 'translate-x-full opacity-0 pointer-events-none'
+                        ? 'translate-x-0 opacity-100 visible' 
+                        : 'translate-x-full opacity-0 invisible pointer-events-none'
                 }`}
                 style={{ direction: 'rtl' }}
+                aria-label="القائمة الجانبية للموبايل"
             >
-                <div>
-                    {/* Drawer Header */}
+                <div className="overflow-y-auto flex-1 p-5 sm:p-6 no-scrollbar">
+                    {/* Drawer Header with Close Button */}
                     <div className="flex items-center justify-between pb-4 border-b border-violet-950/80">
                         <Link href="/" onClick={() => setMobileMenuOpen(false)} className="inline-block">
                             <BrandLogo size="sm" showSlogan={false} displayMode={branding?.navbar_brand_display || 'both'} textClassName="text-white" />
                         </Link>
+                        
+                        {/* Highly Prominent Close Button */}
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="w-9 h-9 rounded-xl bg-slate-900 border border-violet-900/60 text-slate-300 hover:text-white hover:border-[#6320EE] flex items-center justify-center transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-rose-950/40 text-slate-300 hover:text-rose-400 border border-violet-900/60 hover:border-rose-500/50 transition-all text-xs font-bold cursor-pointer shadow-sm"
                             aria-label="إغلاق القائمة"
+                            title="إغلاق القائمة (Esc)"
                         >
-                            <X className="w-5 h-5 text-orange-400" />
+                            <span>إغلاق</span>
+                            <X className="w-4 h-4 text-orange-400" />
                         </button>
                     </div>
 
@@ -321,7 +364,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                 </div>
 
                 {/* Drawer Footer Auth & Contact */}
-                <div className="pt-4 border-t border-violet-950/80 space-y-3">
+                <div className="p-5 border-t border-violet-950/80 bg-[#06081E] space-y-3">
                     {user ? (
                         <div className="space-y-2.5">
                             <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-900 border border-violet-900/40">
@@ -366,10 +409,10 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                         GoTransTech - نمول حركة الغد 🇸🇦
                     </div>
                 </div>
-            </div>
+            </aside>
 
             {/* Hero Section */}
-            <section id="top" className="relative pt-16 sm:pt-20 pb-20 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden">
+            <section id="top" className="relative pt-28 sm:pt-36 pb-20 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden">
                 {/* Investment Background Charts & Technical Grids Layer */}
                 <div className="absolute inset-0 pointer-events-none -z-10 flex items-center justify-center overflow-hidden select-none opacity-40 sm:opacity-60">
                     <svg className="w-full h-full max-w-[1200px] min-h-[500px]" viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
