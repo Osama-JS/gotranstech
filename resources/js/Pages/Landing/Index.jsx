@@ -106,17 +106,71 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
     };
 
     const dashboardUrl = getDashboardUrl();
-    const heroSection = sections?.hero?.content || {};
-    const heroTitle = heroSection?.title_ar || 'نمول حركة الغد في قطاع النقل والخدمات اللوجستية';
-    const heroSubtitle = heroSection?.subtitle_ar || 'اربط شركتك اللوجستية بمستثمري السيولة، أو استثمر في تمويل شحنات التوصيل اليومية وحقق عوائد وأرباح فورية بكل شفافية وأمان.';
+    const heroSec = sections?.hero || {};
+    const heroSection = heroSec?.content || {};
+    const heroTitle = heroSec?.title_ar || 'منصة التمويل اللوجستي الذكية لربط المستثمرين بشركات النقل';
+    const heroSubtitle = heroSec?.subtitle_ar || 'حوّل تدفقاتك النقدية إلى أرباح حقيقية من خلال تمويل مهام الشحن والتوصيل اللوجستية بعوائد فورية ومضمونة.';
+    const heroBadge = heroSection?.badge_text || heroSection?.badge_ar || 'منصة التمويل والاستثمار اللوجستي المعتمدة بالمملكة 🇸🇦';
+    const heroPrimaryBtn = heroSection?.primary_button_text || heroSection?.cta_primary_text_ar || 'ابدأ الاستثمار الآن';
+    const heroSecondaryBtn = heroSection?.secondary_button_text || heroSection?.cta_secondary_text_ar || 'ربط الشركات اللوجستية (API)';
     
-    const statsSection = sections?.stats?.content || {};
+    const statsSec = sections?.stats || {};
+    const statsSection = statsSec?.content || {};
     const howSection = sections?.how_it_works?.content || {};
     const featuresSection = sections?.features?.content || {};
     const faqSection = sections?.faq?.content || {};
     const footerSection = sections?.contact_footer?.content || {};
 
     const [faqOpen, setFaqOpen] = useState(null);
+
+    const defaultSteps = [
+        {
+            step: 1,
+            title: 'شحن المحفظة الاستثمارية',
+            description: 'قم بإيداع رأس المال بأمان عبر التحويل البنكي المعتمد أو الدفع الإلكتروني الفوري HyperPay.'
+        },
+        {
+            step: 2,
+            title: 'استعراض المهام اللوجستية',
+            description: 'تصفح قائمة المهام اليومية الواردة لحظياً من شركات الشحن عبر الـ API مع تفاصيل المسار والعمولة.'
+        },
+        {
+            step: 3,
+            title: 'تمويل المهمة بضغطة زر',
+            description: 'اختر المهمة المناسبة وسيتم اقتطاع قيمتها من محفظتك وتوجيه التمويل مباشرة للشركة المنفذة.'
+        },
+        {
+            step: 4,
+            title: 'جني الأرباح الفورية',
+            description: 'استلم حصتك من عمولة المنصة فور تمويل المهمة وأعد استثمارها أو اطلب سحبها لحسابك البنكي.'
+        },
+    ];
+
+    const displaySteps = Array.isArray(howSection?.steps) && howSection.steps.length > 0 
+        ? howSection.steps 
+        : defaultSteps;
+
+    const defaultInvestorFeatures = [
+        'عوائد استثمارية فورية على كل مهمة يتم تمويلها',
+        'عقود قانونية إلكترونية موثقة تضمن حقوق الأطراف',
+        'سحب وإيداع مرن مع دعم المدفوعات السعودية المعتمدة',
+        'لوحة تحكم تفاعلية وتقارير أداء ومحافظ مالية معزولة',
+    ];
+
+    const defaultCompanyFeatures = [
+        'سيولة فورية لتمويل وقود وصيانة ومصاريف رحلات النقل',
+        'ربط تقني فوري عبر RESTful APIs مع توثيق كامل للـ Webhooks',
+        'توليد سندات قبض ودين معتمدة بصيغة PDF فور سحب الرصيد',
+        'تتبع لحظي لحالة المهام وحركة السداد والمطابقات المالية',
+    ];
+
+    const displayInvestorFeatures = Array.isArray(featuresSection?.investor_features) && featuresSection.investor_features.length > 0
+        ? featuresSection.investor_features
+        : defaultInvestorFeatures;
+
+    const displayCompanyFeatures = Array.isArray(featuresSection?.company_features) && featuresSection.company_features.length > 0
+        ? featuresSection.company_features
+        : defaultCompanyFeatures;
 
     const defaultFaqs = [
         {
@@ -527,7 +581,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                 {/* Brand Slogan Badge */}
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-300 text-xs sm:text-sm font-bold mb-8 animate-fade-in shadow-inner">
                     <Sparkles className="w-4 h-4 text-orange-400" />
-                    <span>{heroSection?.badge_ar || '🚀 نمول حركة الغد | FINANCING WHAT MOVES TOMORROW'}</span>
+                    <span>{heroBadge}</span>
                 </div>
 
                 {/* Main Headline */}
@@ -555,7 +609,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                             href={route('register')}
                             className="w-full sm:w-auto px-7 py-3.5 sm:px-8 sm:py-4 rounded-2xl font-bold text-sm sm:text-base bg-[#6320EE] hover:bg-[#5217D4] text-white shadow-xl shadow-violet-600/35 flex items-center justify-center gap-2 transition-all hover:scale-105"
                         >
-                            <span>{heroSection?.cta_primary_text_ar || 'ابدأ الاستثمار الآن'}</span>
+                            <span>{heroPrimaryBtn}</span>
                             <Zap className="w-5 h-5 fill-white text-white" />
                         </Link>
                     )}
@@ -564,7 +618,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                         className="w-full sm:w-auto px-7 py-3.5 sm:px-8 sm:py-4 rounded-2xl font-bold text-sm sm:text-base bg-[#0E1338]/90 hover:bg-[#151D52] text-slate-200 border border-violet-800/40 hover:border-orange-500/40 flex items-center justify-center gap-2 transition-all shadow-lg"
                     >
                         <Code className="w-5 h-5 text-orange-400" />
-                        <span>{heroSection?.cta_secondary_text_ar || 'بوابة الشركات (API)'}</span>
+                        <span>{heroSecondaryBtn}</span>
                     </a>
                 </div>
 
@@ -572,34 +626,34 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto">
                     <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-violet-900/30 text-center hover:border-violet-500/40 transition-colors">
                         <span className="block text-xl sm:text-3xl font-black font-mono text-violet-400 mb-1">
-                            {statsSection?.stat1_value || (liveStats?.total_funded_tasks ? `+${liveStats.total_funded_tasks.toLocaleString('en-US')}` : '+250,000')}
+                            {liveStats?.total_funded_tasks ? `+${Number(liveStats.total_funded_tasks).toLocaleString('en-US')}` : '+1,280'}
                         </span>
                         <span className="text-[11px] sm:text-sm text-slate-400 font-medium">
-                            {statsSection?.stat1_label || 'مهمة لوجستية ممولة'}
+                            {statsSection?.funded_tasks_label || statsSection?.stat1_label || 'مهمة لوجستية ممولة'}
                         </span>
                     </div>
                     <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-violet-900/30 text-center hover:border-orange-500/40 transition-colors">
                         <span className="block text-xl sm:text-3xl font-black font-mono text-orange-400 mb-1">
-                            {statsSection?.stat2_value || (liveStats?.total_invested_amount ? `${liveStats.total_invested_amount.toLocaleString('en-US')} ر.س` : '3,450,000 ر.س')}
+                            {liveStats?.total_invested_amount ? `${Number(liveStats.total_invested_amount).toLocaleString('en-US')} ر.س` : '3,450,000 ر.س'}
                         </span>
                         <span className="text-[11px] sm:text-sm text-slate-400 font-medium">
-                            {statsSection?.stat2_label || 'إجمالي التمويل المستثمر'}
+                            {statsSection?.invested_amount_label || statsSection?.stat2_label || 'ريال حجم التمويل المنفذ'}
                         </span>
                     </div>
                     <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-violet-900/30 text-center hover:border-violet-500/40 transition-colors">
                         <span className="block text-xl sm:text-3xl font-black font-mono text-violet-300 mb-1">
-                            {statsSection?.stat3_value || `${liveStats?.available_tasks_count || 24} مهمة`}
+                            {liveStats?.active_investors_count ? `+${Number(liveStats.active_investors_count).toLocaleString('en-US')}` : '+150'}
                         </span>
                         <span className="text-[11px] sm:text-sm text-slate-400 font-medium">
-                            {statsSection?.stat3_label || 'مهام حية متاحة للتمويل'}
+                            {statsSection?.active_investors_label || statsSection?.stat3_label || 'مستثمر نشط بالمنصة'}
                         </span>
                     </div>
                     <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-violet-900/30 text-center hover:border-orange-500/40 transition-colors">
                         <span className="block text-xl sm:text-3xl font-black font-mono text-orange-300 mb-1">
-                            {statsSection?.stat4_value || '100%'}
+                            {liveStats?.connected_companies_count ? `+${Number(liveStats.connected_companies_count).toLocaleString('en-US')}` : '+48'}
                         </span>
                         <span className="text-[11px] sm:text-sm text-slate-400 font-medium">
-                            {statsSection?.stat4_label || 'ضمان محاسبي وعقود رسمية'}
+                            {statsSection?.companies_label || statsSection?.stat4_label || 'شركة لوجستية مربوطة'}
                         </span>
                     </div>
                 </div>
@@ -617,91 +671,58 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div className="glass-panel-card p-6 rounded-2xl border border-violet-900/30 relative">
-                            <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-400 font-mono font-bold flex items-center justify-center mb-4">
-                                01
+                    <div className={`grid grid-cols-1 sm:grid-cols-2 ${displaySteps.length <= 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} gap-6`}>
+                        {displaySteps.map((stepItem, idx) => (
+                            <div key={idx} className="glass-panel-card p-6 rounded-2xl border border-violet-900/30 hover:border-violet-500/40 transition-all duration-300 relative group">
+                                <div className={`w-10 h-10 rounded-xl ${idx % 2 === 0 ? 'bg-violet-500/10 border-violet-500/30 text-violet-400' : 'bg-orange-500/10 border-orange-500/30 text-orange-400'} border font-mono font-bold flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
+                                    {String(idx + 1).padStart(2, '0')}
+                                </div>
+                                <h3 className="text-base font-bold text-white mb-2">
+                                    {stepItem.title}
+                                </h3>
+                                <p className="text-xs text-slate-400 leading-relaxed">
+                                    {stepItem.description}
+                                </p>
                             </div>
-                            <h3 className="text-base font-bold text-white mb-2">
-                                {howSection?.step1_title || 'إرسال المهام عبر API'}
-                            </h3>
-                            <p className="text-xs text-slate-400 leading-relaxed">
-                                {howSection?.step1_desc || 'تقوم الشركات اللوجستية بإرسال مهام التوصيل اللحظية عبر الـ API المؤمن إلى سوق التمويل.'}
-                            </p>
-                        </div>
-
-                        <div className="glass-panel-card p-6 rounded-2xl border border-violet-900/30 relative">
-                            <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 font-mono font-bold flex items-center justify-center mb-4">
-                                02
-                            </div>
-                            <h3 className="text-base font-bold text-white mb-2">
-                                {howSection?.step2_title || 'شحن المحفظة والتمويل'}
-                            </h3>
-                            <p className="text-xs text-slate-400 leading-relaxed">
-                                {howSection?.step2_desc || 'يشحن المستثمر محفظته عبر HyperPay أو التحويل البنكي ويختار المهام لتمويلها بضغطة زر.'}
-                            </p>
-                        </div>
-
-                        <div className="glass-panel-card p-6 rounded-2xl border border-violet-900/30 relative">
-                            <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-300 font-mono font-bold flex items-center justify-center mb-4">
-                                03
-                            </div>
-                            <h3 className="text-base font-bold text-white mb-2">
-                                {howSection?.step3_title || 'أرباح عمولات فورية'}
-                            </h3>
-                            <p className="text-xs text-slate-400 leading-relaxed">
-                                {howSection?.step3_desc || 'تُضاف أرباح العمولة لمحفظة المستثمر فور تمويل المهمة وفق النسبة المحددة في عقده.'}
-                            </p>
-                        </div>
-
-                        <div className="glass-panel-card p-6 rounded-2xl border border-violet-900/30 relative">
-                            <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-300 font-mono font-bold flex items-center justify-center mb-4">
-                                04
-                            </div>
-                            <h3 className="text-base font-bold text-white mb-2">
-                                {howSection?.step4_title || 'سحب التمويل وسداد الديون'}
-                            </h3>
-                            <p className="text-xs text-slate-400 leading-relaxed">
-                                {howSection?.step4_desc || 'تطلب الشركة سحب مبالغ التمويل بسندات PDF موقعة وتسددها في تاريخ الاستحقاق المحدد.'}
-                            </p>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
 
-            {/* Features Section */}
+            {/* Features & Solutions Section */}
             <section id="features" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
-                        {sections?.features?.title_ar || 'مميزات صُممت لتمكين منظومة النقل والاستثمار'}
+                        {sections?.features?.title_ar || 'حلول ومميزات مصممة خصيصاً للطرفين'}
                     </h2>
                     <p className="text-slate-400 text-sm sm:text-base">
-                        {sections?.features?.subtitle_ar || 'تقنيات مالية متطورة لتسريع تدفقاتك النقدية وتحقيق أقصى درجات الأمان والشفافية.'}
+                        {sections?.features?.subtitle_ar || 'مزايا استثنائية تمكّن المستثمرين من تحقيق عوائد مستمرة وتمنح شركات النقل سيولة تشغيلية فورية.'}
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Core Pillars Overview */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                     <div className="glass-panel-card p-6 rounded-2xl border border-violet-900/30 hover:border-violet-500/40 transition-all duration-300">
-                        <div className="w-12 h-12 rounded-xl bg-violet-500/15 border border-violet-500/30 text-violet-400 flex items-center justify-center mb-4 glow-violet">
+                        <div className="w-12 h-12 rounded-xl bg-violet-500/15 border border-violet-500/30 text-violet-400 flex items-center justify-center mb-4">
                             <ShieldCheck className="w-6 h-6" />
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">
-                            {featuresSection?.feat1_title || 'أمان مالي ونظام قيود مزدوجة'}
+                            أمان محاسبي ونظام قيود مزدوجة
                         </h3>
                         <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                            {featuresSection?.feat1_desc || 'تدقيق محاسبي غير قابل للتلاعب (Double-Entry Ledger) يضمن سلامة كل هللة في النظام وتطابقها التام.'}
+                            تدقيق محاسبي غير قابل للتلاعب (Double-Entry Ledger) يضمن سلامة كل هللة في النظام وتطابقها التام.
                         </p>
                     </div>
 
                     <div className="glass-panel-card p-6 rounded-2xl border border-violet-900/30 hover:border-orange-500/40 transition-all duration-300">
-                        <div className="w-12 h-12 rounded-xl bg-orange-500/15 border border-orange-500/30 text-orange-400 flex items-center justify-center mb-4 glow-orange">
+                        <div className="w-12 h-12 rounded-xl bg-orange-500/15 border border-orange-500/30 text-orange-400 flex items-center justify-center mb-4">
                             <TrendingUp className="w-6 h-6" />
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">
-                            {featuresSection?.feat2_title || 'عوائد أرباح فورية'}
+                            عوائد أرباح فورية وموثقة
                         </h3>
                         <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                            {featuresSection?.feat2_desc || 'تحصل على نسبتك من أرباح العمولة مباشرة في محفظتك لحظة تمويل المهمة دون انتظار انتهاء فترة التوصيل.'}
+                            تحصل على نسبتك من أرباح العمولة مباشرة في محفظتك لحظة تمويل المهمة دون انتظار انتهاء فترة التوصيل.
                         </p>
                     </div>
 
@@ -710,11 +731,84 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                             <Zap className="w-6 h-6 text-orange-400" />
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">
-                            {featuresSection?.feat3_title || 'ربط برمجي فائق السرعة'}
+                            ربط برمجي فائق السرعة
                         </h3>
                         <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                            {featuresSection?.feat3_desc || 'واجهات برمجية RESTful مهيأة وموثقة للربط المباشر مع أنظمة تخطيط الموارد وسجلات الشحنات بسهولة تامة.'}
+                            واجهات برمجية RESTful مهيأة وموثقة للربط المباشر مع أنظمة تخطيط الموارد وسجلات الشحنات بسهولة تامة.
                         </p>
+                    </div>
+                </div>
+
+                {/* Two Dedicated Portals: Investors Hub & Logistics Hub (Dynamic from Admin CMS) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Investors Portal */}
+                    <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-violet-900/40 relative overflow-hidden flex flex-col justify-between hover:border-violet-500/50 transition-all duration-300">
+                        <div>
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="w-12 h-12 rounded-2xl bg-violet-600/20 border border-violet-500/30 text-violet-400 flex items-center justify-center">
+                                    <TrendingUp className="w-6 h-6" />
+                                </div>
+                                <span className="text-xs font-bold px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-300">
+                                    بوابة المستثمرين
+                                </span>
+                            </div>
+                            <h3 className="text-xl sm:text-2xl font-black text-white mb-3">
+                                استثمار ذكي وآمن في مهام النقل اللوجستي
+                            </h3>
+                            <p className="text-xs sm:text-sm text-slate-400 mb-6 leading-relaxed">
+                                نوفر للمستثمر بيئة آمنة توفر سيولة مباشرة لمهام نقل حقيقية بعوائد فورية وإدارة متكاملة للمحفظة.
+                            </p>
+                            <ul className="space-y-3.5 mb-8">
+                                {displayInvestorFeatures.map((feat, idx) => (
+                                    <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-200">
+                                        <CheckCircle2 className="w-4 h-4 text-violet-400 shrink-0 mt-0.5" />
+                                        <span className="leading-snug">{feat}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <Link
+                            href={user ? dashboardUrl : route('register')}
+                            className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-2xl bg-[#6320EE] hover:bg-[#5217D4] text-white font-bold text-xs sm:text-sm shadow-lg shadow-violet-900/30 transition-all hover:scale-[1.02]"
+                        >
+                            <span>{user ? 'الانتقال إلى المحفظة الاستثمارية' : 'سجّل كمستثمر وابدأ الآن'}</span>
+                            <ArrowLeft className="w-4 h-4" />
+                        </Link>
+                    </div>
+
+                    {/* Logistics Companies Portal */}
+                    <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-violet-900/40 relative overflow-hidden flex flex-col justify-between hover:border-orange-500/50 transition-all duration-300">
+                        <div>
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="w-12 h-12 rounded-2xl bg-orange-500/20 border border-orange-500/30 text-orange-400 flex items-center justify-center">
+                                    <Truck className="w-6 h-6" />
+                                </div>
+                                <span className="text-xs font-bold px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-300">
+                                    بوابة الشركات اللوجستية
+                                </span>
+                            </div>
+                            <h3 className="text-xl sm:text-2xl font-black text-white mb-3">
+                                سيولة نقدية تشغيلية فورية وتوسع بلا قيود
+                            </h3>
+                            <p className="text-xs sm:text-sm text-slate-400 mb-6 leading-relaxed">
+                                حلول تمويلية فورية تغطي مصاريف التشغيل والوقود والصيانة لكل رحلة مع ربط تقني سلس عبر الـ API.
+                            </p>
+                            <ul className="space-y-3.5 mb-8">
+                                {displayCompanyFeatures.map((feat, idx) => (
+                                    <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-200">
+                                        <CheckCircle2 className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
+                                        <span className="leading-snug">{feat}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <Link
+                            href={user ? dashboardUrl : route('register')}
+                            className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-2xl bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold text-xs sm:text-sm shadow-lg shadow-orange-900/30 transition-all hover:scale-[1.02]"
+                        >
+                            <span>{user ? 'لوحة تحكم الشركات' : 'انضم كشريك لوجستي واطلب الربط'}</span>
+                            <ArrowLeft className="w-4 h-4" />
+                        </Link>
                     </div>
                 </div>
             </section>

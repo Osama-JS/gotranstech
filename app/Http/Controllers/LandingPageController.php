@@ -23,6 +23,7 @@ class LandingPageController extends Controller
             'total_invested_amount' => (float) TaskInvestment::sum('investment_amount') + 3450000.00,
             'available_tasks_count' => Task::where('status', 'available')->where('expires_at', '>', now())->count(),
             'active_investors_count' => User::where('user_type', 'investor')->count() + 150,
+            'connected_companies_count' => User::where('user_type', 'company')->count() + 48,
         ];
 
         return Inertia::render('Landing/Index', [

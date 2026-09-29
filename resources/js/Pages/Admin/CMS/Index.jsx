@@ -983,19 +983,79 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                             <div>
                                 <h3 className="text-base font-bold text-slate-900 dark:text-white">خطوات العمل وآلية التمويل اللوجستي</h3>
-                                <p className="text-xs text-slate-500">تعديل نصوص وتفاصيل الخطوات الأربع التي تشرح آلية عمل المنصة للمستخدم</p>
+                                <p className="text-xs text-slate-500">تعديل نصوص وتفاصيل الخطوات التي تشرح آلية عمل المنصة للمستخدم</p>
                             </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const currentSteps = howForm.data.content.steps || [];
+                                    const nextNum = currentSteps.length + 1;
+                                    const updated = [
+                                        ...currentSteps,
+                                        { step: nextNum, title: `خطوة جديدة ${nextNum}`, description: 'شرح وتفاصيل هذه الخطوة...' }
+                                    ];
+                                    howForm.setData('content', { ...howForm.data.content, steps: updated });
+                                }}
+                                className="px-4 py-2 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>إضافة خطوة جديدة</span>
+                            </button>
                         </div>
 
                         <form onSubmit={(e) => submitForm(howForm, howSec.id, e)} className="space-y-4">
+                            {/* Section Title & Subtitle */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                                        عنوان قسم خطوات العمل
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={howForm.data.title_ar}
+                                        onChange={(e) => howForm.setData('title_ar', e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500 font-bold"
+                                        placeholder="كيف تعمل المنصة؟"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                                        الوصف التوضيحي للقسم
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={howForm.data.subtitle_ar}
+                                        onChange={(e) => howForm.setData('subtitle_ar', e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
+                                        placeholder="دورة تمويل واستثمار مؤتمتة بالكامل..."
+                                    />
+                                </div>
+                            </div>
+
                             <div className="space-y-4">
                                 {howForm.data.content.steps?.map((step, idx) => (
-                                    <div key={idx} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <span className="w-6 h-6 rounded-full bg-[#6320EE] text-slate-950 font-bold text-xs flex items-center justify-center">
-                                                {idx + 1}
-                                            </span>
-                                            <span className="font-bold text-xs text-slate-900 dark:text-white">الخطوة {idx + 1}</span>
+                                    <div key={idx} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 relative group">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-6 h-6 rounded-full bg-[#6320EE] text-white font-bold text-xs flex items-center justify-center">
+                                                    {idx + 1}
+                                                </span>
+                                                <span className="font-bold text-xs text-slate-900 dark:text-white">الخطوة {idx + 1}</span>
+                                            </div>
+                                            {howForm.data.content.steps.length > 2 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const updated = howForm.data.content.steps.filter((_, i) => i !== idx);
+                                                        howForm.setData('content', { ...howForm.data.content, steps: updated });
+                                                    }}
+                                                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer"
+                                                    title="حذف هذه الخطوة"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            )}
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1061,10 +1121,39 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                         </div>
 
                         <form onSubmit={(e) => submitForm(featuresForm, featuresSec.id, e)} className="space-y-6">
+                            {/* Section Title & Subtitle */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                                        عنوان قسم المميزات والحلول
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={featuresForm.data.title_ar}
+                                        onChange={(e) => featuresForm.setData('title_ar', e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500 font-bold"
+                                        placeholder="حلول ومميزات مصممة خصيصاً للطرفين"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                                        الوصف التوضيحي للقسم
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={featuresForm.data.subtitle_ar}
+                                        onChange={(e) => featuresForm.setData('subtitle_ar', e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
+                                        placeholder="مزايا استثنائية تمكّن المستثمرين وشركات النقل..."
+                                    />
+                                </div>
+                            </div>
+
                             {/* Investor Features */}
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
-                                    <h4 className="font-bold text-sm text-violet-600 dark:text-violet-400">مميزات المستثمرين:</h4>
+                                    <h4 className="font-bold text-sm text-[#6320EE]">مميزات المستثمرين:</h4>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -1110,14 +1199,14 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             {/* Company Features */}
                             <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                                 <div className="flex items-center justify-between">
-                                    <h4 className="font-bold text-sm text-blue-600 dark:text-blue-400">مميزات الشركات اللوجستية:</h4>
+                                    <h4 className="font-bold text-sm text-[#FF6B00]">مميزات الشركات اللوجستية:</h4>
                                     <button
                                         type="button"
                                         onClick={() => {
                                             const updated = [...(featuresForm.data.content.company_features || []), 'ميزة جديدة للشركات اللوجستية'];
                                             featuresForm.setData('content', { ...featuresForm.data.content, company_features: updated });
                                         }}
-                                        className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                                        className="px-3 py-1 bg-orange-50 dark:bg-orange-500/10 hover:bg-orange-100 dark:hover:bg-orange-500/20 text-[#FF6B00] rounded-xl text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
                                     >
                                         <Plus className="w-3.5 h-3.5" />
                                         <span>إضافة ميزة</span>
@@ -1192,6 +1281,35 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                         </div>
 
                         <form onSubmit={(e) => submitForm(faqForm, faqSec.id, e)} className="space-y-4">
+                            {/* Section Title & Subtitle */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                                        عنوان قسم الأسئلة الشائعة
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={faqForm.data.title_ar}
+                                        onChange={(e) => faqForm.setData('title_ar', e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500 font-bold"
+                                        placeholder="الأسئلة الشائعة"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                                        الوصف التوضيحي للقسم
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={faqForm.data.subtitle_ar}
+                                        onChange={(e) => faqForm.setData('subtitle_ar', e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
+                                        placeholder="كل ما تحتاج لمعرفته حول الاستثمار والربط..."
+                                    />
+                                </div>
+                            </div>
+
                             <div className="space-y-4">
                                 {faqForm.data.content.faqs?.map((faq, idx) => (
                                     <div key={idx} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 relative group">
