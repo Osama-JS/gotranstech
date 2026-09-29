@@ -160,7 +160,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
             }`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3 group">
-                        <BrandLogo size="md" showSlogan={false} displayMode={branding?.navbar_brand_display || 'both'} textClassName="text-white" />
+                        <BrandLogo size={branding?.navbar_brand_size || 'md'} showSlogan={false} displayMode={branding?.navbar_brand_display || 'both'} textClassName="text-white" />
                     </Link>
 
                     {/* Desktop Navigation Links */}
@@ -253,7 +253,12 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                     {/* Drawer Header with Close Button */}
                     <div className="flex items-center justify-between pb-4 border-b border-violet-950/80">
                         <Link href="/" onClick={() => setMobileMenuOpen(false)} className="inline-block">
-                            <BrandLogo size="sm" showSlogan={false} displayMode={branding?.navbar_brand_display || 'both'} textClassName="text-white" />
+                            <BrandLogo 
+                                size={Math.min(36, parseInt(branding?.navbar_brand_size, 10) || 30)} 
+                                showSlogan={false} 
+                                displayMode={branding?.navbar_brand_display || 'both'} 
+                                textClassName="text-white" 
+                            />
                         </Link>
                         
                         {/* Highly Prominent Close Button */}
@@ -828,7 +833,7 @@ curl -X POST https://api.gotranstech.sa/api/v1/tasks \\
                             {/* Col 1 & 2: Platform Identity, Bio & Social Networks */}
                             <div className="lg:col-span-2 space-y-5">
                                 <Link href="/" className="inline-block">
-                                    <BrandLogo size="md" showSlogan={true} displayMode={branding?.navbar_brand_display || 'both'} textClassName="text-white" />
+                                    <BrandLogo size={branding?.navbar_brand_size || 'md'} showSlogan={true} displayMode={branding?.navbar_brand_display || 'both'} textClassName="text-white" />
                                 </Link>
 
                                 <p className="text-xs text-slate-400 leading-relaxed max-w-md">

@@ -21,7 +21,11 @@ import {
     Image,
     UploadCloud,
     RefreshCw,
-    ExternalLink
+    ExternalLink,
+    Maximize2,
+    Sliders,
+    Minus,
+    RotateCcw
 } from 'lucide-react';
 
 export default function AdminLandingCms({ sections = [], branding = {}, landingUrl = null }) {
@@ -56,6 +60,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
         site_slogan_ar: branding?.site_slogan_ar || 'نمول حركة الغد',
         site_slogan_en: branding?.site_slogan_en || 'FINANCING WHAT MOVES TOMORROW',
         navbar_brand_display: branding?.navbar_brand_display || 'both',
+        navbar_brand_size: parseInt(branding?.navbar_brand_size, 10) || 36,
     });
 
     const handleLogoChange = (e) => {
@@ -599,6 +604,175 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                         <p className="text-[10px] text-slate-400 leading-relaxed">
                                             يعرض الاسم المعتمد للمنصة GoTransTech بنص بارز بدون أيقونة الشعار.
                                         </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Navbar Brand Size Slider Control */}
+                            <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-6">
+                                {/* Header of section */}
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div>
+                                        <h4 className="text-xs font-bold text-white flex items-center gap-2">
+                                            <Sliders className="w-4 h-4 text-[#FF6B00]" />
+                                            <span>شريط التحكم في مقاس وارتفاع الشعار (Logo Size Slider)</span>
+                                        </h4>
+                                        <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                                            اسحب الخط لزيادة أو إنقاص حجم وارتفاع الشعار، وستلاحظ تغيّر المقاس بالكامل لحظياً وتفاعلياً
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-2 self-start sm:self-center">
+                                        <div className="px-3.5 py-1.5 rounded-xl bg-slate-900 border border-violet-900/60 flex items-center gap-1.5 shadow-sm">
+                                            <span className="text-[11px] text-slate-400">الارتفاع المختار:</span>
+                                            <span className="text-sm font-black text-[#FF6B00] font-mono">{brandingForm.data.navbar_brand_size}</span>
+                                            <span className="text-[11px] text-slate-400 font-mono">px</span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => brandingForm.setData('navbar_brand_size', 36)}
+                                            className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700 text-[11px] font-semibold flex items-center gap-1 transition-all cursor-pointer"
+                                            title="إعادة ضبط للحجم القياسي الموصى به (36px)"
+                                        >
+                                            <RotateCcw className="w-3.5 h-3.5 text-violet-400" />
+                                            <span>الافتراضي (36px)</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Slider Bar & Stepper Controls */}
+                                <div className="p-5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-4">
+                                    <div className="flex items-center gap-3 sm:gap-4">
+                                        {/* Decrease Stepper Button */}
+                                        <button
+                                            type="button"
+                                            onClick={() => brandingForm.setData('navbar_brand_size', Math.max(20, (parseInt(brandingForm.data.navbar_brand_size, 10) || 36) - 2))}
+                                            className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-[#6320EE] text-slate-300 hover:text-white border border-slate-700 hover:border-[#6320EE] flex items-center justify-center transition-all shrink-0 cursor-pointer shadow-sm active:scale-95"
+                                            title="إنقاص الحجم بمقدار 2 بكسل"
+                                        >
+                                            <Minus className="w-4 h-4" />
+                                        </button>
+
+                                        {/* Slider Line Track */}
+                                        <div className="flex-1 relative py-2">
+                                            <input
+                                                type="range"
+                                                min="20"
+                                                max="96"
+                                                step="1"
+                                                value={brandingForm.data.navbar_brand_size}
+                                                onChange={(e) => brandingForm.setData('navbar_brand_size', parseInt(e.target.value, 10))}
+                                                className="w-full h-3 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-[#6320EE] focus:outline-none border border-slate-800"
+                                            />
+                                            {/* Tick Marks along the line */}
+                                            <div className="flex justify-between items-center text-[10px] text-slate-400 font-mono mt-2.5 px-1 select-none flex-wrap gap-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => brandingForm.setData('navbar_brand_size', 24)}
+                                                    className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 24 ? 'text-[#FF6B00] font-black' : ''}`}
+                                                >
+                                                    24px (صغير)
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => brandingForm.setData('navbar_brand_size', 36)}
+                                                    className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 36 ? 'text-[#FF6B00] font-black' : ''}`}
+                                                >
+                                                    36px (متوسط)
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => brandingForm.setData('navbar_brand_size', 48)}
+                                                    className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 48 ? 'text-[#FF6B00] font-black' : ''}`}
+                                                >
+                                                    48px (كبير)
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => brandingForm.setData('navbar_brand_size', 64)}
+                                                    className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 64 ? 'text-[#FF6B00] font-black' : ''}`}
+                                                >
+                                                    64px (عريض)
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => brandingForm.setData('navbar_brand_size', 80)}
+                                                    className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 80 ? 'text-[#FF6B00] font-black' : ''}`}
+                                                >
+                                                    80px (فائق)
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => brandingForm.setData('navbar_brand_size', 96)}
+                                                    className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 96 ? 'text-[#FF6B00] font-black' : ''}`}
+                                                >
+                                                    96px (أقصى مقاس)
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Increase Stepper Button */}
+                                        <button
+                                            type="button"
+                                            onClick={() => brandingForm.setData('navbar_brand_size', Math.min(96, (parseInt(brandingForm.data.navbar_brand_size, 10) || 36) + 2))}
+                                            className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-[#6320EE] text-slate-300 hover:text-white border border-slate-700 hover:border-[#6320EE] flex items-center justify-center transition-all shrink-0 cursor-pointer shadow-sm active:scale-95"
+                                            title="زيادة الحجم بمقدار 2 بكسل"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </button>
+                                    </div>
+
+                                    {/* Quick Preset Buttons */}
+                                    <div className="flex items-center gap-2 pt-3 border-t border-slate-800/90 flex-wrap">
+                                        <span className="text-[11px] text-slate-400 font-medium">أحجام سريعة:</span>
+                                        {[
+                                            { px: 28, label: 'مدمج (28px)' },
+                                            { px: 36, label: 'قياسي (36px)' },
+                                            { px: 44, label: 'بارز (44px)' },
+                                            { px: 54, label: 'كبير (54px)' },
+                                            { px: 68, label: 'عريض (68px)' },
+                                        ].map((preset) => (
+                                            <button
+                                                key={preset.px}
+                                                type="button"
+                                                onClick={() => brandingForm.setData('navbar_brand_size', preset.px)}
+                                                className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                                    parseInt(brandingForm.data.navbar_brand_size, 10) === preset.px
+                                                        ? 'bg-[#6320EE] text-white shadow-md shadow-violet-600/30'
+                                                        : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
+                                                }`}
+                                            >
+                                                {preset.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Live Interactive Preview Showcase */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-xs">
+                                        <span className="font-semibold text-slate-300 flex items-center gap-1.5">
+                                            <span className="w-2 h-2 rounded-full bg-[#FF6B00] animate-pulse" />
+                                            <span>معاينة حية ومباشرة للشعار أثناء تحريك الخط:</span>
+                                        </span>
+                                        <span className="text-[11px] font-mono text-slate-400">
+                                            الارتفاع الحالي: <strong className="text-white">{brandingForm.data.navbar_brand_size}px</strong>
+                                        </span>
+                                    </div>
+
+                                    {/* Mock Landing Navbar Showcase */}
+                                    <div className="rounded-2xl border border-violet-900/50 bg-[#06081B] p-6 sm:p-8 flex flex-col items-center justify-center min-h-[140px] shadow-2xl relative overflow-hidden">
+                                        <div className="relative z-10 flex items-center justify-center w-full transition-all duration-150 py-2">
+                                            <BrandLogo
+                                                size={brandingForm.data.navbar_brand_size}
+                                                displayMode={brandingForm.data.navbar_brand_display}
+                                                forceVector={!branding?.logo}
+                                            />
+                                        </div>
+
+                                        <div className="mt-4 pt-3 border-t border-slate-800/80 w-full flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                                            <span>نمط العرض المعتمد: {brandingForm.data.navbar_brand_display === 'logo' ? 'الشعار فقط' : brandingForm.data.navbar_brand_display === 'name' ? 'الاسم فقط' : 'الشعار والاسم معاً'}</span>
+                                            <span>ارتفاع الشعار: {brandingForm.data.navbar_brand_size}px</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

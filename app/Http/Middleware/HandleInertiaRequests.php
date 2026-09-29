@@ -92,6 +92,13 @@ class HandleInertiaRequests extends Middleware
                 'site_slogan_ar' => EncryptedSettingService::get('site_slogan_ar', 'نمول حركة الغد'),
                 'site_slogan_en' => EncryptedSettingService::get('site_slogan_en', 'FINANCING WHAT MOVES TOMORROW'),
                 'navbar_brand_display' => EncryptedSettingService::get('navbar_brand_display', 'both'),
+                'navbar_brand_size' => match ($rawSize = EncryptedSettingService::get('navbar_brand_size', '36')) {
+                    'sm' => '28',
+                    'md' => '36',
+                    'lg' => '48',
+                    'xl' => '64',
+                    default => is_numeric($rawSize) ? (string) $rawSize : '36',
+                },
             ],
         ];
     }

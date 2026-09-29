@@ -8,7 +8,7 @@ import { usePage } from '@inertiajs/react';
  * - Automatically keeps browser favicon in sync with CMS branding settings
  */
 export default function BrandLogo({
-    size = 'md', // 'sm', 'md', 'lg', 'xl'
+    size = null, // 'sm', 'md', 'lg', 'xl' (defaults to branding?.navbar_brand_size || 'md')
     variant = 'full', // 'full', 'icon', 'vertical', 'stacked'
     showSlogan = false,
     className = '',
@@ -20,6 +20,7 @@ export default function BrandLogo({
 }) {
     const pageProps = usePage()?.props || {};
     const branding = pageProps.branding || {};
+    const effectiveSize = size ?? branding?.navbar_brand_size ?? 36;
 
     // Keep browser favicon in sync dynamically
     useEffect(() => {
@@ -33,47 +34,23 @@ export default function BrandLogo({
 
     const customLogo = !forceVector ? (logoUrl || (!isLight && branding?.logo_dark ? branding.logo_dark : branding?.logo)) : null;
 
-    // Sizing maps
-    const sizeConfig = {
-        sm: {
-            iconW: 36,
-            iconH: 26,
-            imgH: 'h-7 max-h-7',
-            textClass: 'text-base',
-            subTextClass: 'text-[9px]',
-            sloganClass: 'text-[8px]',
-            gap: 'gap-2',
-        },
-        md: {
-            iconW: 46,
-            iconH: 32,
-            imgH: 'h-9 max-h-9',
-            textClass: 'text-xl',
-            subTextClass: 'text-[11px]',
-            sloganClass: 'text-[10px]',
-            gap: 'gap-3',
-        },
-        lg: {
-            iconW: 64,
-            iconH: 45,
-            imgH: 'h-12 max-h-12',
-            textClass: 'text-2xl sm:text-3xl',
-            subTextClass: 'text-xs',
-            sloganClass: 'text-xs',
-            gap: 'gap-3.5',
-        },
-        xl: {
-            iconW: 96,
-            iconH: 68,
-            imgH: 'h-16 max-h-16',
-            textClass: 'text-4xl sm:text-5xl',
-            subTextClass: 'text-sm',
-            sloganClass: 'text-sm',
-            gap: 'gap-4',
-        },
+    // Convert effectiveSize to actual pixel height
+    const isNamedSize = typeof effectiveSize === 'string' && ['sm', 'md', 'lg', 'xl'].includes(effectiveSize);
+    const pixelHeight = isNamedSize
+        ? (effectiveSize === 'sm' ? 28 : effectiveSize === 'lg' ? 48 : effectiveSize === 'xl' ? 64 : 36)
+        : Math.max(20, Math.min(120, parseInt(effectiveSize, 10) || 36));
+
+    // Dynamic proportional sizing configuration
+    const cfg = {
+        iconW: Math.round(pixelHeight * (160 / 110)),
+        iconH: pixelHeight,
+        imgH: pixelHeight,
+        fontSize: Math.max(12, Math.round(pixelHeight * 0.52)),
+        subFontSize: Math.max(8, Math.round(pixelHeight * 0.28)),
+        sloganFontSize: Math.max(8, Math.round(pixelHeight * 0.26)),
+        gap: Math.max(6, Math.round(pixelHeight * 0.26)),
     };
 
-    const cfg = sizeConfig[size] || sizeConfig.md;
     const sloganAr = branding?.site_slogan_ar || 'نمول حركة الغد';
     const sloganEn = branding?.site_slogan_en || 'FINANCING WHAT MOVES TOMORROW';
     const siteName = branding?.site_name_ar || 'GoTransTech';
@@ -100,12 +77,12 @@ export default function BrandLogo({
     // 1. If display mode is set to 'name' only: render only the styled brand name
     if (effectiveMode === 'name') {
         return (
-            <div className={`inline-flex items-center text-start ${className}`}>
-                <div className={`font-black tracking-tight leading-none ${cfg.textClass} ${textClassName}`}>
+            <div className={`inline-flex items-center text-start ${className}`} style={{ gap: `${cfg.gap}px` }}>
+                <div className={`font-black tracking-tight leading-none ${textClassName}`} style={{ fontSize: `${cfg.fontSize}px` }}>
                     {renderBrandName()}
                 </div>
                 {showSlogan && (
-                    <span className={`font-semibold text-violet-600 dark:text-violet-400 ${cfg.sloganClass} mr-2`}>
+                    <span className="font-semibold text-violet-600 dark:text-violet-400 mr-2" style={{ fontSize: `${cfg.sloganFontSize}px` }}>
                         {sloganAr}
                     </span>
                 )}
@@ -186,14 +163,15 @@ export default function BrandLogo({
                     <img
                         src={customLogo}
                         alt={siteName}
-                        className={`${cfg.imgH} w-auto object-contain drop-shadow-[0_2px_8px_rgba(99,32,238,0.25)]`}
+                        style={{ height: `${cfg.imgH}px`, maxHeight: `${cfg.imgH}px` }}
+                        className="w-auto object-contain drop-shadow-[0_2px_8px_rgba(99,32,238,0.25)] transition-all duration-150"
                     />
                 </div>
             );
         }
         return (
             <div className={`inline-flex items-center justify-center shrink-0 ${className}`}>
-                <GttIcon />
+                <GttIcon width={cfg.iconW} height={cfg.iconH} />
             </div>
         );
     }
@@ -205,21 +183,22 @@ export default function BrandLogo({
                     <img
                         src={customLogo}
                         alt={siteName}
-                        className={`${size === 'xl' ? 'max-h-24' : 'max-h-16 sm:max-h-20'} w-auto object-contain drop-shadow-[0_4px_16px_rgba(99,32,238,0.35)]`}
+                        style={{ height: `${Math.round(cfg.imgH * 1.3)}px`, maxHeight: `${Math.round(cfg.imgH * 1.3)}px` }}
+                        className="w-auto object-contain drop-shadow-[0_4px_16px_rgba(99,32,238,0.35)] transition-all duration-150"
                     />
                 ) : (
-                    <GttIcon width={cfg.iconW * 1.3} height={cfg.iconH * 1.3} />
+                    <GttIcon width={Math.round(cfg.iconW * 1.3)} height={Math.round(cfg.iconH * 1.3)} />
                 )}
                 <div className="mt-3">
-                    <div className={`font-black tracking-tight leading-none ${cfg.textClass}`}>
+                    <div className={`font-black tracking-tight leading-none ${textClassName}`} style={{ fontSize: `${cfg.fontSize}px` }}>
                         {renderBrandName()}
                     </div>
                     {showSlogan && (
                         <div className="mt-1.5 flex flex-col items-center">
-                            <span className={`font-bold text-violet-600 dark:text-violet-400 ${cfg.sloganClass}`}>
+                            <span className="font-bold text-violet-600 dark:text-violet-400" style={{ fontSize: `${cfg.sloganFontSize}px` }}>
                                 {sloganAr}
                             </span>
-                            <span className={`font-mono tracking-widest uppercase text-slate-500 dark:text-slate-400 ${cfg.sloganClass} text-[8px]`}>
+                            <span className="font-mono tracking-widest uppercase text-slate-500 dark:text-slate-400 text-[8px]">
                                 {sloganEn}
                             </span>
                         </div>
@@ -231,26 +210,27 @@ export default function BrandLogo({
 
     // 3. Default 'both' (or 'full') horizontal variant: Logo + Text Name
     return (
-        <div className={`inline-flex items-center ${cfg.gap} ${className}`}>
+        <div className={`inline-flex items-center ${className}`} style={{ gap: `${cfg.gap}px` }}>
             {customLogo ? (
                 <img
                     src={customLogo}
                     alt={siteName}
-                    className={`${cfg.imgH} w-auto object-contain drop-shadow-[0_2px_10px_rgba(99,32,238,0.3)]`}
+                    style={{ height: `${cfg.imgH}px`, maxHeight: `${cfg.imgH}px` }}
+                    className="w-auto object-contain drop-shadow-[0_2px_10px_rgba(99,32,238,0.3)] shrink-0 transition-all duration-150"
                 />
             ) : (
-                <GttIcon />
+                <GttIcon width={cfg.iconW} height={cfg.iconH} />
             )}
-            <div className="flex flex-col text-start">
-                <div className={`font-black tracking-tight leading-none ${cfg.textClass} ${textClassName}`}>
+            <div className="flex flex-col text-start justify-center">
+                <div className={`font-black tracking-tight leading-none ${textClassName}`} style={{ fontSize: `${cfg.fontSize}px` }}>
                     {renderBrandName()}
                 </div>
                 {showSlogan ? (
-                    <span className={`font-semibold text-violet-600 dark:text-violet-400 ${cfg.sloganClass} mt-0.5 tracking-tight`}>
+                    <span className="font-semibold text-violet-600 dark:text-violet-400 mt-0.5 tracking-tight" style={{ fontSize: `${cfg.sloganFontSize}px` }}>
                         {sloganAr}
                     </span>
                 ) : (
-                    <span className={`font-mono text-slate-500 dark:text-slate-400 ${cfg.subTextClass} tracking-wider uppercase -mt-0.5`}>
+                    <span className="font-mono text-slate-500 dark:text-slate-400 tracking-wider uppercase -mt-0.5" style={{ fontSize: `${cfg.subFontSize}px` }}>
                         Logistics FinTech
                     </span>
                 )}

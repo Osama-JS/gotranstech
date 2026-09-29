@@ -24,6 +24,15 @@ class AdminLandingCmsController extends Controller
 
         $sections = LandingPageSection::orderBy('order')->get();
 
+        $rawSize = EncryptedSettingService::get('navbar_brand_size', '36');
+        $brandSize = match ($rawSize) {
+            'sm' => '28',
+            'md' => '36',
+            'lg' => '48',
+            'xl' => '64',
+            default => is_numeric($rawSize) ? (string) $rawSize : '36',
+        };
+
         $branding = [
             'logo' => $this->getAbsoluteUrl(EncryptedSettingService::get('platform_logo')),
             'logo_dark' => $this->getAbsoluteUrl(EncryptedSettingService::get('platform_logo_dark')),
@@ -33,6 +42,7 @@ class AdminLandingCmsController extends Controller
             'site_slogan_ar' => EncryptedSettingService::get('site_slogan_ar', 'نمول حركة الغد'),
             'site_slogan_en' => EncryptedSettingService::get('site_slogan_en', 'FINANCING WHAT MOVES TOMORROW'),
             'navbar_brand_display' => EncryptedSettingService::get('navbar_brand_display', 'both'),
+            'navbar_brand_size' => $brandSize,
         ];
 
         return Inertia::render('Admin/CMS/Index', [
@@ -64,6 +74,7 @@ class AdminLandingCmsController extends Controller
             'site_slogan_ar' => 'nullable|string|max:255',
             'site_slogan_en' => 'nullable|string|max:255',
             'navbar_brand_display' => 'nullable|string|in:logo,name,both',
+            'navbar_brand_size' => 'nullable|string|max:10',
         ]);
 
         $publicBrandingDir = public_path('storage/branding');
@@ -154,13 +165,16 @@ class AdminLandingCmsController extends Controller
         if ($request->filled('navbar_brand_display')) {
             EncryptedSettingService::set('navbar_brand_display', $request->input('navbar_brand_display'), 'branding', false, 'طريقة عرض الهوية في الـ Navbar', null, $userId);
         }
+        if ($request->filled('navbar_brand_size')) {
+            EncryptedSettingService::set('navbar_brand_size', $request->input('navbar_brand_size'), 'branding', false, 'حجم عرض الشعار في صفحة الهبوط', null, $userId);
+        }
 
         $this->auditLogService->log(
             'updated',
             null,
             [],
             $request->except(['logo', 'logo_dark', 'favicon']),
-            'تحديث إعدادات هوية المنصة، الشعار الرسمي، وخيارات عرض الـ Navbar'
+            'تحديث إعدادات هوية المنصة، الشعار الرسمي، وخيارات وحجم عرض الـ Navbar'
         );
 
         return back()->with('success', 'تم حفظ وتحديث هوية الشعار، خيارات العرض، وأيقونة المتصفح بنجاح.');
