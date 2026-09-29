@@ -115,7 +115,7 @@ class DatabaseSeeder extends Seeder
             ['user_id' => $investorUser->id, 'wallet_type' => 'investor_investment'],
             ['currency' => 'SAR', 'balance' => 150000.00, 'locked_balance' => 0.00]
         );
-        
+
         $commWallet = Wallet::firstOrCreate(
             ['user_id' => $investorUser->id, 'wallet_type' => 'investor_commission'],
             ['currency' => 'SAR', 'balance' => 12500.00, 'locked_balance' => 0.00]
@@ -301,7 +301,7 @@ class DatabaseSeeder extends Seeder
             ['key' => 'default_currency', 'value' => 'SAR', 'group' => 'general', 'label' => 'العملة الافتراضية'],
             ['key' => 'platform_default_commission_rate', 'value' => '10.00', 'group' => 'general', 'label' => 'نسبة عمولة المنصة الافتراضية للشركات (%)'],
             ['key' => 'investor_default_share_rate', 'value' => '70.00', 'group' => 'general', 'label' => 'نسبة أرباح المستثمر الافتراضية من صافي العمولة (%)'],
-            
+
             // HyperPay Settings
             ['key' => 'hyperpay_environment', 'value' => 'test', 'group' => 'hyperpay', 'label' => 'بيئة التشغيل (test / live)'],
             ['key' => 'hyperpay_access_token', 'value' => 'OGFjZGE0Yzg4Yzg5Mjg5YTAxOGM4OTJhZjkwNzAwMTh8c2VjcmV0', 'group' => 'hyperpay', 'is_encrypted' => true, 'label' => 'مفتاح Access Token'],
@@ -370,6 +370,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $this->call(DemoPlatformSeeder::class);
+        // $this->call(DemoPlatformSeeder::class);
     }
 }
