@@ -25,7 +25,13 @@ class AdminSettingsController extends Controller
         // Ensure default settings exist for all groups
         $this->ensureDefaultSettingsExist();
 
-        $settings = SystemSetting::where('group', $group)->get()->map(function ($s) {
+        // Delete obsolete settings
+        SystemSetting::where('key', 'under_development_allow_dismiss')->delete();
+
+        $settings = SystemSetting::where('group', $group)
+            ->where('key', '!=', 'under_development_allow_dismiss')
+            ->get()
+            ->map(function ($s) {
             return [
                 'id' => $s->id,
                 'key' => $s->key,
@@ -73,6 +79,12 @@ class AdminSettingsController extends Controller
                 'label_ar' => 'إعدادات قوالب وطباعة الـ PDF',
                 'label_en' => 'PDF Templates & Printing',
                 'desc' => 'تخصيص ترويسة وتذييل صفحات العقود وسندات السحب، شعار الطباعة، والختم الرسمي والشروط القانونية',
+            ],
+            [
+                'key' => 'maintenance',
+                'label_ar' => 'وضع التطوير والإعلانات',
+                'label_en' => 'Under Development & Notices',
+                'desc' => 'شريط التنبيه المتحرك أسفل المنصة عند كون المنصة قيد التطوير أو التحديث، والنص المخصص',
             ],
         ];
 
@@ -182,6 +194,12 @@ class AdminSettingsController extends Controller
             ['key' => 'pdf_stamp_title', 'value' => 'الختم والتوقيع الرقمي المعتمد - منصة GoTransTech', 'group' => 'pdf_branding', 'label' => 'عنوان الختم والتوقيع الإلكتروني للوثائق', 'is_encrypted' => false],
             ['key' => 'pdf_watermark_text', 'value' => 'GoTransTech - معتمد رسمياً', 'group' => 'pdf_branding', 'label' => 'نص العلامة المائية للوثائق المطبوعة', 'is_encrypted' => false],
             ['key' => 'pdf_print_logo', 'value' => '', 'group' => 'pdf_branding', 'label' => 'رابط أو مسار الشعار المخصص للطباعة (فارغ لاستخدام الشعار الرسمي للمنصة)', 'is_encrypted' => false],
+
+            // Under Development & Announcement Banner
+            ['key' => 'is_under_development', 'value' => 'no', 'group' => 'maintenance', 'label' => 'تفعيل شريط التنبيه (المنصة قيد التطوير)', 'is_encrypted' => false, 'description' => 'عند التفعيل، سيظهر شريط تنبيه متحرك احترافي مثبت إجبارياً أسفل كافة صفحات المنصة طالما أنه مفعل.'],
+            ['key' => 'under_development_text', 'value' => '🚀 تنبيه: المنصة حالياً قيد التطوير والتحديث المستمر | يجري إطلاق مزايا استثمارية جديدة وتحسينات تقنية متقدمة لخدمتكم بشكل أفضل.', 'group' => 'maintenance', 'label' => 'نص شريط التطوير المتحرك (Ticker Text)', 'is_encrypted' => false, 'description' => 'النص الذي سيتحرك بسلاسة عبر الشريط السفلي ويمكن للمشرف تعديله في أي وقت.'],
+            ['key' => 'under_development_badge', 'value' => 'نسخة تجريبية قيد التطوير', 'group' => 'maintenance', 'label' => 'عنوان الشارة الثابتة (Badge)', 'is_encrypted' => false, 'description' => 'النص التعريفي المكتوب على الشارة الثابتة في بداية الشريط.'],
+            ['key' => 'under_development_speed', 'value' => 'normal', 'group' => 'maintenance', 'label' => 'سرعة حركة الشريط', 'is_encrypted' => false, 'description' => 'حدد سرعة دوران وتمرير النص (بطيء / عادي / سريع).'],
         ];
 
         foreach ($defaults as $item) {

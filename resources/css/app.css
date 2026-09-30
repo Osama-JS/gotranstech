@@ -448,3 +448,73 @@ html.light .dialog-container {
     background-color: #ffffff !important;
     border-color: #e2e8f0 !important;
 }
+
+/* Under Development Marquee Ticker Animations */
+@keyframes ticker-rtl {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(50%, 0, 0);
+    }
+}
+
+@keyframes ticker-ltr {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+.animate-ticker-rtl {
+    display: inline-flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: ticker-rtl 35s linear infinite;
+}
+
+.animate-ticker-rtl-slow {
+    display: inline-flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: ticker-rtl 55s linear infinite;
+}
+
+.animate-ticker-rtl-fast {
+    display: inline-flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: ticker-rtl 20s linear infinite;
+}
+
+.animate-ticker-ltr {
+    display: inline-flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: ticker-ltr 35s linear infinite;
+}
+
+.animate-ticker-ltr-slow {
+    display: inline-flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: ticker-ltr 55s linear infinite;
+}
+
+.animate-ticker-ltr-fast {
+    display: inline-flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: ticker-ltr 20s linear infinite;
+}
+
+.animate-ticker-rtl:hover,
+.animate-ticker-ltr:hover,
+.animate-ticker-rtl-slow:hover,
+.animate-ticker-ltr-slow:hover,
+.animate-ticker-rtl-fast:hover,
+.animate-ticker-ltr-fast:hover {
+    animation-play-state: paused;
+}

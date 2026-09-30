@@ -4,6 +4,7 @@ import { Lock, Mail, User, Phone, Building2, CreditCard, ShieldCheck } from 'luc
 import Toast from '../../Components/Toast';
 import PhoneInput from '../../Components/PhoneInput';
 import BrandLogo from '../../Components/BrandLogo';
+import UnderDevelopmentBanner from '../../Components/UnderDevelopmentBanner';
 
 export default function Register() {
     const [role, setRole] = useState('investor'); // investor, company
@@ -214,6 +215,9 @@ export default function Register() {
                     </Link>
                 </div>
             </div>
+
+            {/* Bottom Under Development Banner */}
+            <UnderDevelopmentBanner />
         </div>
     );
 }

@@ -100,6 +100,12 @@ class HandleInertiaRequests extends Middleware
                     default => is_numeric($rawSize) ? (string) $rawSize : '36',
                 },
             ],
+            'underDevelopment' => [
+                'enabled' => in_array(EncryptedSettingService::get('is_under_development', 'no'), ['yes', 'true', '1', 1, true], true),
+                'text' => EncryptedSettingService::get('under_development_text', '🚀 تنبيه: المنصة حالياً قيد التطوير والتحديث المستمر | يجري إطلاق مزايا استثمارية جديدة وتحسينات تقنية متقدمة لخدمتكم بشكل أفضل.'),
+                'badge' => EncryptedSettingService::get('under_development_badge', 'نسخة تجريبية قيد التطوير'),
+                'speed' => EncryptedSettingService::get('under_development_speed', 'normal'),
+            ],
         ];
     }
 }

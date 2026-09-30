@@ -23,8 +23,12 @@ import {
     AlertTriangle,
     Zap,
     Printer,
-    FileText
+    FileText,
+    Wrench,
+    Megaphone,
+    Bell
 } from 'lucide-react';
+import Select2 from '../../../Components/Select2';
 
 export default function AdminSettings({ settings, currentGroup, groups }) {
     const initialSettings = settings.reduce((acc, s) => {
@@ -87,6 +91,7 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
             case 'sms': return MessageSquare;
             case 'security': return ShieldCheck;
             case 'pdf_branding': return Printer;
+            case 'maintenance': return Wrench;
             default: return Settings;
         }
     };
@@ -122,7 +127,7 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                 />
 
                 {/* Tabs Navigation */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl backdrop-blur-md">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl backdrop-blur-md">
                     {groups.map((g) => {
                         const IconComp = getGroupIcon(g.key);
                         const isActive = currentGroup === g.key;
@@ -187,18 +192,38 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                         </div>
                     )}
 
+                    {/* Under Development Banner Notice */}
+                    {currentGroup === 'maintenance' && (
+                        <div className="p-4 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-start gap-3">
+                            <Wrench className="w-5 h-5 text-violet-400 shrink-0 mt-0.5" />
+                            <div className="text-xs text-violet-200 space-y-1">
+                                <span className="font-bold block text-white">إشعار شريط المنصة قيد التطوير:</span>
+                                <p className="leading-relaxed text-slate-300">
+                                    عند تفعيل هذا الخيار، سيظهر شريط تنبيه متحرك احترافي مثبت في أسفل المنصة على مدار الساعة في كافة الصفحات (صفحة الهبوط، تسجيل الدخول، لوحة التحكم، وبوابات المستثمرين والشركات). يتيح لك إبلاغ الزوار والمستخدمين بمرحلة التطوير مع تحديث فوري للنص في أي وقت.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Form */}
                     <form onSubmit={submit} className="space-y-5">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {settings.map((s) => {
                                 const isPassword = s.is_encrypted && !visiblePasswords[s.key];
-                                const isSelectField = s.key === 'hyperpay_mode' || s.key === 'require_kyc_verification' || s.key === 'enable_two_factor_auth' || s.key === 'sms_provider' || s.key === 'mail_encryption';
+                                const isSelectField = s.key === 'hyperpay_mode' || 
+                                    s.key === 'require_kyc_verification' || 
+                                    s.key === 'enable_two_factor_auth' || 
+                                    s.key === 'sms_provider' || 
+                                    s.key === 'mail_encryption' ||
+                                    s.key === 'is_under_development' ||
+                                    s.key === 'under_development_speed';
+                                const isTextareaField = s.key === 'under_development_text' || s.key === 'pdf_footer_legal_text';
 
                                 return (
                                     <div 
                                         key={s.id} 
                                         className={`p-4 rounded-2xl bg-slate-950/70 border border-slate-800/90 space-y-2 transition-all hover:border-slate-700 ${
-                                            s.key.includes('token') || s.key.includes('url') || s.key.includes('host') || s.key.includes('password')
+                                            s.key.includes('token') || s.key.includes('url') || s.key.includes('host') || s.key.includes('password') || s.key === 'under_development_text' || s.key === 'pdf_footer_legal_text'
                                                 ? 'md:col-span-2'
                                                 : ''
                                         }`}
@@ -221,44 +246,66 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
 
                                         <div className="relative">
                                             {isSelectField ? (
-                                                <select
+                                                (() => {
+                                                    let optionsList = [];
+                                                    if (s.key === 'hyperpay_mode') {
+                                                        optionsList = [
+                                                            { value: 'test', label: 'تجريبي (Test Sandbox)', description: 'بيئة اختبارية لا تسحب أموالاً حقيقية' },
+                                                            { value: 'live', label: 'إنتاجي حقيقي (Live Production)', description: 'البيئة التشغيلية الحقيقية' },
+                                                        ];
+                                                    } else if (s.key === 'require_kyc_verification') {
+                                                        optionsList = [
+                                                            { value: 'yes', label: 'نعم، إلزامي لجميع الحسابات', description: 'يمنع الاستثمار والتمويل قبل رفع الوثائق' },
+                                                            { value: 'no', label: 'لا، اختياري', description: 'السماح بالوصول دون تحقق إلزامي' },
+                                                        ];
+                                                    } else if (s.key === 'enable_two_factor_auth') {
+                                                        optionsList = [
+                                                            { value: 'optional', label: 'اختياري حسب رغبة المستخدم', description: 'يمكن للمستخدم تفعيله أو تركه' },
+                                                            { value: 'forced', label: 'إلزامي لجميع المشرفين والمستثمرين', description: 'فرض التحقق الثنائي بكود OTP' },
+                                                        ];
+                                                    } else if (s.key === 'sms_provider') {
+                                                        optionsList = [
+                                                            { value: 'unifonic', label: 'Unifonic (يونيفونيك)', description: 'بوابة الرسائل السعودية المعتمدة' },
+                                                            { value: 'twilio', label: 'Twilio', description: 'البوابة العالمية Twilio SMS' },
+                                                            { value: 'taqnyat', label: 'تقنيات (Taqnyat)', description: 'بوابة تقنيات للرسائل القصيرة' },
+                                                        ];
+                                                    } else if (s.key === 'mail_encryption') {
+                                                        optionsList = [
+                                                            { value: 'tls', label: 'TLS (المنفذ 587)', description: 'تشفير النقل الموصى به' },
+                                                            { value: 'ssl', label: 'SSL (المنفذ 465)', description: 'تشفير SSL المباشر' },
+                                                            { value: 'null', label: 'بدون تشفير', description: 'اتصال غير مشفر' },
+                                                        ];
+                                                    } else if (s.key === 'is_under_development') {
+                                                        optionsList = [
+                                                            { value: 'no', label: 'معطل (وضع التشغيل الطبيعي)', description: 'إخفاء شريط التنبيه وتعمل المنصة بالشكل المعتاد' },
+                                                            { value: 'yes', label: 'مفعل (إظهار شريط المنصة قيد التطوير)', description: 'تثبيت الشريط المتحرك إجبارياً أسفل كافة الصفحات' },
+                                                        ];
+                                                    } else if (s.key === 'under_development_speed') {
+                                                        optionsList = [
+                                                            { value: 'slow', label: 'حركة بطيئة وهادئة (Slow)', description: 'دوران هادئ ومريح للعين' },
+                                                            { value: 'normal', label: 'حركة معتدلة وسلسة (Normal - مستحسن)', description: 'السرعة القياسية لسهولة قراءة الإعلان' },
+                                                            { value: 'fast', label: 'حركة سريعة (Fast)', description: 'تمرير سريع للتنبيهات العاجلة' },
+                                                        ];
+                                                    }
+
+                                                    return (
+                                                        <Select2
+                                                            value={data.settings[s.key] !== undefined ? data.settings[s.key] : (s.value || '')}
+                                                            onChange={(val) => handleSettingChange(s.key, val)}
+                                                            options={optionsList}
+                                                            placeholder={`اختر ${s.label || s.key}...`}
+                                                            searchPlaceholder="ابحث في الخيارات..."
+                                                        />
+                                                    );
+                                                })()
+                                            ) : isTextareaField ? (
+                                                <textarea
+                                                    rows={3}
                                                     value={data.settings[s.key] !== undefined ? data.settings[s.key] : (s.value || '')}
                                                     onChange={(e) => handleSettingChange(s.key, e.target.value)}
-                                                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500"
-                                                >
-                                                    {s.key === 'hyperpay_mode' && (
-                                                        <>
-                                                            <option value="test">تجريبي (Test Sandbox)</option>
-                                                            <option value="live">إنتاجي حقيقي (Live Production)</option>
-                                                        </>
-                                                    )}
-                                                    {s.key === 'require_kyc_verification' && (
-                                                        <>
-                                                            <option value="yes">نعم، إلزامي لجميع الحسابات</option>
-                                                            <option value="no">لا، اختياري</option>
-                                                        </>
-                                                    )}
-                                                    {s.key === 'enable_two_factor_auth' && (
-                                                        <>
-                                                            <option value="optional">اختياري حسب رغبة المستخدم</option>
-                                                            <option value="forced">إلزامي لجميع المشرفين والمستثمرين</option>
-                                                        </>
-                                                    )}
-                                                    {s.key === 'sms_provider' && (
-                                                        <>
-                                                            <option value="unifonic">Unifonic (يونيفونيك)</option>
-                                                            <option value="twilio">Twilio</option>
-                                                            <option value="taqnyat">تقنيات (Taqnyat)</option>
-                                                        </>
-                                                    )}
-                                                    {s.key === 'mail_encryption' && (
-                                                        <>
-                                                            <option value="tls">TLS (المنفذ 587)</option>
-                                                            <option value="ssl">SSL (المنفذ 465)</option>
-                                                            <option value="null">بدون تشفير</option>
-                                                        </>
-                                                    )}
-                                                </select>
+                                                    placeholder={s.label || s.key}
+                                                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-violet-500 font-sans leading-relaxed"
+                                                />
                                             ) : (
                                                 <div className="relative">
                                                     <input

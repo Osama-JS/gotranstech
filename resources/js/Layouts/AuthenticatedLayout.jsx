@@ -35,6 +35,7 @@ import Toast from '../Components/Toast';
 import ThemeToggle from '../Components/ThemeToggle';
 import QuickSearchModal from '../Components/QuickSearchModal';
 import BrandLogo from '../Components/BrandLogo';
+import UnderDevelopmentBanner from '../Components/UnderDevelopmentBanner';
 
 export default function AuthenticatedLayout({ children, title }) {
     const { auth, locale, landingUrl } = usePage().props;
@@ -351,6 +352,9 @@ export default function AuthenticatedLayout({ children, title }) {
                     </div>
                 </main>
             </div>
+
+            {/* Bottom Under Development Marquee Banner */}
+            <UnderDevelopmentBanner />
         </div>
     );
 }

@@ -3,6 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
 import Toast from '../../Components/Toast';
 import BrandLogo from '../../Components/BrandLogo';
+import UnderDevelopmentBanner from '../../Components/UnderDevelopmentBanner';
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm({
@@ -104,6 +105,9 @@ export default function Login() {
                     </Link>
                 </div>
             </div>
+
+            {/* Bottom Under Development Banner */}
+            <UnderDevelopmentBanner />
         </div>
     );
 }

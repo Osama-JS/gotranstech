@@ -33,6 +33,7 @@ import {
     ChevronLeft,
 } from 'lucide-react';
 import BrandLogo from '../../Components/BrandLogo';
+import UnderDevelopmentBanner from '../../Components/UnderDevelopmentBanner';
 
 const LinkedinIcon = ({ className = "w-4 h-4" }) => (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -1378,6 +1379,9 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                     </div>
                 </footer>
             )}
+
+            {/* Bottom Under Development Banner */}
+            <UnderDevelopmentBanner />
         </div>
     );
 }
