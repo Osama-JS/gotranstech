@@ -36,18 +36,6 @@ export default function AdminAnalytics({
 }) {
     const { t, locale } = useTranslation();
     const isAr = locale === 'ar';
-    const { t, locale } = useTranslation();
-    const isAr = locale === 'ar';
-    period = '30days',
-    kpis = {},
-    fundingTrend = [],
-    cityDistribution = [],
-    cashflowTrend = [],
-    userGrowthTrend = [],
-    taskStatusCounts = {},
-    topInvestors = [],
-    topCompanies = [],
-}) {
     const [hoveredFundingPoint, setHoveredFundingPoint] = useState(null);
 
     const handlePeriodChange = (newPeriod) => {
