@@ -3,7 +3,7 @@ import { Head, router, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
 import Modal from '../../../Components/Modal';
-import { useTranslation } from '@/Utils/useTranslation';
+import { useTranslation } from '@/Utils/i18n';
 import { 
     Settings, 
     Lock, 

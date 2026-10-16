@@ -5,7 +5,7 @@ import AdminPageHeader from '@/Components/AdminPageHeader';
 import Select2 from '@/Components/Select2';
 import notificationSound from '@/Services/NotificationSound';
 import browserNotification from '@/Services/BrowserNotification';
-import { useTranslation } from '@/Utils/useTranslation';
+import { useTranslation } from '@/Utils/i18n';
 import {
     Bell,
     Shield,

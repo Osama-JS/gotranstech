@@ -2,7 +2,7 @@ import React from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import AdminPageHeader from '@/Components/AdminPageHeader';
-import { useTranslation } from '@/Utils/useTranslation';
+import { useTranslation } from '@/Utils/i18n';
 import {
     Server,
     Database,

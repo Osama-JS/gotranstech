@@ -7,7 +7,7 @@ import SearchableSelect from '../../../Components/SearchableSelect';
 import DatePicker from '../../../Components/DatePicker';
 import Pagination from '../../../Components/Pagination';
 import Modal from '../../../Components/Modal';
-import { useTranslation } from '@/Utils/useTranslation';
+import { useTranslation } from '@/Utils/i18n';
 import { 
     History, 
     Search, 

@@ -4,7 +4,7 @@ import axios from 'axios';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import AdminPageHeader from '@/Components/AdminPageHeader';
 import ConfirmDialog from '@/Components/ConfirmDialog';
-import { useTranslation } from '@/Utils/useTranslation';
+import { useTranslation } from '@/Utils/i18n';
 import notificationSound from '@/Services/NotificationSound';
 import {
     Database,
