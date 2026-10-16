@@ -85,7 +85,7 @@ class CompanyApiKeyController extends Controller
             'last_key_used_at' => $apiKeys->whereNotNull('last_used_at')->sortByDesc('last_used_at')->first()?->last_used_at?->diffForHumans() ?? 'لم يُستخدم بعد',
         ];
 
-        $apiBaseUrl = url('/api/v1');
+        $apiBaseUrl = $this->getApiBaseUrl();
 
         return Inertia::render('Company/Api/Index', [
             'company' => $company,
@@ -122,11 +122,25 @@ class CompanyApiKeyController extends Controller
         return Inertia::render('Company/Api/Sandbox', [
             'company' => $company,
             'apiKeys' => $apiKeys,
-            'apiBaseUrl' => url('/api/v1'),
+            'apiBaseUrl' => $this->getApiBaseUrl(),
             'recentTasks' => $recentTasks,
             'isTestMode' => $isTestMode,
             'environment' => $company->environment ?? 'test',
         ]);
+    }
+
+    /**
+     * Retrieve the public API Base URL for external companies.
+     * Uses EXTERNAL_API_BASE_URL if configured, otherwise falls back to local /api/v1.
+     */
+    protected function getApiBaseUrl(): string
+    {
+        $customUrl = config('services.external_api.base_url');
+        if (!empty($customUrl)) {
+            return rtrim($customUrl, '/');
+        }
+
+        return url('/api/v1');
     }
 
     public function generate(Request $request)
