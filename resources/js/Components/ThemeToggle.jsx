@@ -19,6 +19,7 @@ export default function ThemeToggle({ className = '' }) {
             document.documentElement.classList.add('dark');
         }
         localStorage.setItem('gotech_theme', newTheme);
+        window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: newTheme } }));
     };
 
     const toggleTheme = () => {

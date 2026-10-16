@@ -85,7 +85,7 @@ class HandleInertiaRequests extends Middleware
             'landingUrl' => url('/'),
             'branding' => [
                 'logo' => ($pLogo = EncryptedSettingService::get('platform_logo')) ? (str_starts_with($pLogo, 'http') ? $pLogo : asset(ltrim($pLogo, '/'))) : null,
-                'logo_dark' => ($pLogoDark = EncryptedSettingService::get('platform_logo_dark')) ? (str_starts_with($pLogoDark, 'http') ? $pLogoDark : asset(ltrim($pLogoDark, '/'))) : null,
+                'logo_dark' => ($pLogoDark = (EncryptedSettingService::get('platform_logo_dark') ?: $pLogo)) ? (str_starts_with($pLogoDark, 'http') ? $pLogoDark : asset(ltrim($pLogoDark, '/'))) : null,
                 'favicon' => ($pFavicon = EncryptedSettingService::get('platform_favicon')) ? (str_starts_with($pFavicon, 'http') ? $pFavicon : asset(ltrim($pFavicon, '/'))) : null,
                 'site_name_ar' => EncryptedSettingService::get('site_name_ar', 'GoTransTech'),
                 'site_name_en' => EncryptedSettingService::get('site_name_en', 'GoTransTech Platform'),

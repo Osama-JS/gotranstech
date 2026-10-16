@@ -22,6 +22,35 @@ export default function BrandLogo({
     const branding = pageProps.branding || {};
     const effectiveSize = size ?? branding?.navbar_brand_size ?? 36;
 
+    // Detect dark vs light mode dynamically
+    const [isDarkMode, setIsDarkMode] = React.useState(() => {
+        if (typeof document !== 'undefined') {
+            return !document.documentElement.classList.contains('light');
+        }
+        return true;
+    });
+
+    React.useEffect(() => {
+        if (typeof document === 'undefined') return;
+        const checkTheme = () => {
+            const hasLight = document.documentElement.classList.contains('light');
+            setIsDarkMode(!hasLight);
+        };
+        checkTheme();
+
+        const observer = new MutationObserver(checkTheme);
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class'],
+        });
+
+        window.addEventListener('theme-changed', checkTheme);
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('theme-changed', checkTheme);
+        };
+    }, []);
+
     // Keep browser favicon in sync dynamically
     useEffect(() => {
         if (branding?.favicon) {
@@ -32,7 +61,14 @@ export default function BrandLogo({
         }
     }, [branding?.favicon]);
 
-    const customLogo = !forceVector ? (logoUrl || (!isLight && branding?.logo_dark ? branding.logo_dark : branding?.logo)) : null;
+    // In Light mode: prioritize branding.logo (Light Mode logo), fallback to branding.logo_dark
+    // In Dark mode: prioritize branding.logo_dark (Dark Mode logo), fallback to branding.logo
+    const activeIsLight = isLight || !isDarkMode;
+    const chosenLogo = activeIsLight
+        ? (branding?.logo || branding?.logo_dark)
+        : (branding?.logo_dark || branding?.logo);
+
+    const customLogo = !forceVector ? (logoUrl || chosenLogo) : null;
 
     // Convert effectiveSize to actual pixel height
     const isNamedSize = typeof effectiveSize === 'string' && ['sm', 'md', 'lg', 'xl'].includes(effectiveSize);

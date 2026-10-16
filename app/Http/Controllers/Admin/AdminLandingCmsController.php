@@ -33,9 +33,12 @@ class AdminLandingCmsController extends Controller
             default => is_numeric($rawSize) ? (string) $rawSize : '36',
         };
 
+        $rawLogo = EncryptedSettingService::get('platform_logo');
+        $rawLogoDark = EncryptedSettingService::get('platform_logo_dark') ?: $rawLogo;
+
         $branding = [
-            'logo' => $this->getAbsoluteUrl(EncryptedSettingService::get('platform_logo')),
-            'logo_dark' => $this->getAbsoluteUrl(EncryptedSettingService::get('platform_logo_dark')),
+            'logo' => $this->getAbsoluteUrl($rawLogo),
+            'logo_dark' => $this->getAbsoluteUrl($rawLogoDark),
             'favicon' => $this->getAbsoluteUrl(EncryptedSettingService::get('platform_favicon')),
             'site_name_ar' => EncryptedSettingService::get('site_name_ar', 'GoTransTech'),
             'site_name_en' => EncryptedSettingService::get('site_name_en', 'GoTransTech Platform'),

@@ -26,7 +26,9 @@ import {
     Maximize2,
     Sliders,
     Minus,
-    RotateCcw
+    RotateCcw,
+    Sun,
+    Moon
 } from 'lucide-react';
 
 export default function AdminLandingCms({ sections = [], branding = {}, landingUrl = null }) {
@@ -51,6 +53,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
     const previewUrl = getLandingPageUrl();
 
     const [logoPreview, setLogoPreview] = useState(null);
+    const [logoDarkPreview, setLogoDarkPreview] = useState(null);
     const [faviconPreview, setFaviconPreview] = useState(null);
 
     // Branding & Logo Form
@@ -74,6 +77,14 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
         }
     };
 
+    const handleLogoDarkChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            brandingForm.setData('logo_dark', file);
+            setLogoDarkPreview(URL.createObjectURL(file));
+        }
+    };
+
     const handleFaviconChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -89,13 +100,18 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
             forceFormData: true,
             onSuccess: () => {
                 setLogoPreview(null);
+                setLogoDarkPreview(null);
                 setFaviconPreview(null);
             },
         });
     };
 
     const handleDeleteBrandingItem = (type) => {
-        const label = type === 'logo' ? t('admin.cms.platform_logo_title') : (type === 'favicon' ? t('admin.cms.browser_favicon_title') : t('admin.cms.platform_logo_title'));
+        const label = type === 'logo'
+            ? (t('admin.cms.platform_logo_light_title') || 'شعار الوضع النهاري')
+            : (type === 'logo_dark'
+                ? (t('admin.cms.platform_logo_dark_title') || 'شعار الوضع الليلي')
+                : (t('admin.cms.browser_favicon_title') || 'أيقونة المتصفح Favicon'));
         if (confirm(t('admin.cms.confirm_delete_branding', { label }))) {
             router.delete(route('admin.cms.branding.delete', type), {
                 preserveScroll: true,
@@ -308,82 +324,88 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                         </div>
 
                         <form onSubmit={submitBranding} className="space-y-6">
-                            {/* Grid for Logo & Favicon */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* 1. Main Logo Card */}
-                                <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-800 space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <label className="text-xs font-bold text-white flex items-center gap-2">
-                                            <Image className="w-4 h-4 text-violet-400" />
-                                            <span>{t('admin.cms.platform_logo_title')}</span>
-                                        </label>
-                                        {branding?.logo && (
-                                            <button
-                                                type="button"
-                                                onClick={() => handleDeleteBrandingItem('logo')}
-                                                className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 font-semibold transition-colors cursor-pointer"
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                                <span>{t('admin.cms.btn_restore_default')}</span>
-                                            </button>
-                                        )}
+                            {/* Grid for Light Logo, Dark Logo & Favicon */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {/* 1. Light Mode Logo Card */}
+                                <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-800 space-y-4 flex flex-col justify-between">
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-xs font-bold text-white flex items-center gap-2">
+                                                <Sun className="w-4 h-4 text-amber-400" />
+                                                <span>{t('admin.cms.platform_logo_light_title') || 'شعار الوضع النهاري'}</span>
+                                            </label>
+                                            {branding?.logo && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteBrandingItem('logo')}
+                                                    className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 font-semibold transition-colors cursor-pointer"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                    <span>{t('admin.cms.btn_restore_default') || 'استعادة الافتراضي'}</span>
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {/* Light Mode Preview Box (Simulates Light Background) */}
+                                        <div className="p-4 rounded-xl bg-slate-100 border border-dashed border-slate-300 flex flex-col items-center justify-center min-h-[140px] text-center relative overflow-hidden shadow-inner">
+                                            <span className="absolute top-2 start-2 text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-800 border border-amber-500/20 flex items-center gap-1">
+                                                <Sun className="w-2.5 h-2.5 text-amber-600" />
+                                                <span>خلفية نهارية فاتحة</span>
+                                            </span>
+                                            {logoPreview || branding?.logo ? (
+                                                <div className="space-y-2 w-full flex flex-col items-center pt-3">
+                                                    <img
+                                                        src={logoPreview || branding?.logo}
+                                                        alt="شعار الوضع النهاري"
+                                                        className="max-h-16 w-auto object-contain mx-auto drop-shadow-sm"
+                                                    />
+                                                    <span className="text-[10px] text-slate-500 block font-mono">
+                                                        {logoPreview ? (t('admin.cms.preview_selected_file') || 'معاينة الملف المختار') : (t('admin.cms.current_active_logo') || 'الشعار النهاري النشط')}
+                                                    </span>
+                                                    {branding?.logo && !logoPreview && (
+                                                        <div className="w-full text-[10px] text-slate-700 font-mono bg-white/90 p-2 rounded-lg border border-slate-200 break-all select-all flex items-center justify-between gap-2 shadow-xs">
+                                                            <span className="truncate text-right ltr:text-left direction-ltr">{branding.logo}</span>
+                                                            <a
+                                                                href={branding.logo}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-violet-600 hover:text-violet-800 shrink-0 p-1 hover:bg-slate-100 rounded"
+                                                                title={t('admin.cms.open_image_tab') || 'فتح الصورة'}
+                                                            >
+                                                                <ExternalLink className="w-3.5 h-3.5" />
+                                                            </a>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2 pt-3">
+                                                    <BrandLogo size="md" isLight={true} forceVector={true} />
+                                                    <span className="text-[10px] text-slate-500 block">
+                                                        {t('admin.cms.default_vector_logo') || 'الشعار المتجهي الافتراضي'}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    {/* Preview Box */}
-                                    <div className="p-4 rounded-xl bg-slate-900/90 border border-dashed border-slate-700 flex flex-col items-center justify-center min-h-[140px] text-center relative overflow-hidden">
-                                        {logoPreview || branding?.logo ? (
-                                            <div className="space-y-2 w-full flex flex-col items-center">
-                                                <img
-                                                    src={logoPreview || branding?.logo}
-                                                    alt={t('admin.cms.logo_preview_alt')}
-                                                    className="max-h-16 w-auto object-contain mx-auto drop-shadow-md"
-                                                />
-                                                <span className="text-[10px] text-slate-400 block font-mono">
-                                                    {logoPreview ? t('admin.cms.preview_selected_file') : t('admin.cms.current_active_logo')}
-                                                </span>
-                                                {branding?.logo && !logoPreview && (
-                                                    <div className="w-full text-[10px] text-violet-300 font-mono bg-violet-950/60 p-2 rounded-lg border border-violet-800/40 break-all select-all flex items-center justify-between gap-2">
-                                                        <span className="truncate text-right ltr:text-left direction-ltr">{branding.logo}</span>
-                                                        <a
-                                                            href={branding.logo}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-violet-400 hover:text-white shrink-0 p-1 hover:bg-violet-800/30 rounded"
-                                                            title={t('admin.cms.open_image_tab')}
-                                                        >
-                                                            <ExternalLink className="w-3.5 h-3.5" />
-                                                        </a>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div className="space-y-2">
-                                                <BrandLogo size="md" forceVector={true} />
-                                                <span className="text-[10px] text-slate-500 block">
-                                                    {t('admin.cms.default_vector_logo')}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Upload Input */}
+                                    {/* Upload Light Logo Input */}
                                     <div>
                                         <input
                                             type="file"
                                             id="logo-upload"
-                                            accept="image/png,image/svg+xml,image/jpeg,image/webp"
+                                            accept="image/png,image/jpeg,image/webp"
                                             onChange={handleLogoChange}
                                             className="hidden"
                                         />
                                         <label
                                             htmlFor="logo-upload"
-                                            className="w-full py-2.5 px-4 rounded-xl bg-violet-600/10 hover:bg-violet-600/20 text-violet-400 border border-violet-500/30 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                                            className="w-full py-2.5 px-4 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
                                         >
-                                            <UploadCloud className="w-4 h-4" />
-                                            <span>{branding?.logo ? t('admin.cms.btn_change_logo') : t('admin.cms.btn_upload_logo')}</span>
+                                            <UploadCloud className="w-4 h-4 text-amber-400" />
+                                            <span>{branding?.logo ? 'تغيير شعار الوضع النهاري' : 'رفع شعار الوضع النهاري'}</span>
                                         </label>
                                         <p className="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
-                                            {t('admin.cms.logo_specs_hint')}
+                                            مخصص للعرض على القوائم والخلفيات الفاتحة في الوضع النهاري (PNG شفاف أو WebP).
                                         </p>
                                         {brandingForm.errors.logo && (
                                             <p className="text-[11px] text-rose-400 mt-1 font-semibold">{brandingForm.errors.logo}</p>
@@ -391,53 +413,142 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     </div>
                                 </div>
 
-                                {/* 2. Browser Favicon Card */}
-                                <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-800 space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <label className="text-xs font-bold text-white flex items-center gap-2">
-                                            <Globe className="w-4 h-4 text-orange-400" />
-                                            <span>{t('admin.cms.browser_favicon_title')}</span>
-                                        </label>
-                                        {branding?.favicon && (
-                                            <button
-                                                type="button"
-                                                onClick={() => handleDeleteBrandingItem('favicon')}
-                                                className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 font-semibold transition-colors cursor-pointer"
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                                <span>{t('admin.cms.btn_restore_favicon')}</span>
-                                            </button>
-                                        )}
+                                {/* 2. Dark Mode Logo Card */}
+                                <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-800 space-y-4 flex flex-col justify-between">
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-xs font-bold text-white flex items-center gap-2">
+                                                <Moon className="w-4 h-4 text-violet-400" />
+                                                <span>{t('admin.cms.platform_logo_dark_title') || 'شعار الوضع الليلي'}</span>
+                                            </label>
+                                            {branding?.logo_dark && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteBrandingItem('logo_dark')}
+                                                    className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 font-semibold transition-colors cursor-pointer"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                    <span>{t('admin.cms.btn_restore_default') || 'استعادة الافتراضي'}</span>
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {/* Dark Mode Preview Box (Simulates Dark Deep Background) */}
+                                        <div className="p-4 rounded-xl bg-[#070A1E] border border-dashed border-violet-900/60 flex flex-col items-center justify-center min-h-[140px] text-center relative overflow-hidden shadow-inner">
+                                            <span className="absolute top-2 start-2 text-[9px] font-bold px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20 flex items-center gap-1">
+                                                <Moon className="w-2.5 h-2.5 text-violet-400" />
+                                                <span>خلفية ليلية داكنة</span>
+                                            </span>
+                                            {logoDarkPreview || branding?.logo_dark ? (
+                                                <div className="space-y-2 w-full flex flex-col items-center pt-3">
+                                                    <img
+                                                        src={logoDarkPreview || branding?.logo_dark}
+                                                        alt="شعار الوضع الليلي"
+                                                        className="max-h-16 w-auto object-contain mx-auto drop-shadow-md"
+                                                    />
+                                                    <span className="text-[10px] text-slate-400 block font-mono">
+                                                        {logoDarkPreview ? (t('admin.cms.preview_selected_file') || 'معاينة الملف المختار') : (t('admin.cms.current_active_logo') || 'الشعار الليلي النشط')}
+                                                    </span>
+                                                    {branding?.logo_dark && !logoDarkPreview && (
+                                                        <div className="w-full text-[10px] text-violet-300 font-mono bg-violet-950/60 p-2 rounded-lg border border-violet-800/40 break-all select-all flex items-center justify-between gap-2">
+                                                            <span className="truncate text-right ltr:text-left direction-ltr">{branding.logo_dark}</span>
+                                                            <a
+                                                                href={branding.logo_dark}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-violet-400 hover:text-white shrink-0 p-1 hover:bg-violet-800/30 rounded"
+                                                                title={t('admin.cms.open_image_tab') || 'فتح الصورة'}
+                                                            >
+                                                                <ExternalLink className="w-3.5 h-3.5" />
+                                                            </a>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2 pt-3">
+                                                    <BrandLogo size="md" isLight={false} forceVector={true} />
+                                                    <span className="text-[10px] text-slate-500 block">
+                                                        {t('admin.cms.default_vector_logo') || 'الشعار المتجهي الافتراضي'}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    {/* Mock Browser Tab Preview */}
-                                    <div className="p-4 rounded-xl bg-slate-900/90 border border-dashed border-slate-700 flex flex-col items-center justify-center min-h-[140px] text-center">
-                                        <span className="text-[10px] text-slate-500 mb-2 font-mono">{t('admin.cms.browser_tab_preview')}</span>
-                                        <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-slate-800 rounded-t-xl border border-b-0 border-slate-700 shadow-md">
-                                            <img
-                                                src={faviconPreview || branding?.favicon || '/favicon.ico'}
-                                                alt="Favicon"
-                                                className="w-4 h-4 object-contain shrink-0 rounded-sm"
-                                            />
-                                            <span className="text-xs font-semibold text-slate-200 truncate max-w-[150px]">
-                                                {brandingForm.data.site_name_ar || 'GoTransTech'}
-                                            </span>
-                                            <span className="text-[10px] text-slate-500 ml-1">×</span>
-                                        </div>
-                                        {branding?.favicon && !faviconPreview && (
-                                            <div className="w-full mt-3 text-[10px] text-orange-300 font-mono bg-orange-950/60 p-2 rounded-lg border border-orange-800/40 break-all select-all flex items-center justify-between gap-2">
-                                                <span className="truncate text-right ltr:text-left direction-ltr">{branding.favicon}</span>
-                                                <a
-                                                    href={branding.favicon}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-orange-400 hover:text-white shrink-0 p-1 hover:bg-orange-800/30 rounded"
-                                                    title={t('admin.cms.open_favicon_tab')}
-                                                >
-                                                    <ExternalLink className="w-3.5 h-3.5" />
-                                                </a>
-                                            </div>
+                                    {/* Upload Dark Logo Input */}
+                                    <div>
+                                        <input
+                                            type="file"
+                                            id="logo-dark-upload"
+                                            accept="image/png,image/jpeg,image/webp"
+                                            onChange={handleLogoDarkChange}
+                                            className="hidden"
+                                        />
+                                        <label
+                                            htmlFor="logo-dark-upload"
+                                            className="w-full py-2.5 px-4 rounded-xl bg-violet-600/10 hover:bg-violet-600/20 text-violet-400 border border-violet-500/30 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                                        >
+                                            <UploadCloud className="w-4 h-4 text-violet-400" />
+                                            <span>{branding?.logo_dark ? 'تغيير شعار الوضع الليلي' : 'رفع شعار الوضع الليلي'}</span>
+                                        </label>
+                                        <p className="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
+                                            مخصص للعرض على القوائم الداكنة في الوضع الليلي وصفحات الهبوط الداكنة.
+                                        </p>
+                                        {brandingForm.errors.logo_dark && (
+                                            <p className="text-[11px] text-rose-400 mt-1 font-semibold">{brandingForm.errors.logo_dark}</p>
                                         )}
+                                    </div>
+                                </div>
+
+                                {/* 3. Browser Favicon Card */}
+                                <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-800 space-y-4 flex flex-col justify-between">
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-xs font-bold text-white flex items-center gap-2">
+                                                <Globe className="w-4 h-4 text-orange-400" />
+                                                <span>{t('admin.cms.browser_favicon_title') || 'أيقونة المتصفح Favicon'}</span>
+                                            </label>
+                                            {branding?.favicon && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteBrandingItem('favicon')}
+                                                    className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 font-semibold transition-colors cursor-pointer"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                    <span>{t('admin.cms.btn_restore_favicon') || 'استعادة الافتراضي'}</span>
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {/* Mock Browser Tab Preview */}
+                                        <div className="p-4 rounded-xl bg-slate-900/90 border border-dashed border-slate-700 flex flex-col items-center justify-center min-h-[140px] text-center">
+                                            <span className="text-[10px] text-slate-500 mb-2 font-mono">{t('admin.cms.browser_tab_preview') || 'محاكاة لسان المتصفح'}</span>
+                                            <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-slate-800 rounded-t-xl border border-b-0 border-slate-700 shadow-md">
+                                                <img
+                                                    src={faviconPreview || branding?.favicon || '/favicon.ico'}
+                                                    alt="Favicon"
+                                                    className="w-4 h-4 object-contain shrink-0 rounded-sm"
+                                                />
+                                                <span className="text-xs font-semibold text-slate-200 truncate max-w-[150px]">
+                                                    {brandingForm.data.site_name_ar || 'GoTransTech'}
+                                                </span>
+                                                <span className="text-[10px] text-slate-500 ml-1">×</span>
+                                            </div>
+                                            {branding?.favicon && !faviconPreview && (
+                                                <div className="w-full mt-3 text-[10px] text-orange-300 font-mono bg-orange-950/60 p-2 rounded-lg border border-orange-800/40 break-all select-all flex items-center justify-between gap-2">
+                                                    <span className="truncate text-right ltr:text-left direction-ltr">{branding.favicon}</span>
+                                                    <a
+                                                        href={branding.favicon}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-orange-400 hover:text-white shrink-0 p-1 hover:bg-orange-800/30 rounded"
+                                                        title={t('admin.cms.open_favicon_tab') || 'فتح الأيقونة'}
+                                                    >
+                                                        <ExternalLink className="w-3.5 h-3.5" />
+                                                    </a>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
                                     {/* Upload Favicon Input */}
@@ -445,7 +556,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                         <input
                                             type="file"
                                             id="favicon-upload"
-                                            accept="image/x-icon,image/png,image/svg+xml,image/webp"
+                                            accept="image/x-icon,image/png,image/webp"
                                             onChange={handleFaviconChange}
                                             className="hidden"
                                         />
@@ -454,10 +565,10 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             className="w-full py-2.5 px-4 rounded-xl bg-orange-600/10 hover:bg-orange-600/20 text-orange-400 border border-orange-500/30 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
                                         >
                                             <UploadCloud className="w-4 h-4" />
-                                            <span>{branding?.favicon ? t('admin.cms.btn_change_favicon') : t('admin.cms.btn_upload_favicon')}</span>
+                                            <span>{branding?.favicon ? (t('admin.cms.btn_change_favicon') || 'تغيير أيقونة المتصفح') : (t('admin.cms.btn_upload_favicon') || 'رفع أيقونة المتصفح')}</span>
                                         </label>
                                         <p className="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
-                                            {t('admin.cms.favicon_specs_hint')}
+                                            {t('admin.cms.favicon_specs_hint') || 'يفضل ملف مربع بأبعاد 32x32 أو 64x64 بصيغة ICO أو PNG.'}
                                         </p>
                                         {brandingForm.errors.favicon && (
                                             <p className="text-[11px] text-rose-400 mt-1 font-semibold">{brandingForm.errors.favicon}</p>
