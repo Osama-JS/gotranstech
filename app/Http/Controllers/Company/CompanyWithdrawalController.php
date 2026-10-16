@@ -100,11 +100,13 @@ class CompanyWithdrawalController extends Controller
         $company = Auth::user()->companyProfile;
         $withdrawal = WithdrawalRequest::where('company_id', $company->id)->findOrFail($id);
 
-        if (!$withdrawal->pdf_file_path || !Storage::disk('public')->exists($withdrawal->pdf_file_path)) {
+        $disk = 'local';
+        if (!$withdrawal->pdf_file_path || (!Storage::disk('local')->exists($withdrawal->pdf_file_path) && !Storage::disk('public')->exists($withdrawal->pdf_file_path))) {
             $this->pdfService->generateWithdrawalPdf($withdrawal);
         }
 
-        return Storage::disk('public')->download($withdrawal->pdf_file_path, "withdrawal_{$withdrawal->request_number}.pdf");
+        $disk = Storage::disk('local')->exists($withdrawal->pdf_file_path) ? 'local' : 'public';
+        return Storage::disk($disk)->download($withdrawal->pdf_file_path, "withdrawal_{$withdrawal->request_number}.pdf");
     }
 
     public function viewPdf(int $id)
@@ -112,10 +114,12 @@ class CompanyWithdrawalController extends Controller
         $company = Auth::user()->companyProfile;
         $withdrawal = WithdrawalRequest::where('company_id', $company->id)->findOrFail($id);
 
-        if (!$withdrawal->pdf_file_path || !Storage::disk('public')->exists($withdrawal->pdf_file_path)) {
+        $disk = 'local';
+        if (!$withdrawal->pdf_file_path || (!Storage::disk('local')->exists($withdrawal->pdf_file_path) && !Storage::disk('public')->exists($withdrawal->pdf_file_path))) {
             $this->pdfService->generateWithdrawalPdf($withdrawal);
         }
 
-        return Storage::disk('public')->response($withdrawal->pdf_file_path);
+        $disk = Storage::disk('local')->exists($withdrawal->pdf_file_path) ? 'local' : 'public';
+        return Storage::disk($disk)->response($withdrawal->pdf_file_path);
     }
 }

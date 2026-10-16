@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, router, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
+import { useTranslation } from '../../../Utils/i18n';
 import StatCard from '../../../Components/StatCard';
 import Modal from '../../../Components/Modal';
 import ConfirmDialog from '../../../Components/ConfirmDialog';
@@ -22,6 +23,8 @@ import {
 } from 'lucide-react';
 
 export default function AdminRoles({ roles = [], permissions = [], stats = {} }) {
+    const { t, locale } = useTranslation();
+    const isAr = locale === 'ar';
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -82,11 +85,11 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
 
     // Permission Groups
     const groupLabels = {
-        users: 'إدارة المستخدمين والحسابات',
-        logistics: 'المهام اللوجستية وتتبعها',
-        finance: 'العمليات المالية والمحافظ والعقود',
-        system: 'إعدادات النظام والتدقيق وCMS',
-        general: 'صلاحيات عامة أخرى'
+        users: t('admin.roles.cat_users'),
+        logistics: t('admin.roles.cat_logistics'),
+        finance: t('admin.roles.cat_finance'),
+        system: t('admin.roles.cat_system'),
+        general: t('admin.roles.cat_general')
     };
 
     const groupedPermissions = permissions.reduce((acc, p) => {
@@ -140,53 +143,53 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
     const isSystemRole = (name) => ['admin', 'investor', 'company'].includes(name);
 
     return (
-        <AuthenticatedLayout title="إدارة الأدوار ومصفوفة الصلاحيات">
-            <Head title="إدارة الأدوار والصلاحيات - إدارة المنصة" />
+        <AuthenticatedLayout title={t('admin.roles.page_title')}>
+            <Head title={t('admin.roles.page_title')} />
 
             <div className="space-y-6 pb-12">
                 {/* Header */}
                 <AdminPageHeader
-                    title="إدارة الأدوار ومصفوفة الصلاحيات"
-                    subtitle="تحديد مستويات الوصول والأذونات للمشرفين والمسؤولين بنظام Spatie RBAC"
+                    title={t('admin.roles.header_title')}
+                    subtitle={t('admin.roles.header_subtitle')}
                     breadcrumbs={[
-                        { label: 'الرئيسية', url: route('admin.dashboard') },
-                        { label: 'الأدوار والصلاحيات' }
+                        { label: t('common.home'), url: route('admin.dashboard') },
+                        { label: t('admin.nav.roles') }
                     ]}
                     icon={ShieldCheck}
                     iconColor="text-purple-400"
                     actions={[
                         {
-                            label: 'إضافة دور جديد',
+                            label: t('admin.roles.btn_create_role'),
                             icon: PlusCircle,
                             onClick: () => setCreateModalOpen(true),
                             variant: 'primary',
                         }
                     ]}
-                    badge={{ text: `${stats?.total_roles || roles.length} دور معرف`, color: 'purple' }}
+                    badge={{ text: t('admin.roles.badge_roles_count', { count: stats?.total_roles || roles.length }), color: 'purple' }}
                 />
 
                 {/* Stat Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <StatCard
-                        title="إجمالي الأدوار"
+                        title={t('admin.roles.stat_total_roles')}
                         value={stats?.total_roles || roles.length}
                         icon={ShieldCheck}
                         color="purple"
-                        description="الأدوار المعرفة في النظام"
+                        description={t('admin.roles.stat_roles_desc')}
                     />
                     <StatCard
-                        title="إجمالي الصلاحيات"
+                        title={t('admin.roles.stat_permissions_total')}
                         value={stats?.total_permissions || permissions.length}
                         icon={Key}
                         color="blue"
-                        description="صلاحية قابلة للتعيين"
+                        description={t('admin.roles.stat_permissions_desc')}
                     />
                     <StatCard
-                        title="أدوار مخصصة"
+                        title={t('admin.roles.stat_custom_roles')}
                         value={stats?.custom_roles || 0}
                         icon={Layers}
                         color="brand"
-                        description="أنشأتها الإدارة"
+                        description={t('admin.roles.stat_custom_roles_desc')}
                     />
                 </div>
 
@@ -196,12 +199,12 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                         <table className="w-full text-xs text-right">
                             <thead className="bg-slate-900/90 text-slate-400 font-semibold border-b border-slate-800">
                                 <tr>
-                                    <th className="p-4">اسم الدور</th>
-                                    <th className="p-4">نوع الدور</th>
-                                    <th className="p-4">المستخدمين المرتبطين</th>
-                                    <th className="p-4">عدد الصلاحيات الممنوحة</th>
-                                    <th className="p-4">تاريخ الإنشاء</th>
-                                    <th className="p-4 text-center">الإجراءات</th>
+                                    <th className="p-4">{t('admin.roles.table_role_name')}</th>
+                                    <th className="p-4">{t('admin.roles.table_role_type')}</th>
+                                    <th className="p-4">{t('admin.roles.table_assigned_users')}</th>
+                                    <th className="p-4">{t('admin.roles.table_granted_permissions')}</th>
+                                    <th className="p-4">{t('admin.roles.table_created_at')}</th>
+                                    <th className="p-4 text-center">{t('admin.roles.table_actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/60">
@@ -223,22 +226,22 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                                             <td className="p-4">
                                                 {isSys ? (
                                                     <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-lg text-[11px] font-bold inline-flex items-center gap-1">
-                                                        <Lock className="w-3 h-3" /> دور نظام أساسي
+                                                        <Lock className="w-3 h-3" /> {t('admin.roles.badge_core_system')}
                                                     </span>
                                                 ) : (
                                                     <span className="bg-violet-500/10 text-violet-400 border border-violet-500/20 px-2.5 py-1 rounded-lg text-[11px] font-bold">
-                                                        دور مخصص
+                                                        {t('admin.roles.badge_custom_role')}
                                                     </span>
                                                 )}
                                             </td>
                                             <td className="p-4">
                                                 <span className="font-mono font-bold text-slate-300">
-                                                    {role.users_count || 0} مستخدم
+                                                    {t('admin.roles.users_count', { count: role.users_count || 0 })}
                                                 </span>
                                             </td>
                                             <td className="p-4">
                                                 <span className="bg-purple-500/10 text-purple-300 border border-purple-500/20 px-2.5 py-1 rounded-lg font-mono font-bold text-xs">
-                                                    {role.permissions?.length || 0} صلاحية
+                                                    {t('admin.roles.permissions_count', { count: role.permissions?.length || 0 })}
                                                 </span>
                                             </td>
                                             <td className="p-4 text-slate-400 font-mono text-[11px]">
@@ -252,7 +255,7 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                                                         className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-400 hover:text-blue-300 border border-slate-700 transition-all text-xs font-semibold flex items-center gap-1 cursor-pointer"
                                                     >
                                                         <Edit className="w-3.5 h-3.5" />
-                                                        <span>تعديل الصلاحيات</span>
+                                                        <span>{t('admin.roles.btn_edit_permissions')}</span>
                                                     </button>
                                                     {!isSys && (
                                                         <button
@@ -260,7 +263,7 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                                                             onClick={() => handleOpenDelete(role)}
                                                             disabled={role.users_count > 0}
                                                             className="p-1.5 rounded-xl bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 border border-rose-500/20 transition-all text-xs disabled:opacity-30 cursor-pointer"
-                                                            title={role.users_count > 0 ? "لا يمكن حذف دور به مستخدمين" : "حذف الدور"}
+                                                            title={role.users_count > 0 ? t('admin.roles.cant_delete_with_users') : t('admin.roles.btn_delete_role')}
                                                         >
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
@@ -280,13 +283,13 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
             <Modal
                 isOpen={createModalOpen}
                 onClose={() => setCreateModalOpen(false)}
-                title="إنشاء دور وتعيين مصفوفة الصلاحيات"
+                title={t('admin.roles.modal_create_title')}
                 maxWidth="3xl"
             >
                 <form onSubmit={submitCreate} className="space-y-5">
                     <div>
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                            اسم الدور باللغة الإنجليزية (مثال: accountant, operations_manager)
+                            {t('admin.roles.field_role_name_en')}
                         </label>
                         <input
                             type="text"
@@ -302,7 +305,7 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                     {/* Permissions Matrix */}
                     <div className="space-y-4">
                         <label className="block text-xs font-bold text-slate-200">
-                            مصفوفة الصلاحيات المتاحة:
+                            {t('admin.roles.permissions_available')}
                         </label>
 
                         {Object.entries(groupedPermissions).map(([grp, perms]) => {
@@ -321,7 +324,7 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                                             className="text-[11px] text-slate-400 hover:text-white flex items-center gap-1 font-semibold"
                                         >
                                             {allSelected ? <CheckSquare className="w-3.5 h-3.5 text-purple-400" /> : <Square className="w-3.5 h-3.5" />}
-                                            <span>{allSelected ? 'إلغاء تحديد الكل' : 'تحديد الكل في القسم'}</span>
+                                            <span>{allSelected ? t('admin.roles.btn_deselect_all') : t('admin.roles.btn_select_all')}</span>
                                         </button>
                                     </div>
 
@@ -366,7 +369,7 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                             onClick={() => setCreateModalOpen(false)}
                             className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -378,7 +381,7 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                             ) : (
                                 <>
                                     <Save className="w-4 h-4" />
-                                    <span>إنشاء الدور وحفظ الصلاحيات</span>
+                                    <span>{t('admin.roles.btn_submit_create')}</span>
                                 </>
                             )}
                         </button>
@@ -390,13 +393,13 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
             <Modal
                 isOpen={editModalOpen}
                 onClose={() => setEditModalOpen(false)}
-                title={`تعديل صلاحيات الدور (${selectedRole?.name})`}
+                title={t('admin.roles.modal_edit_title', { name: selectedRole?.name })}
                 maxWidth="3xl"
             >
                 <form onSubmit={submitEdit} className="space-y-5">
                     <div>
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                            اسم الدور
+                            {t('admin.roles.field_role_name')}
                         </label>
                         <input
                             type="text"
@@ -407,7 +410,7 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                             required
                         />
                         {isSystemRole(selectedRole?.name) && (
-                            <p className="text-[11px] text-slate-500 mt-1">لا يمكن تعديل اسم الأدوار الأساسية للنظام.</p>
+                            <p className="text-[11px] text-slate-500 mt-1">{t('admin.roles.core_role_notice')}</p>
                         )}
                         {editErrors.name && <p className="text-xs text-rose-400 mt-1">{editErrors.name}</p>}
                     </div>
@@ -415,7 +418,7 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                     {/* Permissions Matrix */}
                     <div className="space-y-4">
                         <label className="block text-xs font-bold text-slate-200">
-                            مصفوفة الصلاحيات الممنوحة:
+                            {t('admin.roles.permissions_granted')}
                         </label>
 
                         {Object.entries(groupedPermissions).map(([grp, perms]) => {
@@ -434,7 +437,7 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                                             className="text-[11px] text-slate-400 hover:text-white flex items-center gap-1 font-semibold"
                                         >
                                             {allSelected ? <CheckSquare className="w-3.5 h-3.5 text-purple-400" /> : <Square className="w-3.5 h-3.5" />}
-                                            <span>{allSelected ? 'إلغاء تحديد الكل' : 'تحديد الكل في القسم'}</span>
+                                            <span>{allSelected ? t('admin.roles.btn_deselect_all') : t('admin.roles.btn_select_all')}</span>
                                         </button>
                                     </div>
 
@@ -479,7 +482,7 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                             onClick={() => setEditModalOpen(false)}
                             className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -491,7 +494,7 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                             ) : (
                                 <>
                                     <Save className="w-4 h-4" />
-                                    <span>حفظ التعديلات</span>
+                                    <span>{t('admin.roles.btn_submit_edit')}</span>
                                 </>
                             )}
                         </button>
@@ -504,9 +507,9 @@ export default function AdminRoles({ roles = [], permissions = [], stats = {} })
                 isOpen={deleteConfirmOpen}
                 onClose={() => setDeleteConfirmOpen(false)}
                 onConfirm={confirmDelete}
-                title="حذف الدور المخصص"
-                message={`هل أنت متأكد من رغبتك في حذف الدور (${selectedRole?.name}) نهائياً من النظام؟ لا يمكن التراجع عن هذا الإجراء.`}
-                confirmText="تأكيد الحذف"
+                title={t('admin.roles.delete_dialog_title')}
+                message={t('admin.roles.delete_dialog_msg', { name: selectedRole?.name })}
+                confirmText={t('admin.roles.delete_dialog_confirm')}
                 type="danger"
             />
         </AuthenticatedLayout>

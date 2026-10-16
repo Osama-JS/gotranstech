@@ -4,9 +4,11 @@ import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import TaskCard from '../../../Components/TaskCard';
 import ConfirmDialog from '../../../Components/ConfirmDialog';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
+import { useTranslation } from '../../../Utils/i18n';
 import { Zap, Search, Filter, MapPin, DollarSign, RefreshCw, Wallet } from 'lucide-react';
 
 export default function InvestorMarket({ tasks, walletBalance, investorShareRate, filters }) {
+    const { t, locale } = useTranslation();
     const [selectedCity, setSelectedCity] = useState(filters?.city || '');
     const [minAmount, setMinAmount] = useState(filters?.min_amount || '');
     const [maxAmount, setMaxAmount] = useState(filters?.max_amount || '');
@@ -44,24 +46,27 @@ export default function InvestorMarket({ tasks, walletBalance, investorShareRate
     };
 
     return (
-        <AuthenticatedLayout title="سوق المهام اللوجستية القابلة للتمويل">
-            <Head title="سوق المهام اللوجستية" />
+        <AuthenticatedLayout title={t('investor.market.title')}>
+            <Head title={t('investor.market.page_title')} />
 
             {/* Professional Page Header */}
             <AdminPageHeader
-                title="سوق المهام اللوجستية الحية"
-                subtitle="استكشف مهام التوصيل والشحن المتاحة للتمويل المباشر مع حساب العمولات الفورية ومؤقت العد التنازلي"
+                title={t('investor.market.header_title')}
+                subtitle={t('investor.market.subtitle')}
                 icon={Zap}
                 iconColor="text-orange-400"
                 iconBg="bg-orange-500/15 border-orange-500/30"
-                breadcrumbs={[{ label: 'سوق المهام اللوجستية' }]}
+                breadcrumbs={[{ label: t('investor.market.breadcrumb') }]}
                 badge={{
-                    text: `${tasks?.total || tasks?.data?.length || 0} مهمة متاحة`,
+                    text: t('investor.market.tasks_available_badge', { count: tasks?.total || tasks?.data?.length || 0 }),
                     color: 'orange',
                 }}
                 actions={[
                     {
-                        label: `الرصيد المتاح: ${Number(walletBalance || 0).toLocaleString('en-US')} ر.س`,
+                        label: t('investor.market.available_balance_action', {
+                            balance: Number(walletBalance || 0).toLocaleString('en-US'),
+                            currency: t('common.sar'),
+                        }),
                         icon: Wallet,
                         url: route('investor.wallet.index'),
                         variant: 'primary',
@@ -73,37 +78,37 @@ export default function InvestorMarket({ tasks, walletBalance, investorShareRate
             <div className="glass-panel p-5 rounded-2xl border border-violet-900/30 mb-6 bg-[#0A0E2A]/80">
                 <form onSubmit={handleFilter} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div>
-                        <label className="block text-xs font-semibold text-slate-400 mb-1">المدينة (الاستلام أو التسليم)</label>
+                        <label className="block text-xs font-semibold text-slate-400 mb-1">{t('investor.market.city_label')}</label>
                         <div className="relative">
-                            <MapPin className="w-4 h-4 text-violet-400 absolute right-3 top-3" />
+                            <MapPin className="w-4 h-4 text-violet-400 absolute right-3 rtl:right-3 rtl:left-auto ltr:left-3 ltr:right-auto top-3" />
                             <input
                                 type="text"
                                 value={selectedCity}
                                 onChange={(e) => setSelectedCity(e.target.value)}
-                                placeholder="مثال: الرياض، جدة..."
-                                className="w-full bg-[#06081B] border border-violet-800/40 rounded-xl px-3.5 py-2 pr-9 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500"
+                                placeholder={t('investor.market.city_placeholder')}
+                                className="w-full bg-[#06081B] border border-violet-800/40 rounded-xl px-3.5 py-2 rtl:pr-9 rtl:pl-3.5 ltr:pl-9 ltr:pr-3.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-semibold text-slate-400 mb-1">الحد الأدنى للمبلغ (ر.س)</label>
+                        <label className="block text-xs font-semibold text-slate-400 mb-1">{t('investor.market.min_amount_label')}</label>
                         <input
                             type="number"
                             value={minAmount}
                             onChange={(e) => setMinAmount(e.target.value)}
-                            placeholder="مثال: 1000"
+                            placeholder={t('investor.market.min_amount_placeholder')}
                             className="w-full bg-[#06081B] border border-violet-800/40 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-semibold text-slate-400 mb-1">الحد الأقصى للمبلغ (ر.س)</label>
+                        <label className="block text-xs font-semibold text-slate-400 mb-1">{t('investor.market.max_amount_label')}</label>
                         <input
                             type="number"
                             value={maxAmount}
                             onChange={(e) => setMaxAmount(e.target.value)}
-                            placeholder="مثال: 20000"
+                            placeholder={t('investor.market.max_amount_placeholder')}
                             className="w-full bg-[#06081B] border border-violet-800/40 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500"
                         />
                     </div>
@@ -114,13 +119,13 @@ export default function InvestorMarket({ tasks, walletBalance, investorShareRate
                             className="flex-1 py-2 px-4 rounded-xl font-bold text-xs bg-[#6320EE] hover:bg-[#5217D4] text-white transition-all flex items-center justify-center gap-1.5 h-[38px] shadow-md shadow-violet-600/30 cursor-pointer"
                         >
                             <Filter className="w-3.5 h-3.5" />
-                            <span>تطبيق الفلتر</span>
+                            <span>{t('investor.market.apply_filter')}</span>
                         </button>
                         <button
                             type="button"
                             onClick={() => router.get(route('investor.market.index'))}
                             className="p-2 rounded-xl bg-violet-950/40 hover:bg-violet-900/60 text-slate-300 hover:text-white transition-colors h-[38px] border border-violet-800/40 cursor-pointer"
-                            title="إعادة التحديث"
+                            title={t('investor.market.refresh')}
                         >
                             <RefreshCw className="w-4 h-4 text-orange-400" />
                         </button>
@@ -144,8 +149,8 @@ export default function InvestorMarket({ tasks, walletBalance, investorShareRate
             ) : (
                 <div className="glass-panel p-16 rounded-3xl border border-slate-800 text-center">
                     <Zap className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                    <h3 className="font-bold text-white text-lg mb-1">لا توجد مهام مطابقة للبحث حالياً</h3>
-                    <p className="text-xs text-slate-400">جرب تغيير معايير البحث أو تحقق مجدداً بعد قليل.</p>
+                    <h3 className="font-bold text-white text-lg mb-1">{t('investor.market.no_matching_tasks')}</h3>
+                    <p className="text-xs text-slate-400">{t('investor.market.no_matching_desc')}</p>
                 </div>
             )}
 
@@ -156,10 +161,15 @@ export default function InvestorMarket({ tasks, walletBalance, investorShareRate
                 onConfirm={handleConfirmFunding}
                 isLoading={fundingLoading}
                 type="success"
-                title="تأكيد تمويل المهمة اللوجستية"
-                message={`هل ترغب في تمويل المهمة #${selectedTask?.task_number} بمبلغ ${parseFloat(selectedTask?.funding_amount || 0).toLocaleString('en-US')} ر.س؟ ستتحصل على أرباح عمولة قدرها +${estimatedProfit.toFixed(2)} ر.س تودع في محفظة أرباحك فوراً.`}
-                confirmText="تأكيد وتمويل الآن"
-                cancelText="إلغاء التراجع"
+                title={t('investor.market.confirm_modal_title')}
+                message={t('investor.market.confirm_modal_msg', {
+                    task: selectedTask?.task_number,
+                    amount: parseFloat(selectedTask?.funding_amount || 0).toLocaleString('en-US'),
+                    profit: estimatedProfit.toFixed(2),
+                    currency: t('common.sar'),
+                })}
+                confirmText={t('investor.market.confirm_modal_btn')}
+                cancelText={t('investor.market.cancel_modal_btn')}
             />
         </AuthenticatedLayout>
     );

@@ -166,10 +166,41 @@ class HyperPayService
                 "شحن ناجح لمحفظة الاستثمار بمبلغ {$transaction->amount} ر.س عبر HyperPay"
             );
 
+            // Notify Admin of electronic deposit
+            \App\Services\NotificationDispatcherService::dispatch(
+                'admin.deposit_completed',
+                "شحن إلكتروني ناجح: {$transaction->user->name}",
+                "تم شحن محفظة المستثمر ({$transaction->user->name}) بمبلغ " . number_format($transaction->amount, 2) . " ر.س بنجاح عبر بوابة HyperPay ({$transaction->payment_brand}).",
+                route('admin.deposits.index', [], false),
+                ['transaction_id' => $transaction->id, 'amount' => $transaction->amount]
+            );
+
+            // Notify Investor
+            \App\Services\NotificationDispatcherService::dispatch(
+                'investor.deposit_credited',
+                "تم شحن محفظتك الاستثمارية",
+                "تمت عملية الدفع بنجاح وإيداع مبلغ " . number_format($transaction->amount, 2) . " ر.س في محفظة الاستثمار الخاصة بك وهو متاح الآن للاستثمار.",
+                route('investor.wallet.investment', [], false),
+                ['transaction_id' => $transaction->id, 'amount' => $transaction->amount],
+                $transaction->user,
+                'success'
+            );
+
             return ['status' => 'success', 'message' => 'تمت عملية الدفع وإيداع الرصيد بنجاح', 'transaction' => $transaction];
         } else {
             $transaction->status = 'failed';
             $transaction->save();
+
+            // Notify Admin of deposit failure
+            \App\Services\NotificationDispatcherService::dispatch(
+                'admin.deposit_failed',
+                "فشل عملية دفع: {$transaction->user->name}",
+                "فشلت محاولة شحن محفظة بقيمة " . number_format($transaction->amount, 2) . " ر.س للمستثمر ({$transaction->user->name}). سبب الرفض: " . ($resData['result']['description'] ?? 'خطأ في عملية الدفع'),
+                route('admin.deposits.index', [], false),
+                ['transaction_id' => $transaction->id, 'reason' => $resData['result']['description'] ?? null],
+                null,
+                'warning'
+            );
 
             return ['status' => 'failed', 'message' => 'فشلت عملية الدفع: ' . ($resData['result']['description'] ?? 'غير مصرح'), 'transaction' => $transaction];
         }

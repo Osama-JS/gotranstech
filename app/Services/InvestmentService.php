@@ -119,6 +119,38 @@ class InvestmentService
             // 7. Dispatch Webhook to Logistics Company
             $this->webhookService->dispatchTaskFunded($lockedTask);
 
+            // 8. Dispatch Real-Time Notifications
+            // To Admins
+            NotificationDispatcherService::dispatch(
+                'admin.task_funded',
+                "تمويل مهمة شحن: #{$lockedTask->task_number}",
+                "قام المستثمر {$investor->name} بتمويل المهمة رقم #{$lockedTask->task_number} بمبلغ " . number_format($fundingAmount, 2) . " ر.س بنجاح.",
+                route('admin.tasks.show', $lockedTask->id, false),
+                ['task_id' => $lockedTask->id, 'amount' => $fundingAmount, 'investor_id' => $investor->id]
+            );
+
+            // To Investor
+            NotificationDispatcherService::dispatch(
+                'investor.task_invested',
+                "تأكيد الاستثمار في المهمة #{$lockedTask->task_number}",
+                "تم تأكيد استثمارك بمبلغ " . number_format($fundingAmount, 2) . " ر.س في المهمة #{$lockedTask->task_number} بعائد متوقع " . number_format($investorCommissionEarned, 2) . " ر.س.",
+                route('investor.contracts.index', [], false),
+                ['task_id' => $lockedTask->id, 'investment_id' => $investment->id],
+                $investor
+            );
+
+            // To Company
+            if ($companyUser) {
+                NotificationDispatcherService::dispatch(
+                    'company.task_funded',
+                    "اكتمل تمويل شحنتكم: #{$lockedTask->task_number}",
+                    "تم تمويل شحنتكم رقم #{$lockedTask->task_number} بالكامل بمبلغ " . number_format($fundingAmount, 2) . " ر.س وأصبح رصيد التمويل متاحاً في محفظتكم للسحب الفوري.",
+                    route('company.wallet.funding', [], false),
+                    ['task_id' => $lockedTask->id, 'amount' => $fundingAmount],
+                    $companyUser
+                );
+            }
+
             return $investment;
         });
     }

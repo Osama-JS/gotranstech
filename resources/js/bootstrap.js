@@ -1,8 +1,13 @@
 import axios from 'axios';
 import { route } from 'ziggy-js';
 
+import { trans } from './Utils/i18n';
+
 window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.trans = trans;
+window.t = trans;
+window.__ = trans;
 
 if (typeof window !== 'undefined') {
     window.route = (name, params, absolute, config) => {

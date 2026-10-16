@@ -74,6 +74,15 @@ class CompanyTaskController extends Controller
             "إلغاء المهمة #{$task->task_number} من قبل الشركة"
         );
 
+        // Notify Admin of task cancellation
+        \App\Services\NotificationDispatcherService::dispatch(
+            'admin.task_cancelled',
+            "إلغاء مهمة شحن: #{$task->task_number}",
+            "قامت الشركة اللوجستية ({$company->company_name}) بإلغاء المهمة رقم #{$task->task_number} وسحبها من سوق التمويل.",
+            route('admin.tasks.show', $task->id, false),
+            ['task_id' => $task->id, 'company_id' => $company->id]
+        );
+
         return back()->with('success', 'تم إلغاء المهمة بنجاح وإيقاف عرضها من منصة التمويل.');
     }
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import AdminPageHeader from '@/Components/AdminPageHeader';
+import { useTranslation } from '@/Utils/i18n';
 import {
     TrendingUp,
     BarChart3,
@@ -28,6 +29,7 @@ export default function CompanyAnalytics({
     routeDistribution = [],
     cashflowTrend = [],
 }) {
+    const { t } = useTranslation();
     const [hoveredPoint, setHoveredPoint] = useState(null);
 
     const handlePeriodChange = (newPeriod) => {
@@ -35,10 +37,10 @@ export default function CompanyAnalytics({
     };
 
     const periodLabels = {
-        '7days': 'آخر 7 أيام',
-        '30days': 'آخر 30 يوماً',
-        '6months': 'آخر 6 أشهر',
-        '1year': 'آخر سنة',
+        '7days': t('company.analytics.period_7days'),
+        '30days': t('company.analytics.period_30days'),
+        '6months': t('company.analytics.period_6months'),
+        '1year': t('company.analytics.period_1year'),
     };
 
     // Scaling for Cashflow Line Chart (Withdrawn vs Repaid)
@@ -86,27 +88,27 @@ export default function CompanyAnalytics({
     const donutR = 65;
     const donutC = 2 * Math.PI * donutR;
     const statusList = [
-        { label: 'تمويل مكتمل', key: 'funded', count: statusCounts.funded, color: '#6320EE' },
-        { label: 'تم التسليم بنجاح', key: 'completed', count: statusCounts.completed, color: '#10B981' },
-        { label: 'بانتظار التمويل', key: 'available', count: statusCounts.available, color: '#FF6B00' },
-        { label: 'ملغاة', key: 'cancelled', count: statusCounts.cancelled, color: '#EF4444' },
+        { label: t('company.analytics.status_funded'), key: 'funded', count: statusCounts.funded, color: '#6320EE' },
+        { label: t('company.analytics.status_completed'), key: 'completed', count: statusCounts.completed, color: '#10B981' },
+        { label: t('company.analytics.status_available'), key: 'available', count: statusCounts.available, color: '#FF6B00' },
+        { label: t('company.analytics.status_cancelled'), key: 'cancelled', count: statusCounts.cancelled, color: '#EF4444' },
     ];
     let accumulatedPercent = 0;
 
     return (
-        <AuthenticatedLayout title="التحليلات والمؤشرات التشغيلية والمالية">
-            <Head title="التحليلات التشغيلية والمالية" />
+        <AuthenticatedLayout title={t('company.analytics.title')}>
+            <Head title={t('company.analytics.page_title')} />
 
             {/* Professional Page Header */}
             <AdminPageHeader
-                title="التحليلات والمؤشرات التشغيلية والمالية"
-                subtitle="متابعة حجم التمويل اللوجستي المستغل، كفاءة إنجاز المهام، ومسار سداد الالتزامات والسيولة النقدية"
+                title={t('company.analytics.title')}
+                subtitle={t('company.analytics.subtitle')}
                 icon={BarChart3}
                 iconColor="text-violet-400"
                 iconBg="bg-violet-500/15 border-violet-500/30"
-                breadcrumbs={[{ label: 'التحليلات والإحصائيات' }]}
+                breadcrumbs={[{ label: t('company.nav.analytics') }]}
                 badge={{
-                    text: 'مؤشرات الأداء التشغيلي',
+                    text: t('company.nav.portal_badge'),
                     color: 'brand',
                 }}
                 actions={
@@ -134,68 +136,67 @@ export default function CompanyAnalytics({
                 {/* Total Funding Requested */}
                 <div className="glass-panel p-5 rounded-2xl border border-violet-500/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">حجم التمويل المطلوب</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.analytics.kpi_volume_title')}</span>
                         <div className="w-10 h-10 rounded-xl bg-violet-500/10 text-violet-500 flex items-center justify-center font-bold">
                             <Truck className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-baseline gap-1">
                         {Number(kpis.total_funding_requested || 0).toLocaleString('en-US')}
-                        <span className="text-xs font-sans font-bold text-violet-500">ر.س</span>
+                        <span className="text-xs font-sans font-bold text-violet-500">{t('common.sar')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        إجمالي عدد المهام: {kpis.total_tasks_count || 0} مهمة
+                        {t('company.analytics.kpi_volume_sub')}
                     </p>
                 </div>
 
                 {/* Fulfillment Rate */}
                 <div className="glass-panel p-5 rounded-2xl border border-orange-500/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">نسبة التمويل والإنجاز</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.analytics.kpi_rate_title')}</span>
                         <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center font-bold">
                             <Percent className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-baseline gap-1">
                         {kpis.task_fulfillment_rate || 0}%
-                        <span className="text-xs font-sans font-bold text-orange-500">معدل الإنجاز</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        {kpis.completed_tasks_count || 0} مهمة تم تمويلها بالكامل
+                        {t('company.analytics.kpi_rate_sub', { count: kpis.completed_tasks_count || 0 })}
                     </p>
                 </div>
 
                 {/* Credit Limit & Utilization */}
                 <div className="glass-panel p-5 rounded-2xl border border-indigo-500/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">سقف الائتمان المستغل</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.analytics.kpi_liquidity_title')}</span>
                         <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold">
                             <CreditCard className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-baseline gap-1">
-                        {kpis.credit_utilization_rate || 0}%
-                        <span className="text-xs font-sans font-bold text-indigo-500">من السقف</span>
+                        {(Number(kpis.credit_limit || 0) - Number(kpis.total_outstanding_debt || 0)).toLocaleString('en-US')}
+                        <span className="text-xs font-sans font-bold text-indigo-500">{t('common.sar')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        المتبقي من السقف: {(Number(kpis.credit_limit || 0) - Number(kpis.total_outstanding_debt || 0)).toLocaleString('en-US')} ر.س
+                        {t('company.analytics.kpi_liquidity_sub')}
                     </p>
                 </div>
 
                 {/* Outstanding Debts & Repaid */}
                 <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">الالتزامات القائمة</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.analytics.kpi_debt_title')}</span>
                         <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold">
                             <Clock className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-baseline gap-1">
                         {Number(kpis.total_outstanding_debt || 0).toLocaleString('en-US')}
-                        <span className="text-xs font-sans font-bold text-amber-500">ر.س</span>
+                        <span className="text-xs font-sans font-bold text-amber-500">{t('common.sar')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        إجمالي ما تم سداده: {Number(kpis.total_debts_paid || 0).toLocaleString('en-US')} ر.س
+                        {t('company.analytics.kpi_debt_sub')}
                     </p>
                 </div>
             </div>
@@ -206,21 +207,18 @@ export default function CompanyAnalytics({
                     <div>
                         <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                             <TrendingUp className="w-5 h-5 text-violet-500" />
-                            <span>مسار السيولة التمويلية: المبالغ المسحوبة مقابل المسددة (Lines)</span>
+                            <span>{t('company.analytics.cashflow_title')}</span>
                         </h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                            مقارنة مبالغ التمويل المنصرفة للشركة مع دفعات سداد الالتزامات والديون
-                        </p>
                     </div>
 
                     <div className="flex items-center gap-4 text-xs font-bold">
                         <div className="flex items-center gap-1.5">
                             <span className="w-3 h-3 rounded-full bg-[#6320EE]" />
-                            <span className="text-slate-700 dark:text-slate-300">تمويل منصرف (ر.س)</span>
+                            <span className="text-slate-700 dark:text-slate-300">{t('company.analytics.cashflow_withdrawn')} ({t('common.sar')})</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                             <span className="w-3 h-3 rounded-full bg-[#FF6B00]" />
-                            <span className="text-slate-700 dark:text-slate-300">سداد التزامات (ر.س)</span>
+                            <span className="text-slate-700 dark:text-slate-300">{t('company.analytics.cashflow_repaid')} ({t('common.sar')})</span>
                         </div>
                     </div>
                 </div>
@@ -326,20 +324,20 @@ export default function CompanyAnalytics({
                                 }}
                             >
                                 <div className="font-bold text-slate-300 pb-1 border-b border-slate-700 mb-1">
-                                    تاريخ: {points[hoveredPoint].date}
+                                    {t('company.analytics.cashflow_date')}: {points[hoveredPoint].date}
                                 </div>
                                 <div className="text-violet-300 font-bold">
-                                    تمويل منصرف: {points[hoveredPoint].withVal.toLocaleString('en-US')} ر.س
+                                    {t('company.analytics.cashflow_withdrawn')}: {points[hoveredPoint].withVal.toLocaleString('en-US')} {t('common.sar')}
                                 </div>
                                 <div className="text-orange-400 font-bold">
-                                    سداد: {points[hoveredPoint].repVal.toLocaleString('en-US')} ر.س
+                                    {t('company.analytics.cashflow_repaid')}: {points[hoveredPoint].repVal.toLocaleString('en-US')} {t('common.sar')}
                                 </div>
                             </div>
                         )}
                     </div>
                 ) : (
                     <div className="py-12 text-center text-xs text-slate-500">
-                        لا توجد حركات سيولة مسجلة خلال الفترة المحددة.
+                        {t('company.analytics.no_cashflow_data')}
                     </div>
                 )}
             </div>
@@ -350,7 +348,7 @@ export default function CompanyAnalytics({
                 <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-violet-900/35 bg-white dark:bg-[#0A0E2A]/85 shadow-sm dark:shadow-xl">
                     <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
                         <Truck className="w-5 h-5 text-violet-500" />
-                        <span>توزيع حالات المهام اللوجستية (دائرة)</span>
+                        <span>{t('company.analytics.status_distribution_title')}</span>
                     </h3>
 
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -388,7 +386,7 @@ export default function CompanyAnalytics({
                                 })}
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                                <span className="text-[10px] text-slate-400 font-medium">إجمالي المهام</span>
+                                <span className="text-[10px] text-slate-400 font-medium">{t('common.tasks')}</span>
                                 <span className="text-lg font-black font-mono text-slate-900 dark:text-white">
                                     {totalStatuses}
                                 </span>
@@ -411,7 +409,7 @@ export default function CompanyAnalytics({
                                         </div>
                                         <div className="text-end">
                                             <span className="font-mono font-bold text-slate-900 dark:text-white">
-                                                {st.count} مهمة
+                                                {st.count} {t('common.tasks')}
                                             </span>
                                             <span className="text-[10px] text-slate-400 font-mono block">
                                                 {pct}%
@@ -428,7 +426,7 @@ export default function CompanyAnalytics({
                 <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-violet-900/35 bg-white dark:bg-[#0A0E2A]/85 shadow-sm dark:shadow-xl">
                     <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
                         <Navigation className="w-5 h-5 text-orange-500" />
-                        <span>أكثر مسارات الشحن والتوصيل كثافة</span>
+                        <span>{t('company.analytics.routes_title')}</span>
                     </h3>
 
                     {routeDistribution.length > 0 ? (
@@ -446,17 +444,17 @@ export default function CompanyAnalytics({
                                             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-white">
                                                 <span>{rt.pickup_city}</span>
                                                 <span className="text-slate-400">←</span>
-                                                <span>{rt.dropoff_city || 'نفس المنطقة'}</span>
+                                                <span>{rt.dropoff_city || ''}</span>
                                             </div>
                                             <span className="text-[10px] text-slate-500">
-                                                {rt.count} شحنة منفذة
+                                                {rt.count} {t('common.tasks')}
                                             </span>
                                         </div>
                                     </div>
 
                                     <div className="text-end">
                                         <span className="font-mono font-bold text-xs text-slate-900 dark:text-white block">
-                                            {Number(rt.total_amount || 0).toLocaleString('en-US')} ر.س
+                                            {Number(rt.total_amount || 0).toLocaleString('en-US')} {t('common.sar')}
                                         </span>
                                     </div>
                                 </div>
@@ -464,7 +462,7 @@ export default function CompanyAnalytics({
                         </div>
                     ) : (
                         <div className="py-12 text-center text-xs text-slate-500">
-                            لا توجد مسارات شحن مسجلة خلال الفترة.
+                            {t('company.analytics.no_routes_data')}
                         </div>
                     )}
                 </div>
@@ -478,25 +476,25 @@ export default function CompanyAnalytics({
                     </div>
                     <div>
                         <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1">
-                            مؤشرات الكفاءة التشغيلية والسيولة النقدية للشركة
+                            {t('company.analytics.insights_title')}
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3 text-xs text-slate-700 dark:text-slate-300">
                             <div className="p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
-                                <strong className="text-violet-600 dark:text-violet-400 block mb-1">معدل استغلال الائتمان</strong>
+                                <strong className="text-violet-600 dark:text-violet-400 block mb-1">{t('company.analytics.insight_1_title')}</strong>
                                 <p>
-                                    نسبة استغلال السقف الائتماني الحالية {kpis.credit_utilization_rate || 0}%. يتيح لك السقف المتبقي تمويل شحنات إضافية فورياً دون أي تأخير بنكي.
+                                    {t('company.analytics.insight_1_desc')}
                                 </p>
                             </div>
                             <div className="p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
-                                <strong className="text-orange-500 block mb-1">تسريع وتيرة التمويل</strong>
+                                <strong className="text-orange-500 block mb-1">{t('company.analytics.insight_2_title')}</strong>
                                 <p>
-                                    السداد المبكر للديون المستحقة يرفع من التصنيف الائتماني للشركة لدى المنصة ويمنح الأولوية لبث مهامك للمستثمرين بمعدلات قبول فورية.
+                                    {t('company.analytics.insight_2_desc')}
                                 </p>
                             </div>
                             <div className="p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
-                                <strong className="text-indigo-500 block mb-1">كفاءة مسارات التوصيل</strong>
+                                <strong className="text-indigo-500 block mb-1">{t('company.analytics.insight_3_title')}</strong>
                                 <p>
-                                    تركيز ضخ المهام على المسارات الأكثر طلباً يقلل تكاليف التشغيل بنسبة تصل إلى 14% ويزيد من سرعة التسليم وإغلاق المهام الممولة.
+                                    {t('company.analytics.insight_3_desc')}
                                 </p>
                             </div>
                         </div>

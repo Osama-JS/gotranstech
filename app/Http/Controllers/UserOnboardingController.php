@@ -29,25 +29,38 @@ class UserOnboardingController extends Controller
         $user->save();
 
         // Create initial Contract record
-        Contract::firstOrCreate(
+        $contract = Contract::firstOrCreate(
             [
                 'party_type' => $user->user_type,
                 'party_id' => $user->user_type === 'company' ? ($user->companyProfile?->id ?? $user->id) : ($user->investorProfile?->id ?? $user->id),
             ],
             [
-                'contract_number' => Contract::generateContractNumber(),
+                'user_id' => $user->id,
+                'contract_number' => Contract::generateContractNumber($user->user_type ?? 'general'),
                 'title' => $user->user_type === 'company' ? 'اتفاقية تقديم خدمات وربط لوجستي' : 'اتفاقية تمويل واستثمار لوجستي',
                 'contract_type' => $user->user_type === 'company' ? 'company_service' : 'investor_framework',
                 'start_date' => now(),
                 'end_date' => now()->addYear(),
                 'commission_rate' => $user->user_type === 'company' ? ($user->companyProfile?->platform_commission_rate ?? 10.00) : ($user->investorProfile?->platform_commission_share_rate ?? 70.00),
                 'status' => 'active',
+                'signed_by_user_id' => $user->id,
                 'signed_at' => now(),
-                'terms_and_conditions' => 'اتفاقية معتمدة إلكترونياً وموثقة رقمياً بين منصة Go-Tech والطرف الثاني وفق الأنظمة المالية المعمول بها.',
+                'terms_text' => 'اتفاقية معتمدة إلكترونياً وموثقة رقمياً بين منصة Go-Tech والطرف الثاني وفق الأنظمة المالية المعمول بها.',
             ]
         );
 
         $this->auditLogService->log('contract_sign', $user, [], ['agreement_signed_at' => now()], "قام المستخدم {$user->name} بتوقيع الاتفاقية القانونية إلكترونياً");
+
+        // Notify Admin of Contract Signing with direct link to the signed contract
+        \App\Services\NotificationDispatcherService::dispatch(
+            'admin.contract_signed',
+            "توقيع اتفاقية جديدة: {$user->name}",
+            "قام المستخدم ({$user->name} - {$user->user_type}) بتوقيع الاتفاقية الرسمية للمنصة إلكترونياً بنجاح.",
+            route('admin.contracts.show', $contract->id),
+            ['contract_id' => $contract->id, 'user_id' => $user->id, 'user_type' => $user->user_type],
+            null,
+            'info'
+        );
 
         return back()->with('success', 'تم توقيع الاتفاقية القانونية بنجاح.');
     }
@@ -66,6 +79,17 @@ class UserOnboardingController extends Controller
         $user->save();
 
         $this->auditLogService->log('profile_update', $user, [], ['additional_data' => $user->additional_data], "قام المستخدم {$user->name} بتعبئة نموذج البيانات الإضافية");
+
+        // Notify Admin of KYC Documents Submitted
+        \App\Services\NotificationDispatcherService::dispatch(
+            'admin.kyc_documents_submitted',
+            "اكتمال بيانات التحقق KYC: {$user->name}",
+            "قام المستخدم ({$user->name} - {$user->user_type}) باستكمال بيانات ونموذج التوثيق بانتظار الاعتماد النهائي وتفعيل الحساب.",
+            $user->isCompany() ? route('admin.companies.show', $user->companyProfile?->id ?? $user->id) : route('admin.investors.show', $user->id),
+            ['user_id' => $user->id, 'user_type' => $user->user_type],
+            null,
+            'info'
+        );
 
         return back()->with('success', 'تم حفظ وتأكيد البيانات الإضافية بنجاح، ملفك الآن بانتظار الاعتماد النهائي من الإدارة.');
     }

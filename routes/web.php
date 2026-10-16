@@ -39,7 +39,7 @@ Route::post('/locale/switch', [AuthController::class, 'switchLocale'])->name('lo
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 });
@@ -63,9 +63,9 @@ Route::middleware(['auth'])->prefix('portal')->name('portal.')->group(function (
 Route::match(['get', 'post'], '/payments/hyperpay/callback', [InvestorWalletController::class, 'hyperPayCallback'])->name('payments.hyperpay.callback');
 
 // -----------------------------------------------------------------------------
-// Admin Portal (Protected by Auth + Role/Permission)
+// Admin Portal (Protected by Auth + Admin Role Verification)
 // -----------------------------------------------------------------------------
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'user.admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/quick-search', [AdminQuickSearchController::class, 'search'])->name('quick-search');
 
@@ -87,6 +87,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/companies/{id}/toggle-status', [AdminCompanyController::class, 'toggleStatus'])->name('companies.status');
     Route::post('/companies/{id}/api-key', [AdminCompanyController::class, 'generateApiKey'])->name('companies.api-key');
     Route::post('/companies/{id}/commission-rate', [AdminCompanyController::class, 'updateCommissionRate'])->name('companies.commission');
+    Route::post('/companies/{id}/toggle-environment', [AdminCompanyController::class, 'toggleEnvironment'])->name('companies.toggle-environment');
 
     // Logistics Tasks
     Route::get('/tasks', [AdminTaskController::class, 'index'])->name('tasks.index');
@@ -110,6 +111,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/contracts/create', [AdminContractController::class, 'create'])->name('contracts.create');
     Route::post('/contracts', [AdminContractController::class, 'store'])->name('contracts.store');
     Route::get('/contracts/{id}', [AdminContractController::class, 'show'])->name('contracts.show');
+    Route::post('/contracts/{id}/status', [AdminContractController::class, 'updateStatus'])->name('contracts.status');
     Route::get('/contracts/{id}/pdf', [AdminContractController::class, 'downloadPdf'])->name('contracts.pdf');
     Route::get('/contracts/{id}/view-pdf', [AdminContractController::class, 'viewPdf'])->name('contracts.view-pdf');
 
@@ -153,12 +155,42 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Server & Database Health Monitoring
     Route::get('/system-health', [AdminSystemHealthController::class, 'index'])->name('system-health.index');
     Route::post('/system-health/action', [AdminSystemHealthController::class, 'handleAction'])->name('system-health.action');
+
+    // Notifications Management & Broadcast
+    Route::get('/notifications/settings', [\App\Http\Controllers\NotificationController::class, 'settingsIndex'])->name('notifications.settings');
+    Route::match(['post', 'put'], '/notifications/settings/{id}', [\App\Http\Controllers\NotificationController::class, 'updateSetting'])->name('notifications.settings.update');
+    Route::post('/notifications/broadcast', [\App\Http\Controllers\NotificationController::class, 'sendBroadcast'])->name('notifications.broadcast');
+
+    // Backups & Disaster Recovery Hub (إدارة النسخ الاحتياطي والترحيل السحابي)
+    Route::get('/backups', [\App\Http\Controllers\Admin\AdminBackupController::class, 'index'])->name('backups.index');
+    Route::get('/backups/list', [\App\Http\Controllers\Admin\AdminBackupController::class, 'getBackupsJson'])->name('backups.list');
+    Route::post('/backups/create', [\App\Http\Controllers\Admin\AdminBackupController::class, 'createBackup'])->name('backups.create');
+    Route::get('/backups/{filename}/download', [\App\Http\Controllers\Admin\AdminBackupController::class, 'downloadBackup'])->name('backups.download');
+    Route::post('/backups/{filename}/dispatch', [\App\Http\Controllers\Admin\AdminBackupController::class, 'dispatchBackup'])->name('backups.dispatch');
+    Route::post('/backups/{filename}/verify', [\App\Http\Controllers\Admin\AdminBackupController::class, 'verifyBackup'])->name('backups.verify');
+    Route::post('/backups/restore', [\App\Http\Controllers\Admin\AdminBackupController::class, 'restoreBackup'])->name('backups.restore');
+    Route::post('/backups/upload-restore', [\App\Http\Controllers\Admin\AdminBackupController::class, 'uploadAndRestore'])->name('backups.upload-restore');
+    Route::delete('/backups/{filename}', [\App\Http\Controllers\Admin\AdminBackupController::class, 'destroy'])->name('backups.destroy');
+    Route::post('/backups/config', [\App\Http\Controllers\Admin\AdminBackupController::class, 'saveConfig'])->name('backups.config');
+    Route::post('/backups/test-destination', [\App\Http\Controllers\Admin\AdminBackupController::class, 'testDestination'])->name('backups.test-destination');
+});
+
+// Universal Authenticated Notifications Polling, Center & Actions (Admin, Investor, Company)
+Route::middleware(['auth'])->prefix('notifications')->name('notifications.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\NotificationController::class, 'index'])->name('index');
+    Route::get('/feed', [\App\Http\Controllers\NotificationController::class, 'feed'])->name('feed');
+    Route::post('/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('read');
+    Route::post('/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('read-all');
+    Route::post('/mark-read/{id}', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('mark-read');
+    Route::post('/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+    Route::delete('/clear/read', [\App\Http\Controllers\NotificationController::class, 'clearRead'])->name('clear-read');
+    Route::delete('/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('destroy');
 });
 
 // -----------------------------------------------------------------------------
 // Investor Portal
 // -----------------------------------------------------------------------------
-Route::middleware(['auth'])->prefix('investor')->name('investor.')->group(function () {
+Route::middleware(['auth', 'user.investor'])->prefix('investor')->name('investor.')->group(function () {
     Route::get('/dashboard', [InvestorDashboardController::class, 'index'])->name('dashboard');
 
     // Live Task Market & Funding
@@ -185,7 +217,7 @@ Route::middleware(['auth'])->prefix('investor')->name('investor.')->group(functi
 // -----------------------------------------------------------------------------
 // Company Portal
 // -----------------------------------------------------------------------------
-Route::middleware(['auth'])->prefix('company')->name('company.')->group(function () {
+Route::middleware(['auth', 'user.company'])->prefix('company')->name('company.')->group(function () {
     Route::get('/dashboard', [CompanyDashboardController::class, 'index'])->name('dashboard');
 
     // Operational Analytics & Charts
@@ -197,6 +229,7 @@ Route::middleware(['auth'])->prefix('company')->name('company.')->group(function
 
     // API & Webhooks
     Route::get('/api-settings', [CompanyApiKeyController::class, 'index'])->name('api.index');
+    Route::get('/api/sandbox', [CompanyApiKeyController::class, 'sandbox'])->name('api.sandbox');
     Route::post('/api-settings/generate', [CompanyApiKeyController::class, 'generate'])->name('api.generate');
     Route::post('/api-settings/webhook', [CompanyApiKeyController::class, 'updateWebhook'])->name('api.webhook');
     Route::post('/api-settings/webhook/test', [CompanyApiKeyController::class, 'testWebhook'])->name('api.webhook.test');

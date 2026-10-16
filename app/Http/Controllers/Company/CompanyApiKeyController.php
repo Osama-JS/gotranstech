@@ -18,9 +18,60 @@ class CompanyApiKeyController extends Controller
         protected AuditLogService $auditLogService
     ) {}
 
+    /**
+     * Retrieve the active company profile safely for company users or administrators.
+     * Strictly forbids investors from accessing company API settings.
+     */
+    protected function getTargetCompany(): \App\Models\CompanyProfile
+    {
+        $user = Auth::user();
+        if (!$user) {
+            abort(401);
+        }
+
+        // Strictly forbid investors
+        if ($user->isInvestor()) {
+            abort(403, 'عذراً، هذا القسم ومختبر الربط البرمجي مخصص حصراً لحسابات الشركات اللوجستية.');
+        }
+
+        // Clean up any company profile erroneously attached to an investor user
+        \App\Models\CompanyProfile::whereHas('user', function ($q) {
+            $q->where('user_type', 'investor');
+        })->delete();
+
+        $company = $user->companyProfile;
+
+        if (!$company) {
+            if ($user->isAdmin()) {
+                $company = \App\Models\CompanyProfile::first();
+            }
+
+            if (!$company && $user->isCompany()) {
+                $company = \App\Models\CompanyProfile::firstOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'company_name' => $user->name ?: 'الشركة اللوجستية',
+                        'contact_person' => $user->name,
+                        'contact_email' => $user->email,
+                        'city' => 'الرياض',
+                        'address' => 'طريق الملك فهد، الرياض',
+                        'status' => 'active',
+                        'platform_commission_rate' => 10.00,
+                    ]
+                );
+            }
+        }
+
+        if (!$company) {
+            abort(404, 'لم يتم العثور على سجل الشركة اللوجستية.');
+        }
+
+        return $company;
+    }
+
     public function index(): Response
     {
-        $company = Auth::user()->companyProfile;
+        $company = $this->getTargetCompany();
         $apiKeys = CompanyApiKey::where('company_id', $company->id)
             ->latest()
             ->get();
@@ -44,21 +95,56 @@ class CompanyApiKeyController extends Controller
         ]);
     }
 
+    /**
+     * Dedicated Interactive API Sandbox / Playground
+     */
+    public function sandbox(Request $request): Response
+    {
+        $company = $this->getTargetCompany();
+        $isTestMode = $company->isTestMode();
+        $apiKeys = CompanyApiKey::where('company_id', $company->id)
+            ->where('status', 'active')
+            ->latest()
+            ->get();
+
+        $recentTasks = $isTestMode
+            ? \App\Models\TestTask::where('company_id', $company->id)
+                ->latest()
+                ->take(8)
+                ->select('id', 'task_number', 'external_task_id', 'title', 'status', 'funding_amount', 'is_mock_funded')
+                ->get()
+            : Task::where('company_id', $company->id)
+                ->latest()
+                ->take(8)
+                ->select('id', 'task_number', 'external_task_id', 'title', 'status', 'funding_amount')
+                ->get();
+
+        return Inertia::render('Company/Api/Sandbox', [
+            'company' => $company,
+            'apiKeys' => $apiKeys,
+            'apiBaseUrl' => url('/api/v1'),
+            'recentTasks' => $recentTasks,
+            'isTestMode' => $isTestMode,
+            'environment' => $company->environment ?? 'test',
+        ]);
+    }
+
     public function generate(Request $request)
     {
         $request->validate([
             'key_name' => 'required|string|max:100',
         ]);
 
-        $company = Auth::user()->companyProfile;
-        $result = CompanyApiKey::generateKey($company->id, $request->input('key_name'));
+        $company = $this->getTargetCompany();
+        $env = $company->environment ?? 'test';
+        $result = CompanyApiKey::generateKey($company->id, $request->input('key_name'), $env);
 
         $this->auditLogService->log(
             'created',
             $result['model'],
             [],
-            ['key_name' => $result['model']->key_name],
-            "توليد مفتاح API جديد بواسطة الشركة: {$result['model']->key_name}"
+            ['key_name' => $result['model']->key_name, 'environment' => $env],
+            "توليد مفتاح API جديد ({$env}) بواسطة الشركة: {$result['model']->key_name}"
         );
 
         return back()->with([
@@ -74,26 +160,48 @@ class CompanyApiKeyController extends Controller
             'webhook_secret' => 'nullable|string|max:100',
         ]);
 
-        $company = Auth::user()->companyProfile;
-        $company->webhook_url = $request->input('webhook_url');
+        $company = $this->getTargetCompany();
+        $newUrl = $request->input('webhook_url');
+
+        if (!empty($newUrl)) {
+            [$isUrlValid, $errorMsg] = \App\Services\UrlSecurityValidator::validateWebhookUrl($newUrl);
+            if (!$isUrlValid) {
+                return back()->with('error', "رابط الـ Webhook غير مسموح به أمنياً: {$errorMsg}");
+            }
+        }
+
+        $company->webhook_url = $newUrl;
         if ($secret = $request->input('webhook_secret')) {
             $company->webhook_secret = $secret;
+        } elseif (empty($company->webhook_secret)) {
+            $company->webhook_secret = 'whsec_' . bin2hex(random_bytes(24));
         }
         $company->save();
 
-        return back()->with('success', 'تم حفظ إعدادات الـ Webhook بنجاح.');
+        return back()->with('success', 'تم حفظ إعدادات الـ Webhook بنجاح وتأمينه بتشفير التوقيع الرقمي.');
     }
 
     public function testWebhook(Request $request)
     {
-        $company = Auth::user()->companyProfile;
+        $company = $this->getTargetCompany();
         if (empty($company->webhook_url)) {
             return back()->with('error', 'يرجى إدخال رابط Webhook صالح وحفظه أولاً قبل إجراء الاختبار.');
         }
 
+        [$isUrlValid, $errorMsg] = \App\Services\UrlSecurityValidator::validateWebhookUrl($company->webhook_url);
+        if (!$isUrlValid) {
+            return back()->with('error', "رابط الـ Webhook غير مسموح به أمنياً: {$errorMsg}");
+        }
+
+        if (empty($company->webhook_secret)) {
+            $company->webhook_secret = 'whsec_' . bin2hex(random_bytes(24));
+            $company->saveQuietly();
+        }
+
+        $timestamp = now()->toIso8601String();
         $testPayload = [
             'event' => 'test.ping',
-            'timestamp' => now()->toIso8601String(),
+            'timestamp' => $timestamp,
             'data' => [
                 'message' => 'هذا إشعار تجريبي لاختبار سلامة الاتصال بين منصة GoTransTech وخوادم شركتكم.',
                 'company_name' => $company->company_name,
@@ -103,15 +211,16 @@ class CompanyApiKeyController extends Controller
         ];
 
         $payloadJson = json_encode($testPayload);
-        $secret = $company->webhook_secret ?? 'gotech_secret';
-        $signature = hash_hmac('sha256', $payloadJson, $secret);
+        $signature = hash_hmac('sha256', $timestamp . '.' . $payloadJson, $company->webhook_secret);
 
         try {
             $startTime = microtime(true);
             $response = Http::timeout(5)
+                ->withoutRedirecting() // SSRF Mitigation: Disallow redirects to internal services
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                     'X-GoTech-Signature' => $signature,
+                    'X-GoTech-Timestamp' => $timestamp,
                     'User-Agent' => 'GoTech-Webhook-Tester/1.0',
                 ])
                 ->post($company->webhook_url, $testPayload);
@@ -121,7 +230,7 @@ class CompanyApiKeyController extends Controller
             if ($response->successful()) {
                 return back()->with('success', "تم إرسال الإشعار التجريبي بنجاح! استجاب خادمكم بحالة {$response->status()} OK خلال {$durationMs}ms.");
             } else {
-                return back()->with('error', "استجاب خادمكم بكود استجابة: {$response->status()} {$response->reason()} (استغرق {$durationMs}ms). يرجى التأكد من جهوزية نقطة الاستلام ومعالجة الطلب.");
+                return back()->with('error', "استجاب خادمكم بكود استجابة: {$response->status()} (استغرق {$durationMs}ms). يرجى التأكد من جهوزية نقطة الاستلام ومعالجة الطلب.");
             }
         } catch (\Exception $e) {
             return back()->with('error', "تعذر الاتصال بالرابط المحدد: " . $e->getMessage());
@@ -130,7 +239,7 @@ class CompanyApiKeyController extends Controller
 
     public function revoke(int $id)
     {
-        $company = Auth::user()->companyProfile;
+        $company = $this->getTargetCompany();
         $apiKey = CompanyApiKey::where('company_id', $company->id)->findOrFail($id);
         $apiKey->status = 'revoked';
         $apiKey->save();
@@ -141,6 +250,17 @@ class CompanyApiKeyController extends Controller
             ['status' => 'active'],
             ['status' => 'revoked'],
             "إلغاء تنشيط مفتاح API #{$apiKey->id}"
+        );
+
+        // Security notification to company
+        \App\Services\NotificationDispatcherService::dispatch(
+            'company.api_key_regenerated',
+            "تنبيه أمني: إلغاء تنشيط مفتاح API",
+            "تم إلغاء تنشيط مفتاح الربط البرمجي ({$apiKey->key_name}) بنجاح. لن يتم قبول أي طلبات شحن برمجية باستخدام هذا المفتاح بعد الآن.",
+            route('company.api.index', [], false),
+            ['key_id' => $apiKey->id],
+            Auth::user(),
+            'warning'
         );
 
         return back()->with('success', 'تم إلغاء تفعيل المفتاح البرمجي.');

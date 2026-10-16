@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, router, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
+import { useTranslation } from '../../../Utils/i18n';
 import StatCard from '../../../Components/StatCard';
 import SearchableSelect from '../../../Components/SearchableSelect';
 import Pagination from '../../../Components/Pagination';
@@ -30,6 +31,8 @@ import {
 } from 'lucide-react';
 
 export default function AdminAdmins({ admins, roles = [], stats = {}, filters = {} }) {
+    const { t, locale } = useTranslation();
+    const isAr = locale === 'ar';
     const [search, setSearch] = useState(filters?.search || '');
     const [roleFilter, setRoleFilter] = useState(filters?.role || '');
     const [statusFilter, setStatusFilter] = useState(filters?.status || '');
@@ -149,64 +152,64 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
     };
 
     const roleOptions = [
-        { value: '', label: 'جميع الرتب والأدوار' },
+        { value: '', label: t('admin.admins.filter_all_roles') },
         ...roles.map(r => ({ value: r.name, label: r.name }))
     ];
 
     const statusOptions = [
-        { value: '', label: 'جميع الحالات' },
-        { value: 'active', label: 'نشط (Active)' },
-        { value: 'suspended', label: 'موقوف (Suspended)' },
+        { value: '', label: t('admin.admins.filter_all_statuses') },
+        { value: 'active', label: t('admin.admins.filter_status_active') },
+        { value: 'suspended', label: t('admin.admins.filter_status_suspended') },
     ];
 
     return (
-        <AuthenticatedLayout title="إدارة المشرفين والمسؤولين">
-            <Head title="إدارة المشرفين والمسؤولين - إدارة المنصة" />
+        <AuthenticatedLayout title={t('admin.admins.page_title')}>
+            <Head title={t('admin.admins.page_title')} />
 
             <div className="space-y-6 pb-12">
                 {/* Header */}
                 <AdminPageHeader
-                    title="إدارة المشرفين والمسؤولين"
-                    subtitle="إدارة حسابات طاقم الإدارة، تعيين الأدوار والصلاحيات، وإعادة ضبط كلمات المرور"
+                    title={t('admin.admins.header_title')}
+                    subtitle={t('admin.admins.header_subtitle')}
                     breadcrumbs={[
-                        { label: 'الرئيسية', url: route('admin.dashboard') },
-                        { label: 'المشرفين والمسؤولين' }
+                        { label: t('common.home'), url: route('admin.dashboard') },
+                        { label: t('admin.nav.items.admins') }
                     ]}
                     icon={UserCog}
                     iconColor="text-indigo-400"
                     actions={[
                         {
-                            label: 'إضافة مشرف / مسؤول جديد',
+                            label: t('admin.admins.btn_create'),
                             icon: PlusCircle,
                             onClick: () => setCreateModalOpen(true),
                             variant: 'primary',
                         }
                     ]}
-                    badge={{ text: `${stats?.total_admins || admins.total || 0} مشرف مسجل`, color: 'indigo' }}
+                    badge={{ text: t('admin.admins.badge_total', { count: stats?.total_admins || admins.total || 0 }), color: 'indigo' }}
                 />
 
                 {/* Stat Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <StatCard
-                        title="إجمالي طاقم الإدارة"
+                        title={t('admin.admins.header_title')}
                         value={stats?.total_admins || 0}
                         icon={Users}
                         color="blue"
-                        description="مشرفين وموظفين مسجلين"
+                        description={t('admin.admins.stat_total_desc')}
                     />
                     <StatCard
-                        title="الحسابات النشطة"
+                        title={t('admin.investors.stat_active')}
                         value={stats?.active_admins || 0}
                         icon={UserCheck}
                         color="brand"
-                        description="حسابات مفعلة حالياً"
+                        description={t('admin.admins.stat_active_desc')}
                     />
                     <StatCard
-                        title="مدراء النظام (Super Admins)"
+                        title={t('admin.admins.stat_super_admins')}
                         value={stats?.super_admins || 0}
                         icon={ShieldCheck}
                         color="purple"
-                        description="بكامل الصلاحيات"
+                        description={t('admin.admins.stat_super_admins_desc')}
                     />
                 </div>
 
@@ -215,33 +218,33 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                     <form onSubmit={handleFilter} className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 items-end">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">بحث سريع</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">{t('admin.admins.filter_search_label')}</label>
                                 <div className="relative">
                                     <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute start-3.5 top-3" />
                                     <input
                                         type="text"
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        placeholder="الاسم، البريد، رقم الهاتف..."
+                                        placeholder={t('admin.admins.filter_search_ph')}
                                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl ps-10 pe-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
                                     />
                                 </div>
                             </div>
 
                             <SearchableSelect
-                                label="الدور / الرتبة"
+                                label={t('admin.admins.filter_role_label')}
                                 options={roleOptions}
                                 value={roleFilter}
                                 onChange={setRoleFilter}
-                                placeholder="اختر الدور..."
+                                placeholder={t('admin.admins.filter_select_role')}
                             />
 
                             <SearchableSelect
-                                label="الحالة"
+                                label={t('admin.admins.filter_status_label')}
                                 options={statusOptions}
                                 value={statusFilter}
                                 onChange={setStatusFilter}
-                                placeholder="اختر الحالة..."
+                                placeholder={t('admin.admins.filter_select_status')}
                             />
                         </div>
 
@@ -251,14 +254,14 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                                 className="px-5 py-2.5 rounded-2xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
                             >
                                 <Filter className="w-3.5 h-3.5" />
-                                <span>تطبيق الفلترة</span>
+                                <span>{t('admin.admins.btn_filter')}</span>
                             </button>
                             {(search || roleFilter || statusFilter) && (
                                 <button
                                     type="button"
                                     onClick={handleReset}
                                     className="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700 cursor-pointer"
-                                    title="إعادة ضبط"
+                                    title={t('admin.admins.btn_reset')}
                                 >
                                     <RefreshCw className="w-4 h-4" />
                                 </button>
@@ -273,13 +276,13 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                         <table className="w-full text-xs text-right">
                             <thead className="bg-slate-900/90 text-slate-400 font-semibold border-b border-slate-800">
                                 <tr>
-                                    <th className="p-4">الاسم والبيانات</th>
-                                    <th className="p-4">رقم الهاتف الدولي</th>
-                                    <th className="p-4">الدور / الرتبة</th>
-                                    <th className="p-4">نوع الحساب</th>
-                                    <th className="p-4">الحالة</th>
-                                    <th className="p-4">تاريخ الانضمام</th>
-                                    <th className="p-4 text-center">الإجراءات</th>
+                                    <th className="p-4">{t('admin.admins.table_name')}</th>
+                                    <th className="p-4">{t('admin.admins.table_phone')}</th>
+                                    <th className="p-4">{t('admin.admins.table_role')}</th>
+                                    <th className="p-4">{t('admin.admins.table_account_type')}</th>
+                                    <th className="p-4">{t('admin.admins.table_status')}</th>
+                                    <th className="p-4">{t('admin.admins.table_joined_date')}</th>
+                                    <th className="p-4 text-center">{t('admin.admins.table_actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/60">
@@ -311,7 +314,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                                                 </td>
                                                 <td className="p-4">
                                                     <span className="text-slate-300 font-medium">
-                                                        {admin.user_type === 'admin' ? 'مدير نظام' : 'موظف / مشغل'}
+                                                        {admin.user_type === 'admin' ? t('admin.admins.type_admin') : t('admin.admins.type_employee')}
                                                     </span>
                                                 </td>
                                                 <td className="p-4">
@@ -326,7 +329,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                                                             type="button"
                                                             onClick={() => handleOpenEdit(admin)}
                                                             className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-400 hover:text-blue-300 border border-slate-700 transition-all text-xs"
-                                                            title="تعديل البيانات والدور"
+                                                            title={t('admin.admins.btn_edit')}
                                                         >
                                                             <Edit className="w-4 h-4" />
                                                         </button>
@@ -334,7 +337,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                                                             type="button"
                                                             onClick={() => handleOpenPassword(admin)}
                                                             className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 hover:text-amber-300 border border-slate-700 transition-all text-xs"
-                                                            title="إعادة تعيين كلمة المرور"
+                                                            title={t('admin.admins.btn_reset_pass')}
                                                         >
                                                             <Key className="w-4 h-4" />
                                                         </button>
@@ -346,7 +349,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                                                                     ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border-rose-500/20'
                                                                     : 'bg-violet-500/10 hover:bg-[#5217D4]/20 text-violet-400 border-violet-500/20'
                                                             }`}
-                                                            title={admin.status === 'active' ? 'إيقاف الحساب' : 'تفعيل الحساب'}
+                                                            title={admin.status === 'active' ? t('admin.admins.btn_suspend') : t('admin.admins.btn_activate')}
                                                         >
                                                             {admin.status === 'active' ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
                                                         </button>
@@ -360,12 +363,12 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                                         <td colSpan="7" className="text-center py-12 text-slate-500">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <UserCog className="w-8 h-8 text-slate-600" />
-                                                <p className="text-sm font-semibold">لا يوجد مشرفين مطابقين لمعايير البحث</p>
+                                                <p className="text-sm font-semibold">{t('admin.admins.empty_admins')}</p>
                                                 <button
                                                     onClick={handleReset}
                                                     className="mt-2 text-xs text-indigo-400 hover:text-indigo-300 underline"
                                                 >
-                                                    إلغاء الفلاتر
+                                                    {t('admin.admins.clear_filters')}
                                                 </button>
                                             </div>
                                         </td>
@@ -386,17 +389,17 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
             <Modal
                 isOpen={createModalOpen}
                 onClose={() => setCreateModalOpen(false)}
-                title="إضافة مشرف / مسؤول جديد"
+                title={t('admin.admins.create_modal_title')}
                 maxWidth="lg"
             >
                 <form onSubmit={submitCreate} className="space-y-4">
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">الاسم الكامل</label>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.admins.field_full_name')}</label>
                         <input
                             type="text"
                             value={createData.name}
                             onChange={(e) => setCreateData('name', e.target.value)}
-                            placeholder="محمد أحمد"
+                            placeholder={t('admin.admins.ph_full_name')}
                             className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"
                             required
                         />
@@ -404,7 +407,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                     </div>
 
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">البريد الإلكتروني</label>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.admins.field_email')}</label>
                         <input
                             type="email"
                             value={createData.email}
@@ -428,31 +431,31 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">الدور / الرتبة</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.admins.filter_role_label')}</label>
                             <SearchableSelect
                                 options={roles.map(r => ({ value: r.name, label: r.name }))}
                                 value={createData.role}
                                 onChange={(val) => setCreateData('role', val)}
-                                placeholder="اختر الدور..."
+                                placeholder={t('admin.admins.filter_select_role')}
                             />
                             {createErrors.role && <p className="text-xs text-rose-400 mt-1">{createErrors.role}</p>}
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">حالة الحساب</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.admins.field_status')}</label>
                             <select
                                 value={createData.status}
                                 onChange={(e) => setCreateData('status', e.target.value)}
                                 className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"
                             >
-                                <option value="active">نشط (Active)</option>
-                                <option value="suspended">موقوف (Suspended)</option>
+                                <option value="active">{t('admin.admins.filter_status_active')}</option>
+                                <option value="suspended">{t('admin.admins.filter_status_suspended')}</option>
                             </select>
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">كلمة المرور الأولية</label>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.admins.field_initial_pass')}</label>
                         <input
                             type="password"
                             value={createData.password}
@@ -470,7 +473,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                             onClick={() => setCreateModalOpen(false)}
                             className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -482,7 +485,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                             ) : (
                                 <>
                                     <Save className="w-4 h-4" />
-                                    <span>إضافة وتفعيل المشرف</span>
+                                    <span>{t('admin.admins.btn_submit_create')}</span>
                                 </>
                             )}
                         </button>
@@ -494,12 +497,12 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
             <Modal
                 isOpen={editModalOpen}
                 onClose={() => setEditModalOpen(false)}
-                title={`تعديل بيانات المشرف (${selectedAdmin?.name})`}
+                title={t('admin.admins.edit_modal_title', { name: selectedAdmin?.name })}
                 maxWidth="lg"
             >
                 <form onSubmit={submitEdit} className="space-y-4">
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">الاسم الكامل</label>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.admins.field_full_name')}</label>
                         <input
                             type="text"
                             value={editData.name}
@@ -511,7 +514,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                     </div>
 
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">البريد الإلكتروني</label>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.admins.field_email')}</label>
                         <input
                             type="email"
                             value={editData.email}
@@ -534,25 +537,25 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">الدور / الرتبة</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.admins.filter_role_label')}</label>
                             <SearchableSelect
                                 options={roles.map(r => ({ value: r.name, label: r.name }))}
                                 value={editData.role}
                                 onChange={(val) => setEditData('role', val)}
-                                placeholder="اختر الدور..."
+                                placeholder={t('admin.admins.filter_select_role')}
                             />
                             {editErrors.role && <p className="text-xs text-rose-400 mt-1">{editErrors.role}</p>}
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">حالة الحساب</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.admins.field_status')}</label>
                             <select
                                 value={editData.status}
                                 onChange={(e) => setEditData('status', e.target.value)}
                                 className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"
                             >
-                                <option value="active">نشط (Active)</option>
-                                <option value="suspended">موقوف (Suspended)</option>
+                                <option value="active">{t('admin.admins.filter_status_active')}</option>
+                                <option value="suspended">{t('admin.admins.filter_status_suspended')}</option>
                             </select>
                         </div>
                     </div>
@@ -563,7 +566,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                             onClick={() => setEditModalOpen(false)}
                             className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -575,7 +578,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                             ) : (
                                 <>
                                     <Save className="w-4 h-4" />
-                                    <span>حفظ التعديلات</span>
+                                    <span>{t('admin.admins.btn_submit_edit')}</span>
                                 </>
                             )}
                         </button>
@@ -587,16 +590,16 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
             <Modal
                 isOpen={passwordModalOpen}
                 onClose={() => setPasswordModalOpen(false)}
-                title={`إعادة تعيين كلمة المرور للمشرف (${selectedAdmin?.name})`}
+                title={t('admin.admins.reset_modal_title', { name: selectedAdmin?.name })}
                 maxWidth="md"
             >
                 <form onSubmit={submitPassword} className="space-y-4">
                     <p className="text-xs text-slate-300 leading-relaxed">
-                        سيتم تحديث وتشفير كلمة المرور الجديدة في قاعدة البيانات فوراً.
+                        {t('admin.admins.reset_modal_note')}
                     </p>
 
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">كلمة المرور الجديدة</label>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.admins.field_new_pass')}</label>
                         <input
                             type="password"
                             value={passData.password}
@@ -609,7 +612,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                     </div>
 
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">تأكيد كلمة المرور</label>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.admins.field_confirm_pass')}</label>
                         <input
                             type="password"
                             value={passData.password_confirmation}
@@ -626,7 +629,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                             onClick={() => setPasswordModalOpen(false)}
                             className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -638,7 +641,7 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                             ) : (
                                 <>
                                     <Key className="w-4 h-4" />
-                                    <span>تحديث كلمة المرور</span>
+                                    <span>{t('admin.admins.btn_submit_pass')}</span>
                                 </>
                             )}
                         </button>
@@ -651,10 +654,10 @@ export default function AdminAdmins({ admins, roles = [], stats = {}, filters = 
                 isOpen={!!confirmStatusTarget}
                 onClose={() => setConfirmStatusTarget(null)}
                 onConfirm={confirmToggleStatus}
-                title="تغيير حالة حساب المدير / الموظف"
-                message={`هل أنت متأكد من رغبتك في تغيير حالة حساب "${confirmStatusTarget?.name}"؟`}
-                confirmText="تأكيد تغيير الحالة"
-                cancelText="إلغاء"
+                title={t('admin.admins.status_dialog_title')}
+                message={t('admin.admins.status_dialog_msg', { name: confirmStatusTarget?.name })}
+                confirmText={t('admin.admins.status_dialog_confirm')}
+                cancelText={t('common.cancel')}
                 type="warning"
             />
         </AuthenticatedLayout>

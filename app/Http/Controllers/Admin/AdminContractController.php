@@ -128,32 +128,66 @@ class AdminContractController extends Controller
 
     public function show(int $id): Response
     {
-        $contract = Contract::with(['user', 'signer'])->findOrFail($id);
+        $contract = Contract::with(['user.investorProfile', 'user.companyProfile', 'signer'])->findOrFail($id);
 
         return Inertia::render('Admin/Contracts/Show', [
             'contract' => $contract,
         ]);
     }
 
+    public function updateStatus(Request $request, int $id)
+    {
+        $request->validate([
+            'status' => 'required|in:active,pending_signature,expired,terminated',
+        ]);
+
+        $contract = Contract::findOrFail($id);
+        $oldStatus = $contract->status;
+        $contract->status = $request->input('status');
+        $contract->save();
+
+        $this->auditLogService->log(
+            'status_changed',
+            $contract,
+            ['status' => $oldStatus],
+            ['status' => $contract->status],
+            "تغيير حالة العقد #{$contract->contract_number} إلى {$contract->status}"
+        );
+
+        return back()->with('success', 'تم تحديث حالة العقد بنجاح.');
+    }
+
     public function downloadPdf(int $id, \App\Services\PdfGenerationService $pdfService)
     {
         $contract = Contract::findOrFail($id);
 
-        if (!$contract->file_path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($contract->file_path)) {
+        $disk = 'local';
+        if ($contract->file_path && \Illuminate\Support\Facades\Storage::disk('local')->exists($contract->file_path)) {
+            $disk = 'local';
+        } elseif ($contract->file_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($contract->file_path)) {
+            $disk = 'public';
+        } else {
             $pdfService->generateContractPdf($contract);
+            $disk = 'local';
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('public')->download($contract->file_path, "contract_{$contract->contract_number}.pdf");
+        return \Illuminate\Support\Facades\Storage::disk($disk)->download($contract->file_path, "contract_{$contract->contract_number}.pdf");
     }
 
     public function viewPdf(int $id, \App\Services\PdfGenerationService $pdfService)
     {
         $contract = Contract::findOrFail($id);
 
-        if (!$contract->file_path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($contract->file_path)) {
+        $disk = 'local';
+        if ($contract->file_path && \Illuminate\Support\Facades\Storage::disk('local')->exists($contract->file_path)) {
+            $disk = 'local';
+        } elseif ($contract->file_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($contract->file_path)) {
+            $disk = 'public';
+        } else {
             $pdfService->generateContractPdf($contract);
+            $disk = 'local';
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('public')->response($contract->file_path);
+        return \Illuminate\Support\Facades\Storage::disk($disk)->response($contract->file_path);
     }
 }

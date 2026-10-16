@@ -30,19 +30,27 @@ import {
     Layers,
     Search,
     FormInput,
+    Bell,
+    Database,
+    Terminal,
 } from 'lucide-react';
 import Toast from '../Components/Toast';
 import ThemeToggle from '../Components/ThemeToggle';
 import QuickSearchModal from '../Components/QuickSearchModal';
 import BrandLogo from '../Components/BrandLogo';
 import UnderDevelopmentBanner from '../Components/UnderDevelopmentBanner';
+import NotificationBell from '../Components/NotificationBell';
+import UrgentNotificationModal from '../Components/UrgentNotificationModal';
+import { useTranslation } from '../Utils/i18n';
 
 export default function AuthenticatedLayout({ children, title }) {
     const { auth, locale, landingUrl } = usePage().props;
+    const { t } = useTranslation();
     const user = auth?.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [quickSearchOpen, setQuickSearchOpen] = useState(false);
+    const [urgentNotification, setUrgentNotification] = useState(null);
 
     const isAr = locale === 'ar';
 
@@ -55,43 +63,45 @@ export default function AuthenticatedLayout({ children, title }) {
     // Navigation configuration based on user_type (categorized groups for admin)
     const getAdminNavGroups = () => [
         {
-            title: 'الرئيسية والتحليلات',
+            title: t('admin.nav.groups.home_analytics'),
             items: [
-                { name: 'لوحة المؤشرات', href: route('admin.dashboard'), icon: LayoutDashboard, routeKey: 'admin.dashboard' },
-                { name: 'التحليلات والإحصائيات', href: route('admin.analytics.index'), icon: BarChart3, routeKey: 'admin.analytics.*' },
+                { name: t('admin.nav.items.dashboard'), href: route('admin.dashboard'), icon: LayoutDashboard, routeKey: 'admin.dashboard' },
+                { name: t('admin.nav.items.analytics'), href: route('admin.analytics.index'), icon: BarChart3, routeKey: 'admin.analytics.*' },
             ],
         },
         {
-            title: 'العمليات والتمويل اللوجستي',
+            title: t('admin.nav.groups.operations_funding'),
             items: [
-                { name: 'المهام اللوجستية', href: route('admin.tasks.index'), icon: Truck, routeKey: 'admin.tasks.*' },
-                { name: 'الإيداعات البنكية', href: route('admin.deposits.index'), icon: Receipt, routeKey: 'admin.deposits.*' },
-                { name: 'طلبات سحب الرصيد', href: route('admin.withdrawals.index'), icon: ArrowDownToLine, routeKey: 'admin.withdrawals.*' },
-                { name: 'العقود والاتفاقيات', href: route('admin.contracts.index'), icon: FileText, routeKey: 'admin.contracts.*' },
+                { name: t('admin.nav.items.tasks'), href: route('admin.tasks.index'), icon: Truck, routeKey: 'admin.tasks.*' },
+                { name: t('admin.nav.items.deposits'), href: route('admin.deposits.index'), icon: Receipt, routeKey: 'admin.deposits.*' },
+                { name: t('admin.nav.items.withdrawals'), href: route('admin.withdrawals.index'), icon: ArrowDownToLine, routeKey: 'admin.withdrawals.*' },
+                { name: t('admin.nav.items.contracts'), href: route('admin.contracts.index'), icon: FileText, routeKey: 'admin.contracts.*' },
             ],
         },
         {
-            title: 'الشركاء والمستخدمون',
+            title: t('admin.nav.groups.partners_users'),
             items: [
-                { name: 'المستثمرون', href: route('admin.investors.index'), icon: Users, routeKey: 'admin.investors.*' },
-                { name: 'الشركات اللوجستية', href: route('admin.companies.index'), icon: Building2, routeKey: 'admin.companies.*' },
-                { name: 'إدارة المديرين', href: route('admin.admins.index'), icon: UserCog, routeKey: 'admin.admins.*' },
-                { name: 'الصلاحيات والأدوار', href: route('admin.roles.index'), icon: ShieldCheck, routeKey: 'admin.roles.*' },
+                { name: t('admin.nav.items.investors'), href: route('admin.investors.index'), icon: Users, routeKey: 'admin.investors.*' },
+                { name: t('admin.nav.items.companies'), href: route('admin.companies.index'), icon: Building2, routeKey: 'admin.companies.*' },
+                { name: t('admin.nav.items.admins'), href: route('admin.admins.index'), icon: UserCog, routeKey: 'admin.admins.*' },
+                { name: t('admin.nav.items.roles'), href: route('admin.roles.index'), icon: ShieldCheck, routeKey: 'admin.roles.*' },
             ],
         },
         {
-            title: 'إدارة المحتوى والنماذج',
+            title: t('admin.nav.groups.content_forms'),
             items: [
-                { name: 'صفحة الهبوط (CMS)', href: route('admin.cms.index'), icon: LayoutTemplate, routeKey: 'admin.cms.*' },
-                { name: 'قوالب الحقول الإضافية', href: route('admin.form-templates.index'), icon: FormInput, routeKey: 'admin.form-templates.*' },
+                { name: t('admin.nav.items.cms'), href: route('admin.cms.index'), icon: LayoutTemplate, routeKey: 'admin.cms.*' },
+                { name: t('admin.nav.items.form_templates'), href: route('admin.form-templates.index'), icon: FormInput, routeKey: 'admin.form-templates.*' },
             ],
         },
         {
-            title: 'الرقابة وصحة النظام',
+            title: t('admin.nav.groups.audit_system'),
             items: [
-                { name: 'سجل العمليات والتدقيق', href: route('admin.audit.index'), icon: History, routeKey: 'admin.audit.*' },
-                { name: 'صحة الخادم والقاعدة', href: route('admin.system-health.index'), icon: Server, routeKey: 'admin.system-health.*' },
-                { name: 'الإعدادات وبوابات الدفع', href: route('admin.settings.index'), icon: Settings, routeKey: 'admin.settings.*' },
+                { name: t('admin.nav.items.audit'), href: route('admin.audit.index'), icon: History, routeKey: 'admin.audit.*' },
+                { name: t('admin.nav.items.system_health'), href: route('admin.system-health.index'), icon: Server, routeKey: 'admin.system-health.*' },
+                { name: t('admin.nav.items.backups'), href: route('admin.backups.index'), icon: Database, routeKey: 'admin.backups.*' },
+                { name: t('admin.nav.items.notifications_settings'), href: route('admin.notifications.settings'), icon: Bell, routeKey: 'admin.notifications.*' },
+                { name: t('admin.nav.items.settings'), href: route('admin.settings.index'), icon: Settings, routeKey: 'admin.settings.*' },
             ],
         },
     ];
@@ -99,24 +109,25 @@ export default function AuthenticatedLayout({ children, title }) {
     const getPortalNavItems = () => {
         if (user?.is_investor) {
             return [
-                { name: 'لوحة التحكم', href: route('investor.dashboard'), icon: LayoutDashboard, routeKey: 'investor.dashboard' },
-                { name: 'التحليلات والمؤشرات', href: route('investor.analytics.index'), icon: BarChart3, routeKey: 'investor.analytics.*' },
-                { name: 'سوق المهام الحية', href: route('investor.market.index'), icon: Zap, routeKey: 'investor.market.*' },
-                { name: 'محفظة الاستثمار ورأس المال', href: route('investor.wallet.investment'), icon: Wallet, routeKey: 'investor.wallet.investment' },
-                { name: 'محفظة الأرباح والعمولات', href: route('investor.wallet.commission'), icon: CreditCard, routeKey: 'investor.wallet.commission' },
-                { name: 'عقود الاستثمار', href: route('investor.contracts.index'), icon: FileText, routeKey: 'investor.contracts.*' },
+                { name: t('investor.nav.dashboard'), href: route('investor.dashboard'), icon: LayoutDashboard, routeKey: 'investor.dashboard' },
+                { name: t('investor.nav.analytics'), href: route('investor.analytics.index'), icon: BarChart3, routeKey: 'investor.analytics.*' },
+                { name: t('investor.nav.market'), href: route('investor.market.index'), icon: Zap, routeKey: 'investor.market.*' },
+                { name: t('investor.nav.investment_wallet'), href: route('investor.wallet.investment'), icon: Wallet, routeKey: 'investor.wallet.investment' },
+                { name: t('investor.nav.commission_wallet'), href: route('investor.wallet.commission'), icon: CreditCard, routeKey: 'investor.wallet.commission' },
+                { name: t('investor.nav.contracts'), href: route('investor.contracts.index'), icon: FileText, routeKey: 'investor.contracts.*' },
             ];
         }
 
         if (user?.is_company) {
             return [
-                { name: 'لوحة التحكم', href: route('company.dashboard'), icon: LayoutDashboard, routeKey: 'company.dashboard' },
-                { name: 'التحليلات والمؤشرات', href: route('company.analytics.index'), icon: BarChart3, routeKey: 'company.analytics.*' },
-                { name: 'إدارة المهام', href: route('company.tasks.index'), icon: Truck, routeKey: 'company.tasks.*' },
-                { name: 'محفظة التمويل والمسحوبات', href: route('company.wallet.funding'), icon: Wallet, routeKey: 'company.wallet.funding' },
-                { name: 'محفظة الديون والالتزامات', href: route('company.wallet.debt'), icon: DollarSign, routeKey: 'company.wallet.debt' },
-                { name: 'سحب رصيد التمويل (PDF)', href: route('company.withdrawals.index'), icon: ArrowDownToLine, routeKey: 'company.withdrawals.*' },
-                { name: 'مفاتيح الربط والـ API', href: route('company.api.index'), icon: Key, routeKey: 'company.api.*' },
+                { name: t('company.nav.dashboard'), href: route('company.dashboard'), icon: LayoutDashboard, routeKey: 'company.dashboard' },
+                { name: t('company.nav.analytics'), href: route('company.analytics.index'), icon: BarChart3, routeKey: 'company.analytics.*' },
+                { name: t('company.nav.tasks'), href: route('company.tasks.index'), icon: Truck, routeKey: 'company.tasks.*' },
+                { name: t('company.nav.funding_wallet'), href: route('company.wallet.funding'), icon: Wallet, routeKey: 'company.wallet.funding' },
+                { name: t('company.nav.debt_wallet'), href: route('company.wallet.debt'), icon: DollarSign, routeKey: 'company.wallet.debt' },
+                { name: t('company.nav.withdrawals'), href: route('company.withdrawals.index'), icon: ArrowDownToLine, routeKey: 'company.withdrawals.*' },
+                { sectionHeader: t('company.nav.developers'), name: t('company.nav.api_keys'), href: route('company.api.index'), icon: Key, routeKey: 'company.api.index' },
+                { name: t('company.nav.sandbox'), href: route('company.api.sandbox'), icon: Terminal, routeKey: 'company.api.sandbox' },
             ];
         }
 
@@ -148,7 +159,7 @@ export default function AuthenticatedLayout({ children, title }) {
                     <Link href="/" className="flex items-center gap-3 group">
                         <BrandLogo size="sm" showSlogan={false} />
                         <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-500/20">
-                            {user?.is_admin ? 'لوحة الإدارة' : user?.is_company ? 'بوابة الشركات' : 'بوابة المستثمر'}
+                            {user?.is_admin ? t('admin.nav.portal_badge') : user?.is_company ? t('company.nav.portal_badge') : t('investor.nav.portal_badge')}
                         </span>
                     </Link>
 
@@ -161,7 +172,7 @@ export default function AuthenticatedLayout({ children, title }) {
                                 className="hidden md:flex items-center gap-3 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-violet-950/30 dark:hover:bg-violet-900/40 border border-slate-200 dark:border-violet-800/40 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all text-xs mr-4 rtl:mr-4 rtl:ml-0 shadow-inner cursor-pointer"
                             >
                                 <Search className="w-3.5 h-3.5 text-orange-500" />
-                                <span>البحث السريع في النظام...</span>
+                                <span>{t('admin.nav.quick_search_placeholder')}</span>
                                 <kbd className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-violet-900/60 border border-slate-300 dark:border-violet-700/50 text-[10px] font-mono text-slate-700 dark:text-violet-200">
                                     Ctrl + K
                                 </kbd>
@@ -170,7 +181,7 @@ export default function AuthenticatedLayout({ children, title }) {
                                 type="button"
                                 onClick={() => setQuickSearchOpen(true)}
                                 className="md:hidden p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-violet-950/40 transition-colors mr-2 rtl:mr-2 rtl:ml-0 cursor-pointer"
-                                title="البحث الشامل (Ctrl + K)"
+                                title={t('admin.nav.quick_search_title')}
                             >
                                 <Search className="w-5 h-5 text-orange-500" />
                             </button>
@@ -185,9 +196,9 @@ export default function AuthenticatedLayout({ children, title }) {
                         <div className="hidden sm:flex items-center gap-2 bg-slate-100 dark:bg-violet-950/40 border border-slate-200 dark:border-violet-800/40 px-3.5 py-1.5 rounded-xl">
                             <Wallet className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                             <div className="text-xs">
-                                <span className="text-slate-500 dark:text-slate-400 block text-[10px]">محفظة الاستثمار:</span>
+                                <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('investor.nav.quick_investment_wallet')}</span>
                                 <span className="font-bold font-mono text-orange-600 dark:text-orange-400">
-                                    {user.wallets.investor_investment.available_balance.toLocaleString('en-US')} ر.س
+                                    {Number(user.wallets.investor_investment.available_balance).toLocaleString('en-US')} {t('common.sar')}
                                 </span>
                             </div>
                         </div>
@@ -198,23 +209,26 @@ export default function AuthenticatedLayout({ children, title }) {
                         <div className="hidden sm:flex items-center gap-2 bg-slate-100 dark:bg-violet-950/40 border border-slate-200 dark:border-violet-800/40 px-3.5 py-1.5 rounded-xl">
                             <ArrowDownToLine className="w-4 h-4 text-orange-500" />
                             <div className="text-xs">
-                                <span className="text-slate-500 dark:text-slate-400 block text-[10px]">رصيد التمويل المتاح:</span>
+                                <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('company.nav.available_funding_balance')}</span>
                                 <span className="font-bold font-mono text-violet-700 dark:text-violet-300">
-                                    {user.wallets.company_funding.available_balance.toLocaleString('en-US')} ر.س
+                                    {user.wallets.company_funding.available_balance.toLocaleString('en-US')} {t('common.sar')}
                                 </span>
                             </div>
                         </div>
                     )}
+
+                    {/* Notification Bell */}
+                    <NotificationBell onUrgentDetected={setUrgentNotification} />
 
                     {/* Language Switcher */}
                     <button
                         type="button"
                         onClick={handleSwitchLocale}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-violet-950/40 dark:hover:bg-violet-900/50 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-violet-800/40 transition-colors"
-                        title="تغيير اللغة"
+                        title={t('common.change_language')}
                     >
                         <Globe className="w-3.5 h-3.5 text-orange-500" />
-                        <span>{locale === 'ar' ? 'English' : 'عربي'}</span>
+                        <span>{t('common.lang_switch_target')}</span>
                     </button>
 
                     {/* Theme Toggle (Light / Dark Mode) */}
@@ -252,7 +266,7 @@ export default function AuthenticatedLayout({ children, title }) {
                                     className="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-violet-950/50 hover:text-slate-900 dark:hover:text-white transition-colors"
                                 >
                                     <User className="w-4 h-4 text-violet-500" />
-                                    <span>الملف الشخصي وإعدادات الحساب</span>
+                                    <span>{t('common.profile')}</span>
                                 </Link>
 
                                 <a
@@ -262,7 +276,7 @@ export default function AuthenticatedLayout({ children, title }) {
                                     className="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-violet-950/50 hover:text-slate-900 dark:hover:text-white transition-colors"
                                 >
                                     <LayoutTemplate className="w-4 h-4 text-[#FF6B00]" />
-                                    <span>زيارة صفحة الهبوط العامة</span>
+                                    <span>{t('common.landing_page')}</span>
                                 </a>
 
                                 <button
@@ -271,7 +285,7 @@ export default function AuthenticatedLayout({ children, title }) {
                                     className="w-full flex items-center gap-2 px-4 py-2.5 text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 transition-colors border-t border-slate-200 dark:border-violet-900/40 mt-1 text-start"
                                 >
                                     <LogOut className="w-4 h-4 text-rose-500" />
-                                    <span>تسجيل الخروج</span>
+                                    <span>{t('common.logout')}</span>
                                 </button>
                             </div>
                         )}
@@ -324,20 +338,26 @@ export default function AuthenticatedLayout({ children, title }) {
                                     const isActive = route().current(item.routeKey);
 
                                     return (
-                                        <Link
-                                            key={item.name}
-                                            href={item.href}
-                                            onClick={() => setSidebarOpen(false)}
-                                            data-active={isActive ? 'true' : 'false'}
-                                            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                                                isActive
-                                                    ? 'active-nav-link bg-[#6320EE] text-white shadow-md shadow-violet-600/20'
-                                                    : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-violet-950/40 border border-transparent'
-                                            }`}
-                                        >
-                                            <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-violet-600 dark:text-violet-400/80'}`} />
-                                            <span>{item.name}</span>
-                                        </Link>
+                                        <React.Fragment key={item.name}>
+                                            {item.sectionHeader && (
+                                                <div className="pt-4 pb-1.5 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-violet-300/70 border-t border-slate-200 dark:border-violet-900/30 mt-2">
+                                                    {item.sectionHeader}
+                                                </div>
+                                            )}
+                                            <Link
+                                                href={item.href}
+                                                onClick={() => setSidebarOpen(false)}
+                                                data-active={isActive ? 'true' : 'false'}
+                                                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                                                    isActive
+                                                        ? 'active-nav-link bg-[#6320EE] text-white shadow-md shadow-violet-600/20'
+                                                        : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-violet-950/40 border border-transparent'
+                                                }`}
+                                            >
+                                                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-violet-600 dark:text-violet-400/80'}`} />
+                                                <span>{item.name}</span>
+                                            </Link>
+                                        </React.Fragment>
                                     );
                                 })}
                             </div>
@@ -355,6 +375,13 @@ export default function AuthenticatedLayout({ children, title }) {
 
             {/* Bottom Under Development Marquee Banner */}
             <UnderDevelopmentBanner />
+
+            {/* Urgent Center Screen Notification Modal */}
+            <UrgentNotificationModal 
+                notification={urgentNotification} 
+                onClose={() => setUrgentNotification(null)}
+                onAcknowledge={() => setUrgentNotification(null)}
+            />
         </div>
     );
 }

@@ -5,6 +5,7 @@ import Badge from '../../Components/Badge';
 import OnboardingStepper from '../../Components/OnboardingStepper';
 import AdminPageHeader from '../../Components/AdminPageHeader';
 import LegalAgreementModal from '../../Components/LegalAgreementModal';
+import { useTranslation } from '../../Utils/i18n';
 import {
     Building2,
     Truck,
@@ -21,38 +22,41 @@ import {
 
 export default function CompanyDashboard({ company, stats, recentTasks, recentWithdrawals, formTemplate }) {
     const { auth } = usePage().props;
+    const { t } = useTranslation();
     const user = auth?.user;
     const [agreementModalOpen, setAgreementModalOpen] = useState(false);
 
+    const displayName = company?.company_name || user?.name;
+
     return (
-        <AuthenticatedLayout title={`لوحة تحكم شركة: ${company?.company_name || user?.name}`}>
-            <Head title="لوحة تحكم الشركة" />
+        <AuthenticatedLayout title={t('company.dashboard.title', { name: displayName })}>
+            <Head title={t('company.dashboard.page_title')} />
 
             {/* Professional Page Header */}
             <AdminPageHeader
-                title={`لوحة تحكم شركة: ${company?.company_name || user?.name}`}
-                subtitle="متابعة رصيد التمويل المنصرف، والمهام اللوجستية، ومراقبة الالتزامات والسقف الائتماني"
+                title={t('company.dashboard.title', { name: displayName })}
+                subtitle={t('company.dashboard.subtitle')}
                 icon={Building2}
                 iconColor="text-violet-400"
                 iconBg="bg-violet-500/15 border-violet-500/30"
                 badge={{
-                    text: user?.status === 'active' ? 'منشأة معتمدة ومفعلة' : 'قيد المراجعة والاعتماد',
+                    text: user?.status === 'active' ? t('company.dashboard.status_active') : t('company.dashboard.status_pending'),
                     color: user?.status === 'active' ? 'brand' : 'amber',
                 }}
                 actions={[
                     {
-                        label: 'محفظة التمويل',
+                        label: t('company.dashboard.btn_funding_wallet'),
                         icon: ArrowDownToLine,
                         url: route('company.wallet.funding'),
                         variant: 'primary',
                     },
                     {
-                        label: 'محفظة الديون والالتزامات',
+                        label: t('company.dashboard.btn_debt_wallet'),
                         icon: DollarSign,
                         url: route('company.wallet.debt'),
                     },
                     {
-                        label: 'وثيقة الاتفاقية المعتمدة',
+                        label: t('company.dashboard.btn_legal_agreement'),
                         icon: FileText,
                         onClick: () => setAgreementModalOpen(true),
                     },
@@ -78,17 +82,19 @@ export default function CompanyDashboard({ company, stats, recentTasks, recentWi
                             href={route('company.wallet.funding')}
                             className="text-xs font-bold text-violet-300 hover:text-white flex items-center gap-1 bg-violet-500/10 px-3 py-1.5 rounded-xl border border-violet-500/20 transition-colors"
                         >
-                            <span>محفظة التمويل</span>
+                            <span>{t('company.dashboard.btn_funding_wallet')}</span>
                             <ArrowUpRight className="w-3.5 h-3.5" />
                         </Link>
                     </div>
-                    <span className="text-xs font-semibold text-slate-400 block mb-1">رصيد محفظة التمويل المتاح للمطالبة</span>
+                    <span className="text-xs font-semibold text-slate-400 block mb-1">
+                        {t('company.dashboard.card_funding_title')}
+                    </span>
                     <div className="text-3xl font-black font-mono text-white flex items-baseline gap-1.5">
                         {stats.funding_available.toLocaleString('en-US')}
-                        <span className="text-sm font-sans font-bold text-violet-400">ر.س</span>
+                        <span className="text-sm font-sans font-bold text-violet-400">{t('common.sar')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 mt-2">
-                        المحجوز في طلبات سحب قيد المراجعة: {stats.locked_in_withdrawals.toLocaleString('en-US')} ر.س
+                        {t('company.dashboard.card_funding_locked', { amount: stats.locked_in_withdrawals.toLocaleString('en-US') })}
                     </p>
                 </div>
 
@@ -102,16 +108,18 @@ export default function CompanyDashboard({ company, stats, recentTasks, recentWi
                             href={route('company.wallet.debt')}
                             className="text-xs font-bold text-rose-400 hover:text-rose-300 bg-rose-500/10 px-3 py-1.5 rounded-xl border border-rose-500/20 transition-colors"
                         >
-                            محفظة الديون والسداد
+                            {t('company.dashboard.card_debt_link')}
                         </Link>
                     </div>
-                    <span className="text-xs font-semibold text-slate-400 block mb-1">إجمالي المديونية المستحقة للمنصة</span>
+                    <span className="text-xs font-semibold text-slate-400 block mb-1">
+                        {t('company.dashboard.card_debt_title')}
+                    </span>
                     <div className="text-3xl font-black font-mono text-white flex items-baseline gap-1.5">
                         {stats.total_debt_outstanding.toLocaleString('en-US')}
-                        <span className="text-sm font-sans font-bold text-rose-400">ر.س</span>
+                        <span className="text-sm font-sans font-bold text-rose-400">{t('common.sar')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 mt-2">
-                        تسدد وفق مواعيد الاستحقاق المحددة في عقود السحب
+                        {t('company.dashboard.card_debt_note')}
                     </p>
                 </div>
 
@@ -126,16 +134,18 @@ export default function CompanyDashboard({ company, stats, recentTasks, recentWi
                             className="text-xs font-bold text-orange-300 hover:text-white flex items-center gap-1 bg-orange-500/10 px-3 py-1.5 rounded-xl border border-orange-500/20 transition-colors"
                         >
                             <Key className="w-3.5 h-3.5" />
-                            <span>مفاتيح الـ API</span>
+                            <span>{t('company.dashboard.card_tasks_api_link')}</span>
                         </Link>
                     </div>
-                    <span className="text-xs font-semibold text-slate-400 block mb-1">إجمالي المهام الممولة بالمنصة</span>
+                    <span className="text-xs font-semibold text-slate-400 block mb-1">
+                        {t('company.dashboard.card_tasks_title')}
+                    </span>
                     <div className="text-3xl font-black font-mono text-white flex items-baseline gap-1.5">
                         {stats.funded_tasks_count}
-                        <span className="text-sm font-sans font-bold text-orange-400">مهمة</span>
+                        <span className="text-sm font-sans font-bold text-orange-400">{t('common.tasks')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 mt-2">
-                        {stats.available_tasks_count} مهام قيد العرض للتمويل الآن
+                        {t('company.dashboard.card_tasks_available', { count: stats.available_tasks_count })}
                     </p>
                 </div>
             </div>
@@ -147,10 +157,10 @@ export default function CompanyDashboard({ company, stats, recentTasks, recentWi
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-white text-base flex items-center gap-2">
                             <Truck className="w-5 h-5 text-orange-400" />
-                            <span>آخر المهام المرسلة من نظامكم</span>
+                            <span>{t('company.dashboard.recent_tasks_title')}</span>
                         </h3>
                         <Link href={route('company.tasks.index')} className="text-xs text-orange-400 hover:text-orange-300 transition-colors">
-                            عرض الكل
+                            {t('common.view_all')}
                         </Link>
                     </div>
 
@@ -168,14 +178,14 @@ export default function CompanyDashboard({ company, stats, recentTasks, recentWi
                                     </div>
                                     <div className="text-left flex flex-col items-end gap-1">
                                         <span className="font-mono font-bold text-sm text-white">
-                                            {parseFloat(task.funding_amount).toLocaleString('en-US')} ر.س
+                                            {parseFloat(task.funding_amount).toLocaleString('en-US')} {t('common.sar')}
                                         </span>
                                         <Badge status={task.status} />
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <p className="text-xs text-slate-500 text-center py-6">لم يتم إرسال أي مهام حتى الآن.</p>
+                            <p className="text-xs text-slate-500 text-center py-6">{t('company.dashboard.no_recent_tasks')}</p>
                         )}
                     </div>
                 </div>
@@ -185,10 +195,10 @@ export default function CompanyDashboard({ company, stats, recentTasks, recentWi
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-white text-base flex items-center gap-2">
                             <ArrowDownToLine className="w-5 h-5 text-violet-400" />
-                            <span>آخر طلبات سحب رصيد التمويل</span>
+                            <span>{t('company.dashboard.recent_withdrawals_title')}</span>
                         </h3>
                         <Link href={route('company.withdrawals.index')} className="text-xs text-violet-400 hover:text-violet-300 transition-colors">
-                            عرض الكل
+                            {t('common.view_all')}
                         </Link>
                     </div>
 
@@ -198,18 +208,18 @@ export default function CompanyDashboard({ company, stats, recentTasks, recentWi
                                 <div key={w.id} className="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 flex items-center justify-between gap-3">
                                     <div>
                                         <span className="font-mono text-xs font-bold text-violet-400 block">{w.request_number}</span>
-                                        <span className="text-[11px] text-slate-400 block mt-0.5">{w.number_of_tasks} مهمة مشمولة</span>
+                                        <span className="text-[11px] text-slate-400 block mt-0.5">{t('company.dashboard.tasks_included', { count: w.number_of_tasks })}</span>
                                     </div>
                                     <div className="text-left flex flex-col items-end gap-1">
                                         <span className="font-mono font-bold text-sm text-white">
-                                            {parseFloat(w.requested_amount).toLocaleString('en-US')} ر.س
+                                            {parseFloat(w.requested_amount).toLocaleString('en-US')} {t('common.sar')}
                                         </span>
                                         <Badge status={w.status} />
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <p className="text-xs text-slate-500 text-center py-6">لا توجد طلبات سحب رصيد مسجلة.</p>
+                            <p className="text-xs text-slate-500 text-center py-6">{t('company.dashboard.no_recent_withdrawals')}</p>
                         )}
                     </div>
                 </div>

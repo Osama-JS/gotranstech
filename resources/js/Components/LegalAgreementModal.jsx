@@ -125,6 +125,25 @@ export default function LegalAgreementModal({
                     </button>
                 </div>
 
+                {!isSigned && (
+                    <div className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/25 flex items-center justify-between gap-3 text-orange-500 dark:text-orange-400 text-xs font-bold">
+                        <div className="flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4 shrink-0" />
+                            <span>يرجى النزول لأسفل الوثيقة للموافقة والتوقيع الإلكتروني الرسمي لاعتماد العقد.</span>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const el = document.getElementById('sign-section');
+                                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            className="px-3 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold shrink-0 transition-colors cursor-pointer"
+                        >
+                            الانتقال لخانة التوقيع ↓
+                        </button>
+                    </div>
+                )}
+
                 {/* Printable Formal Document Area */}
                 <div 
                     id="legal-agreement-document" 
@@ -307,13 +326,13 @@ export default function LegalAgreementModal({
 
                 {/* Footer Controls */}
                 {!isSigned ? (
-                    <form onSubmit={handleSign} className="space-y-4 pt-2">
-                        <label className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 cursor-pointer hover:border-violet-500 transition-colors">
+                    <form id="sign-section" onSubmit={handleSign} className="space-y-4 pt-3 border-t-2 border-violet-500/30">
+                        <label className="flex items-start gap-3 p-4 rounded-2xl bg-violet-500/5 dark:bg-violet-950/20 border-2 border-violet-500/40 cursor-pointer hover:border-violet-500 transition-colors">
                             <input
                                 type="checkbox"
                                 checked={data.agree_terms}
                                 onChange={(e) => setData('agree_terms', e.target.checked)}
-                                className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-violet-600 focus:ring-violet-500 bg-white dark:bg-slate-950 mt-0.5 cursor-pointer"
+                                className="w-5 h-5 rounded border-slate-300 dark:border-slate-700 text-[#6320EE] focus:ring-violet-500 bg-white dark:bg-slate-950 mt-0.5 cursor-pointer"
                                 required
                             />
                             <span className="text-xs text-slate-800 dark:text-slate-200 font-medium leading-relaxed">

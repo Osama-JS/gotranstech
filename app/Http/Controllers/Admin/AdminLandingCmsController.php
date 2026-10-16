@@ -66,9 +66,9 @@ class AdminLandingCmsController extends Controller
     public function updateBranding(Request $request)
     {
         $validated = $request->validate([
-            'logo' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
-            'logo_dark' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
-            'favicon' => 'nullable|file|mimes:ico,png,svg,webp,jpg|max:2048',
+            'logo' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'logo_dark' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'favicon' => 'nullable|file|mimes:ico,png,webp,jpg|max:2048',
             'site_name_ar' => 'nullable|string|max:255',
             'site_name_en' => 'nullable|string|max:255',
             'site_slogan_ar' => 'nullable|string|max:255',

@@ -58,4 +58,30 @@ class SystemSetting extends Model
             $this->value = $val;
         }
     }
+
+    public static function getVal(string $key, mixed $default = null): mixed
+    {
+        $setting = static::where('key', $key)->first();
+        if (!$setting || $setting->value === null || $setting->value === '') {
+            return $default;
+        }
+
+        return $setting->decrypted_value ?? $setting->value ?? $default;
+    }
+
+    public static function setVal(string $key, mixed $value, string $group = 'general', bool $isEncrypted = false): static
+    {
+        $setting = static::firstOrNew(['key' => $key]);
+        $setting->group = $group;
+        $setting->is_encrypted = $isEncrypted;
+
+        if ($isEncrypted && !empty($value)) {
+            $setting->value = Crypt::encryptString((string)$value);
+        } else {
+            $setting->value = $value !== null ? (string)$value : null;
+        }
+
+        $setting->save();
+        return $setting;
+    }
 }

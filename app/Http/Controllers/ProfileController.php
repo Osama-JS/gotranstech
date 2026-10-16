@@ -52,7 +52,36 @@ class ProfileController extends Controller
     public function update(Request $request): RedirectResponse
     {
         $user = Auth::user();
+        $isLockedAccount = ($user->status === 'active' && !$user->isAdmin());
 
+        // For active/approved accounts (Investor or Company), legal and banking credentials are locked
+        if ($isLockedAccount) {
+            $validated = $request->validate([
+                'phone' => 'nullable|string|max:20',
+                'phone_country_code' => 'nullable|string|max:10',
+            ]);
+
+            $oldData = $user->toArray();
+            if (array_key_exists('phone', $validated)) {
+                $user->phone = $validated['phone'];
+            }
+            if (array_key_exists('phone_country_code', $validated)) {
+                $user->country_code = $validated['phone_country_code'];
+            }
+            $user->save();
+
+            $this->auditLogService->log(
+                'profile_contact_update',
+                $user,
+                $oldData,
+                $user->fresh()->toArray(),
+                "قام المستخدم {$user->name} بتحديث بيانات الاتصال (البيانات الرسمية والبنكية مقفلة ومعتمدة)"
+            );
+
+            return back()->with('success', 'تم تحديث بيانات الاتصال بنجاح. البيانات الرسمية والبنكية معتمدة ومحمية قانونياً.');
+        }
+
+        // For non-active users (initial setup) or administrators
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,

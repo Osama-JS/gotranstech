@@ -32,10 +32,22 @@ class AdminSettingsController extends Controller
             ->where('key', '!=', 'under_development_allow_dismiss')
             ->get()
             ->map(function ($s) {
+            $val = $s->is_encrypted ? $s->decrypted_value : $s->value;
+            if ($s->is_encrypted && !empty($val)) {
+                $len = strlen($val);
+                if ($len <= 8) {
+                    $maskedVal = '••••••••';
+                } else {
+                    $maskedVal = substr($val, 0, 4) . '••••••••' . substr($val, -4);
+                }
+            } else {
+                $maskedVal = $val;
+            }
+
             return [
                 'id' => $s->id,
                 'key' => $s->key,
-                'value' => $s->is_encrypted ? $s->decrypted_value : $s->value,
+                'value' => $maskedVal,
                 'is_encrypted' => $s->is_encrypted,
                 'group' => $s->group,
                 'label' => $s->label,
@@ -104,6 +116,11 @@ class AdminSettingsController extends Controller
             $existing = SystemSetting::where('key', $key)->first();
             $isEncrypted = $existing ? $existing->is_encrypted : false;
             $label = $existing ? $existing->label : $key;
+
+            // If encrypted and the submitted value contains masking characters, do not overwrite existing secret
+            if ($isEncrypted && (str_contains((string) $value, '••••') || str_contains((string) $value, '********'))) {
+                continue;
+            }
 
             EncryptedSettingService::set(
                 $key,

@@ -89,7 +89,7 @@ class PdfGenerationService
             ]);
 
         $fileName = 'withdrawals/' . $request->request_number . '.pdf';
-        Storage::disk('public')->put($fileName, $pdf->output());
+        Storage::disk('local')->put($fileName, $pdf->output());
 
         $request->pdf_file_path = $fileName;
         $request->save();
@@ -124,7 +124,7 @@ class PdfGenerationService
             ]);
 
         $fileName = 'contracts/' . $contract->contract_number . '.pdf';
-        Storage::disk('public')->put($fileName, $pdf->output());
+        Storage::disk('local')->put($fileName, $pdf->output());
 
         $contract->file_path = $fileName;
         $contract->save();

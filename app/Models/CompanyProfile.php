@@ -26,13 +26,33 @@ class CompanyProfile extends Model
         'webhook_secret',
         'platform_commission_rate',
         'status',
+        'environment',
+        'test_mode_approved_at',
+        'approved_by_admin_id',
+        'test_notes',
     ];
 
     protected function casts(): array
     {
         return [
             'platform_commission_rate' => 'decimal:2',
+            'test_mode_approved_at' => 'datetime',
         ];
+    }
+
+    public function isTestMode(): bool
+    {
+        return ($this->environment ?? 'test') === 'test';
+    }
+
+    public function isLiveMode(): bool
+    {
+        return ($this->environment ?? 'test') === 'live';
+    }
+
+    public function approvedByAdmin(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by_admin_id');
     }
 
     public function user(): BelongsTo
@@ -48,6 +68,11 @@ class CompanyProfile extends Model
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class, 'company_id');
+    }
+
+    public function testTasks(): HasMany
+    {
+        return $this->hasMany(TestTask::class, 'company_id');
     }
 
     public function withdrawalRequests(): HasMany

@@ -189,6 +189,18 @@ class InvestorWalletController extends Controller
             ]);
         });
 
+        // Notify Admin of Investor Withdrawal Request
+        $isLargeAmount = $amount >= 50000;
+        \App\Services\NotificationDispatcherService::dispatch(
+            $isLargeAmount ? 'admin.large_amount_withdrawal_requested' : 'admin.investor_withdrawal_requested',
+            "طلب سحب أرباح مستثمر: {$user->name}",
+            "تقدم المستثمر ({$user->name}) بطلب سحب أرباح بمبلغ " . number_format($amount, 2) . " ر.س إلى بنك {$validated['bank_name']}.",
+            route('admin.investors.index', [], false),
+            ['investor_id' => $user->id, 'amount' => $amount],
+            null,
+            $isLargeAmount ? 'urgent' : 'warning'
+        );
+
         return back()->with('success', 'تم تقديم طلب سحب الأرباح بنجاح، سيتم مراجعته والتحويل لحسابك البنكي المعتمد.');
     }
 
@@ -209,9 +221,9 @@ class InvestorWalletController extends Controller
         ]);
 
         $user = Auth::user();
-        $path = $request->file('receipt_file')->store('receipts', 'public');
+        $path = $request->file('receipt_file')->store('receipts', 'local');
 
-        BankDeposit::create([
+        $deposit = BankDeposit::create([
             'user_id' => $user->id,
             'wallet_id' => $user->investment_wallet->id,
             'deposit_number' => BankDeposit::generateDepositNumber(),
@@ -224,6 +236,17 @@ class InvestorWalletController extends Controller
             'receipt_file_path' => $path,
             'status' => 'pending',
         ]);
+
+        // Notify Admin of Bank Deposit
+        \App\Services\NotificationDispatcherService::dispatch(
+            'admin.deposit_completed',
+            "إشعار إيداع بنكي: #{$deposit->deposit_number}",
+            "قام المستثمر ({$user->name}) برفع إيصال إيداع بنكي بمبلغ " . number_format($validated['amount'], 2) . " ر.س عبر {$validated['bank_name']} بانتظار التحقق والاعتماد.",
+            route('admin.deposits.index', [], false),
+            ['deposit_id' => $deposit->id, 'amount' => $validated['amount'], 'user_id' => $user->id],
+            null,
+            'info'
+        );
 
         return back()->with('success', 'تم رفع إيصال التحويل البنكي بنجاح. سيتم مراجعته وإيداع المبلغ في محفظتك فور اعتماده من الإدارة.');
     }
@@ -279,6 +302,9 @@ class InvestorWalletController extends Controller
         $deposit = BankDeposit::where('user_id', Auth::id())->with(['user'])->findOrFail($id);
         $path = $deposit->receipt_file_path;
 
+        if ($path && Storage::disk('local')->exists($path)) {
+            return Storage::disk('local')->response($path);
+        }
         if ($path && Storage::disk('public')->exists($path)) {
             return Storage::disk('public')->response($path);
         }
@@ -286,7 +312,7 @@ class InvestorWalletController extends Controller
         // Generate fallback receipt PDF
         $fileName = 'deposits/' . ($deposit->deposit_number ?: 'DEP-' . $deposit->id) . '_receipt.pdf';
 
-        if (!Storage::disk('public')->exists($fileName)) {
+        if (!Storage::disk('local')->exists($fileName) && !Storage::disk('public')->exists($fileName)) {
             $html = view('pdf.deposit_receipt', [
                 'deposit' => $deposit,
                 'user' => $deposit->user,
@@ -298,11 +324,12 @@ class InvestorWalletController extends Controller
                 ->setPaper('a5', 'portrait')
                 ->setOption(['defaultFont' => 'DejaVu Sans']);
 
-            Storage::disk('public')->put($fileName, $pdf->output());
+            Storage::disk('local')->put($fileName, $pdf->output());
             $deposit->receipt_file_path = $fileName;
             $deposit->saveQuietly();
         }
 
-        return Storage::disk('public')->response($fileName);
+        $disk = Storage::disk('local')->exists($fileName) ? 'local' : 'public';
+        return Storage::disk($disk)->response($fileName);
     }
 }

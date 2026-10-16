@@ -22,7 +22,7 @@ class AdminInvestorController extends Controller
     public function index(Request $request): Response
     {
         $query = User::where('user_type', 'investor')
-            ->with(['investorProfile', 'wallets'])
+            ->with(['investorProfile', 'wallets', 'contracts'])
             ->withCount(['fundedTasks', 'investments']);
 
         // Search Filter
@@ -43,6 +43,15 @@ class AdminInvestorController extends Controller
             $query->where('status', $status);
         }
 
+        // Agreement Signed Filter
+        if ($agreementStatus = $request->input('agreement_status')) {
+            if ($agreementStatus === 'signed') {
+                $query->whereNotNull('agreement_signed_at');
+            } elseif ($agreementStatus === 'pending') {
+                $query->whereNull('agreement_signed_at');
+            }
+        }
+
         // Date Range Filters
         if ($dateFrom = $request->input('date_from')) {
             $query->whereDate('created_at', '>=', $dateFrom);
@@ -58,6 +67,8 @@ class AdminInvestorController extends Controller
             'total' => User::where('user_type', 'investor')->count(),
             'active' => User::where('user_type', 'investor')->where('status', 'active')->count(),
             'suspended' => User::where('user_type', 'investor')->where('status', 'suspended')->count(),
+            'pending_approval' => User::where('user_type', 'investor')->whereIn('status', ['pending', 'pending_approval'])->count(),
+            'signed_contracts_count' => User::where('user_type', 'investor')->whereNotNull('agreement_signed_at')->count(),
             'total_investment_balance' => Wallet::where('wallet_type', 'investor_investment')
                 ->whereHas('user', fn($q) => $q->where('user_type', 'investor'))
                 ->sum('balance'),
@@ -69,7 +80,7 @@ class AdminInvestorController extends Controller
         return Inertia::render('Admin/Investors/Index', [
             'investors' => $investors,
             'stats' => $stats,
-            'filters' => $request->only(['search', 'status', 'date_from', 'date_to']),
+            'filters' => $request->only(['search', 'status', 'agreement_status', 'date_from', 'date_to']),
         ]);
     }
 

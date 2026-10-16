@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
+import { useTranslation } from '../../../Utils/i18n';
 import StatCard from '../../../Components/StatCard';
 import Badge from '../../../Components/Badge';
 import PhoneDisplay from '../../../Components/PhoneDisplay';
@@ -38,17 +39,17 @@ export default function AdminInvestorShow({ investor, profileStats }) {
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     return (
-        <AuthenticatedLayout title={`ملف المستثمر: ${investor.name}`}>
-            <Head title={`المستثمر: ${investor.name}`} />
+        <AuthenticatedLayout title={t('admin.investors.show_title', { name: investor.name })}>
+            <Head title={t('admin.investors.show_title', { name: investor.name })} />
 
             <AdminPageHeader
                 title={investor.name}
-                subtitle={`عضوية مستثمر منذ ${new Date(investor.created_at).toLocaleDateString('ar-SA')}`}
+                subtitle={t('admin.investors.show_member_since', { date: new Date(investor.created_at).toLocaleDateString(isAr ? 'ar-SA' : 'en-US') })}
                 icon={Users}
                 iconColor="text-violet-400"
                 iconBg="bg-violet-500/10 border-violet-500/20"
                 breadcrumbs={[
-                    { label: 'المستثمرون', href: route('admin.investors.index') },
+                    { label: t('admin.nav.investors'), href: route('admin.investors.index') },
                     { label: investor.name },
                 ]}
                 badge={<Badge status={investor.status} />}
@@ -58,7 +59,7 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                         className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
                     >
                         <ChevronLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180" />
-                        <span>العودة لقائمة المستثمرين</span>
+                        <span>{t('admin.investors.show_btn_back')}</span>
                     </Link>
                 }
             />
@@ -66,79 +67,129 @@ export default function AdminInvestorShow({ investor, profileStats }) {
             {/* Top Stat Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <StatCard
-                    title="رصيد محفظة الاستثمار"
-                    value={`${parseFloat(profileStats?.investment_balance || 0).toLocaleString('en-US')} ر.س`}
-                    subtitle="متاح للاستثمار الفوري"
+                    title={t('admin.investors.show_stat_invest_balance')}
+                    value={`${parseFloat(profileStats?.investment_balance || 0).toLocaleString('en-US')} ${t('common.sar')}`}
+                    subtitle={t('admin.investors.show_stat_invest_balance_sub')}
                     icon={Wallet}
                     color="brand"
                 />
                 <StatCard
-                    title="رصيد محفظة العمولات"
-                    value={`${parseFloat(profileStats?.commission_balance || 0).toLocaleString('en-US')} ر.س`}
-                    subtitle="أرباح محققة قابلة للسحب"
+                    title={t('admin.investors.show_stat_commission_balance')}
+                    value={`${parseFloat(profileStats?.commission_balance || 0).toLocaleString('en-US')} ${t('common.sar')}`}
+                    subtitle={t('admin.investors.show_stat_commission_balance_sub')}
                     icon={TrendingUp}
                     color="blue"
                 />
                 <StatCard
-                    title="إجمالي المبالغ المستثمرة"
-                    value={`${parseFloat(profileStats?.total_invested || 0).toLocaleString('en-US')} ر.س`}
-                    subtitle={`في ${profileStats?.funded_tasks_count || 0} مهمة لوجستية`}
+                    title={t('admin.investors.show_stat_total_invested')}
+                    value={`${parseFloat(profileStats?.total_invested || 0).toLocaleString('en-US')} ${t('common.sar')}`}
+                    subtitle={t('admin.investors.show_stat_total_invested_sub', { count: profileStats?.funded_tasks_count || 0 })}
                     icon={Truck}
                     color="purple"
                 />
                 <StatCard
-                    title="إجمالي الأرباح الموزعة"
-                    value={`${parseFloat(profileStats?.total_profits || 0).toLocaleString('en-US')} ر.س`}
-                    subtitle={`بنسبة ربح ${profile?.platform_commission_share_rate || 70}%`}
+                    title={t('admin.investors.show_stat_total_profit')}
+                    value={`${parseFloat(profileStats?.total_profits || 0).toLocaleString('en-US')} ${t('common.sar')}`}
+                    subtitle={t('admin.investors.show_stat_total_profit_sub', { rate: profile?.platform_commission_share_rate || 70 })}
                     icon={Receipt}
                     color="cyan"
                 />
+            </div>
+
+            {/* Contract & Legal Agreement Status Card */}
+            <div className="bg-slate-900/80 backdrop-blur-xl border border-violet-500/30 rounded-3xl p-6 mb-8 shadow-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-[#6320EE]/10 border border-violet-500/20 text-[#6320EE] dark:text-violet-400 flex items-center justify-center">
+                            <FileText className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                                <span>{t('admin.investors.show_contract_status_title')}</span>
+                                {investor.agreement_signed_at ? (
+                                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#6320EE]/15 text-[#6320EE] dark:text-violet-300 border border-violet-500/30">
+                                        {t('admin.investors.show_contract_signed')}
+                                    </span>
+                                ) : (
+                                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-500/15 text-orange-400 border border-orange-500/30">
+                                        {t('admin.investors.show_contract_pending')}
+                                    </span>
+                                )}
+                            </h3>
+                            <p className="text-xs text-slate-400 mt-0.5">
+                                {investor.agreement_signed_at 
+                                    ? t('admin.investors.show_contract_signed_at', { date: new Date(investor.agreement_signed_at).toLocaleString(isAr ? 'ar-SA' : 'en-US') }) 
+                                    : t('admin.investors.show_contract_not_signed')}
+                            </p>
+                        </div>
+                    </div>
+
+                    {investor.contracts?.[0] && (
+                        <div className="flex items-center gap-2">
+                            <Link
+                                href={route('admin.contracts.show', investor.contracts[0].id)}
+                                className="px-3.5 py-2 rounded-xl bg-[#6320EE] hover:bg-[#5219cf] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+                            >
+                                <Eye className="w-4 h-4" />
+                                <span>{t('admin.investors.show_btn_view_contract', { number: '#' + investor.contracts[0].contract_number })}</span>
+                            </Link>
+                            <a
+                                href={route('admin.contracts.view-pdf', investor.contracts[0].id)}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-3 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+                            >
+                                <span>{t('common.view')}</span>
+                            </a>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Investor Profile Summary Card */}
             <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 mb-8 shadow-xl">
                 <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
                     <Shield className="w-4 h-4 text-violet-400" />
-                    <span>البيانات الشخصية والحساب البنكي</span>
+                    <span>{t('admin.investors.show_personal_info')}</span>
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xs">
                     <div>
-                        <span className="text-slate-400 block mb-1">البريد الإلكتروني</span>
+                        <span className="text-slate-400 block mb-1">{t('admin.investors.field_email')}</span>
                         <span className="font-mono text-slate-200 font-bold select-all">{investor.email}</span>
                     </div>
 
                     <div>
-                        <span className="text-slate-400 block mb-1">رقم الهاتف الجوال</span>
+                        <span className="text-slate-400 block mb-1">{t('admin.investors.field_phone')}</span>
                         <PhoneDisplay countryCode={investor.country_code} phone={investor.phone} />
                     </div>
 
                     <div>
-                        <span className="text-slate-400 block mb-1">الهوية الوطنية / الإقامة</span>
+                        <span className="text-slate-400 block mb-1">{t('admin.investors.field_national_id')}</span>
                         <span className="font-mono text-slate-200 font-bold">{profile?.national_id || '-'}</span>
                     </div>
 
                     <div>
-                        <span className="text-slate-400 block mb-1">نسبة توزيع الأرباح</span>
+                        <span className="text-slate-400 block mb-1">{t('admin.investors.table_profit_rate')}</span>
                         <span className="font-mono font-bold text-violet-400 bg-violet-500/10 px-2 py-0.5 rounded-lg border border-violet-500/20">
                             {profile?.platform_commission_share_rate || 70}%
                         </span>
                     </div>
 
                     <div>
-                        <span className="text-slate-400 block mb-1">البنك المعتمد</span>
+                        <span className="text-slate-400 block mb-1">{t('admin.investors.field_bank_name')}</span>
                         <span className="text-slate-200 font-bold">{profile?.bank_name || '-'}</span>
                     </div>
 
                     <div className="lg:col-span-2">
-                        <span className="text-slate-400 block mb-1">رقم الآيبان (IBAN)</span>
+                        <span className="text-slate-400 block mb-1">{t('admin.investors.field_iban')}</span>
                         <span className="font-mono text-slate-200 font-bold select-all" dir="ltr">
                             {profile?.bank_iban || '-'}
                         </span>
                     </div>
 
                     <div>
-                        <span className="text-slate-400 block mb-1">حالة الحساب</span>
+                        <span className="text-slate-400 block mb-1">{t('admin.investors.field_status')}</span>
                         <Badge status={investor.status} />
                     </div>
                 </div>
@@ -148,14 +199,14 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                     <div className="mt-6 pt-6 border-t border-slate-800">
                         <h4 className="text-xs font-bold text-violet-400 mb-3 flex items-center gap-1.5">
                             <FormInput className="w-3.5 h-3.5" />
-                            <span>البيانات الإضافية المعبأة (حسب نموذج التسجيل)</span>
+                            <span>{t('admin.investors.show_extra_info')}</span>
                         </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {Object.entries(investor.additional_data).map(([key, val]) => (
                                 <div key={key} className="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
                                     <span className="text-[11px] text-slate-400 block mb-1">{key}</span>
                                     <span className="text-xs font-bold text-slate-200 font-mono">
-                                        {typeof val === 'boolean' ? (val ? 'نعم' : 'لا') : String(val || '-')}
+                                        {typeof val === 'boolean' ? (val ? t('common.yes') : t('common.no')) : String(val || '-')}
                                     </span>
                                 </div>
                             ))}
@@ -167,10 +218,10 @@ export default function AdminInvestorShow({ investor, profileStats }) {
             {/* Navigation Tabs */}
             <div className="flex items-center gap-2 border-b border-slate-800/80 mb-6 overflow-x-auto pb-2">
                 {[
-                    { key: 'wallets', label: 'المحافظ وسجل المعاملات المالية', icon: Wallet, count: allTransactions.length },
-                    { key: 'tasks', label: 'المهام الممولة', icon: Truck, count: investor.investments?.length || 0 },
-                    { key: 'deposits', label: 'سجل الإيداعات البنكية', icon: Receipt, count: investor.bank_deposits?.length || 0 },
-                    { key: 'contracts', label: 'العقود والاتفاقيات', icon: FileText, count: investor.contracts?.length || 0 },
+                    { key: 'wallets', label: t('admin.investors.show_tab_wallets'), icon: Wallet, count: allTransactions.length },
+                    { key: 'tasks', label: t('admin.investors.show_tab_tasks'), icon: Truck, count: investor.investments?.length || 0 },
+                    { key: 'deposits', label: t('admin.investors.show_tab_deposits'), icon: Receipt, count: investor.bank_deposits?.length || 0 },
+                    { key: 'contracts', label: t('admin.investors.show_tab_contracts'), icon: FileText, count: investor.contracts?.length || 0 },
                 ].map((tab) => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.key;
@@ -199,21 +250,21 @@ export default function AdminInvestorShow({ investor, profileStats }) {
             {activeTab === 'wallets' && (
                 <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl overflow-hidden shadow-2xl">
                     <div className="p-5 border-b border-slate-800 flex items-center justify-between">
-                        <h4 className="font-bold text-white text-sm">سجل القيود المزدوجة (Double-Entry Ledger)</h4>
-                        <span className="text-xs text-slate-400">آخر 30 حركة مالية</span>
+                        <h4 className="font-bold text-white text-sm">{t('admin.investors.show_ledger_title')}</h4>
+                        <span className="text-xs text-slate-400">{t('admin.investors.show_ledger_sub')}</span>
                     </div>
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-start text-xs text-slate-300">
                             <thead>
                                 <tr className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-bold">
-                                    <th className="p-4 text-start">رقم المعاملة</th>
-                                    <th className="p-4 text-start">نوع المحفظة</th>
-                                    <th className="p-4 text-start">نوع الحركة</th>
-                                    <th className="p-4 text-start">المبلغ</th>
-                                    <th className="p-4 text-start">الرصيد بعدها</th>
-                                    <th className="p-4 text-start">الوصف والبيان</th>
-                                    <th className="p-4 text-start">التاريخ والوقت</th>
+                                    <th className="p-4 text-start">{t('admin.investors.show_tx_num')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.show_tx_wallet_type')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.show_tx_action_type')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.show_tx_amount')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.show_tx_balance_after')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.show_tx_desc')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.show_tx_datetime')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/50">
@@ -227,22 +278,22 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                                                 </td>
                                                 <td className="p-4">
                                                     <span className="text-[11px] px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-mono">
-                                                        {tx.wallet?.wallet_type === 'investor_investment' ? 'محفظة الاستثمار' : 'محفظة العمولات'}
+                                                        {tx.wallet?.wallet_type === 'investor_investment' ? t('admin.investors.show_tx_wallet_invest') : t('admin.investors.show_tx_wallet_comm')}
                                                     </span>
                                                 </td>
                                                 <td className="p-4">
                                                     <span className={`inline-flex items-center gap-1 font-bold ${isCredit ? 'text-violet-400' : 'text-rose-400'}`}>
                                                         {isCredit ? <ArrowDownLeft className="w-3.5 h-3.5" /> : <ArrowUpRight className="w-3.5 h-3.5" />}
-                                                        {isCredit ? 'إيداع / إضافة' : 'خصم / تمويل'}
+                                                        {isCredit ? t('admin.investors.show_tx_credit') : t('admin.investors.show_tx_debit')}
                                                     </span>
                                                 </td>
                                                 <td className="p-4 font-mono font-bold text-sm">
                                                     <span className={isCredit ? 'text-violet-400' : 'text-rose-400'}>
-                                                        {isCredit ? '+' : '-'}{parseFloat(tx.amount).toLocaleString('en-US')} ر.س
+                                                        {isCredit ? '+' : '-'}{parseFloat(tx.amount).toLocaleString('en-US')} {t('common.sar')}
                                                     </span>
                                                 </td>
                                                 <td className="p-4 font-mono text-slate-200">
-                                                    {parseFloat(tx.balance_after).toLocaleString('en-US')} ر.س
+                                                    {parseFloat(tx.balance_after).toLocaleString('en-US')} {t('common.sar')}
                                                 </td>
                                                 <td className="p-4 text-slate-300">{tx.description || '-'}</td>
                                                 <td className="p-4 font-mono text-slate-500 text-[11px]">
@@ -254,7 +305,7 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                                 ) : (
                                     <tr>
                                         <td colSpan={7} className="p-8 text-center text-slate-500">
-                                            لا توجد حركات مالية مسجلة حتى الآن.
+                                            {t('admin.investors.show_tx_empty')}
                                         </td>
                                     </tr>
                                 )}
@@ -271,13 +322,13 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                         <table className="w-full text-start text-xs text-slate-300">
                             <thead>
                                 <tr className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-bold">
-                                    <th className="p-4 text-start">رقم المهمة</th>
-                                    <th className="p-4 text-start">الشركة اللوجستية</th>
-                                    <th className="p-4 text-start">مسار الشحنة</th>
-                                    <th className="p-4 text-start">مبلغ التمويل</th>
-                                    <th className="p-4 text-start">ربح المستثمر المحقق</th>
-                                    <th className="p-4 text-start">حالة المهمة</th>
-                                    <th className="p-4 text-start">تاريخ التمويل</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_task_num')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_logistics_comp')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_shipment_route')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_funding_amt')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_earned_profit')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_task_status')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_funding_date')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/50">
@@ -294,10 +345,10 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                                                 {inv.task?.pickup_city} ➔ {inv.task?.dropoff_city}
                                             </td>
                                             <td className="p-4 font-mono font-bold text-white">
-                                                {parseFloat(inv.invested_amount).toLocaleString('en-US')} ر.س
+                                                {parseFloat(inv.invested_amount).toLocaleString('en-US')} {t('common.sar')}
                                             </td>
                                             <td className="p-4 font-mono font-bold text-violet-400">
-                                                +{parseFloat(inv.investor_profit_amount).toLocaleString('en-US')} ر.س
+                                                +{parseFloat(inv.investor_profit_amount).toLocaleString('en-US')} {t('common.sar')}
                                             </td>
                                             <td className="p-4">
                                                 <Badge status={inv.task?.status} />
@@ -310,7 +361,7 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                                 ) : (
                                     <tr>
                                         <td colSpan={7} className="p-8 text-center text-slate-500">
-                                            لم يقم المستثمر بتمويل أي مهام لوجستية بعد.
+                                            {t('admin.investors.show_tasks_empty')}
                                         </td>
                                     </tr>
                                 )}
@@ -327,12 +378,12 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                         <table className="w-full text-start text-xs text-slate-300">
                             <thead>
                                 <tr className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-bold">
-                                    <th className="p-4 text-start">رقم الإيداع</th>
-                                    <th className="p-4 text-start">المبلغ المودع</th>
-                                    <th className="p-4 text-start">البنك المحول إليه</th>
-                                    <th className="p-4 text-start">الرقم المرجعي</th>
-                                    <th className="p-4 text-start">الحالة</th>
-                                    <th className="p-4 text-start">تاريخ الإيداع</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_deposit_num')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_deposited_amt')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_dest_bank')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_ref_num')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_status')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_deposit_date')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/50">
@@ -343,7 +394,7 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                                                 #{dep.deposit_number}
                                             </td>
                                             <td className="p-4 font-mono font-bold text-violet-400 text-sm">
-                                                {parseFloat(dep.amount).toLocaleString('en-US')} ر.س
+                                                {parseFloat(dep.amount).toLocaleString('en-US')} {t('common.sar')}
                                             </td>
                                             <td className="p-4 text-slate-200">{dep.bank_name}</td>
                                             <td className="p-4 font-mono text-slate-400">{dep.bank_reference_number || '-'}</td>
@@ -356,7 +407,7 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                                 ) : (
                                     <tr>
                                         <td colSpan={6} className="p-8 text-center text-slate-500">
-                                            لا توجد طلبات إيداع بنكي مسجلة.
+                                            {t('admin.investors.show_deposits_empty')}
                                         </td>
                                     </tr>
                                 )}
@@ -373,12 +424,12 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                         <table className="w-full text-start text-xs text-slate-300">
                             <thead>
                                 <tr className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-bold">
-                                    <th className="p-4 text-start">رقم العقد</th>
-                                    <th className="p-4 text-start">عنوان الاتفاقية</th>
-                                    <th className="p-4 text-start">نسبة العمولة المتفق عليها</th>
-                                    <th className="p-4 text-start">تاريخ البدء</th>
-                                    <th className="p-4 text-start">الحالة</th>
-                                    <th className="p-4 text-center">عرض العقد</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_contract_num')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_agreement_title')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_agreed_comm')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_start_date')}</th>
+                                    <th className="p-4 text-start">{t('admin.investors.table_status')}</th>
+                                    <th className="p-4 text-center">{t('admin.investors.table_view_contract')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/50">
@@ -402,7 +453,7 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                                                     className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-colors inline-flex items-center gap-1"
                                                 >
                                                     <Eye className="w-3.5 h-3.5" />
-                                                    <span>التفاصيل</span>
+                                                    <span>{t('admin.investors.show_btn_details')}</span>
                                                 </Link>
                                             </td>
                                         </tr>
@@ -410,7 +461,7 @@ export default function AdminInvestorShow({ investor, profileStats }) {
                                 ) : (
                                     <tr>
                                         <td colSpan={6} className="p-8 text-center text-slate-500">
-                                            لا توجد عقود مسجلة لهذا المستثمر.
+                                            {t('admin.investors.show_contracts_empty')}
                                         </td>
                                     </tr>
                                 )}

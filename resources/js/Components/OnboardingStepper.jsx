@@ -86,6 +86,40 @@ export default function OnboardingStepper({
                 </div>
             </div>
 
+            {/* Dynamic Status Guidance Banner */}
+            <div className="mt-3 p-3 rounded-2xl border text-xs flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/90 border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse shrink-0" />
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">
+                        {!isAgreementSigned
+                            ? 'الخطوة الحالية المطلوبة: مراجعة وتوقيع الاتفاقية والعقد الإلكتروني للمنصة.'
+                            : !isDataSubmitted
+                            ? '✓ تم توقيع العقد بنجاح! الخطوة التالية: تعبئة نموذج بيانات التوثيق والـ KYC.'
+                            : !isAccountActive
+                            ? '✓ تم استكمال العقد والبيانات بنجاح! ملفك الآن قيد المراجعة والاعتماد النهائي من الإدارة.'
+                            : 'حسابك معتمد ومفعّل بالكامل.'}
+                    </span>
+                </div>
+
+                {!isAgreementSigned ? (
+                    <button
+                        type="button"
+                        onClick={() => setAgreementModalOpen(true)}
+                        className="px-3 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[11px] shrink-0 transition-all cursor-pointer"
+                    >
+                        توقيع الاتفاقية الآن
+                    </button>
+                ) : !isDataSubmitted ? (
+                    <button
+                        type="button"
+                        onClick={() => setDataModalOpen(true)}
+                        className="px-3 py-1 rounded-xl bg-[#6320EE] hover:bg-[#5219cf] text-white font-bold text-[11px] shrink-0 transition-all cursor-pointer"
+                    >
+                        تعبئة بيانات KYC
+                    </button>
+                ) : null}
+            </div>
+
             {/* Stepper Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-4">
                 {/* Step 1: Registered */}
@@ -108,7 +142,7 @@ export default function OnboardingStepper({
                     className={`p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border flex flex-col justify-between ${
                         isAgreementSigned
                             ? 'border-violet-500/30'
-                            : 'border-amber-500/40 shadow-sm'
+                            : 'border-2 border-amber-500/60 shadow-md shadow-amber-500/10'
                     }`}
                 >
                     <div>
@@ -131,7 +165,7 @@ export default function OnboardingStepper({
                         <h4 className="text-xs font-bold text-slate-900 dark:text-white mb-1">توقيع الاتفاقية والعقد</h4>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400">
                             {isAgreementSigned
-                                ? `تم التوقيع في ${new Date(user.agreement_signed_at).toLocaleDateString('ar-SA')}`
+                                ? `تم التوقيع بنجاح في ${new Date(user.agreement_signed_at).toLocaleDateString('ar-SA')}`
                                 : 'مطلوب مراجعة وتوقيع اتفاقية الاستخدام'}
                         </p>
                     </div>
@@ -145,14 +179,14 @@ export default function OnboardingStepper({
                                 className="w-full py-1.5 px-2.5 rounded-xl bg-violet-500/10 hover:bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-500/20 font-bold text-[11px] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                             >
                                 <FileText className="w-3.5 h-3.5" />
-                                <span>عرض وتوسيع وثيقة الاتفاقية</span>
+                                <span>عرض وثيقة العقد الموثقة</span>
                             </button>
                         </div>
                     ) : (
                         <button
                             type="button"
                             onClick={() => setAgreementModalOpen(true)}
-                            className="mt-3 w-full py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shadow-sm"
+                            className="mt-3 w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shadow-sm"
                         >
                             <span>مراجعة وتوقيع الاتفاقية</span>
                             <ArrowLeft className="w-3.5 h-3.5" />
@@ -166,7 +200,7 @@ export default function OnboardingStepper({
                         isDataSubmitted
                             ? 'border-violet-500/30'
                             : isAgreementSigned
-                            ? 'border-blue-500/40'
+                            ? 'border-2 border-[#6320EE] dark:border-violet-500 shadow-md shadow-violet-600/20 ring-1 ring-[#6320EE]'
                             : 'border-slate-200 dark:border-slate-800 opacity-60'
                     }`}
                 >
@@ -176,6 +210,8 @@ export default function OnboardingStepper({
                                 className={`w-6 h-6 rounded-full font-bold text-xs flex items-center justify-center ${
                                     isDataSubmitted
                                         ? 'bg-violet-600 text-white'
+                                        : isAgreementSigned
+                                        ? 'bg-[#6320EE] text-white animate-pulse'
                                         : 'bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-200'
                                 }`}
                             >
@@ -184,14 +220,14 @@ export default function OnboardingStepper({
                             {isDataSubmitted ? (
                                 <CheckCircle2 className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                             ) : (
-                                <FileSpreadsheet className="w-5 h-5 text-blue-500" />
+                                <FileSpreadsheet className={`w-5 h-5 ${isAgreementSigned ? 'text-[#6320EE] dark:text-violet-400' : 'text-slate-400'}`} />
                             )}
                         </div>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-white mb-1">البيانات والوثائق الإضافية</h4>
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white mb-1">البيانات والوثائق الإضافية (KYC)</h4>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400">
                             {isDataSubmitted
-                                ? 'تم إدخال كافة البيانات المطلوبة'
-                                : 'تعبئة نموذج التوثيق والبيانات المخصصة'}
+                                ? 'تم إدخال كافة بيانات التوثيق المطلوبة'
+                                : 'تعبئة الهوية والحساب البنكي ونموذج التوثيق'}
                         </p>
                     </div>
 
@@ -208,9 +244,13 @@ export default function OnboardingStepper({
                             type="button"
                             disabled={!isAgreementSigned}
                             onClick={() => setDataModalOpen(true)}
-                            className="mt-3 w-full py-1.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-40"
+                            className={`mt-3 w-full py-2 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-40 ${
+                                isAgreementSigned
+                                    ? 'bg-[#6320EE] hover:bg-[#5219cf] text-white shadow-md shadow-violet-600/30'
+                                    : 'bg-slate-200 dark:bg-slate-800 text-slate-400'
+                            }`}
                         >
-                            <span>تعبئة النموذج</span>
+                            <span>تعبئة نموذج التوثيق</span>
                             <ArrowLeft className="w-3.5 h-3.5" />
                         </button>
                     )}
@@ -219,14 +259,20 @@ export default function OnboardingStepper({
                 {/* Step 4: Final Admin Activation */}
                 <div
                     className={`p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border flex flex-col justify-between ${
-                        isAccountActive ? 'border-violet-500/30' : 'border-slate-200 dark:border-slate-800'
+                        isAccountActive
+                            ? 'border-violet-500/30'
+                            : (isAgreementSigned && isDataSubmitted
+                                ? 'border-2 border-orange-500/50 shadow-md shadow-orange-500/10'
+                                : 'border-slate-200 dark:border-slate-800 opacity-60')
                     }`}
                 >
                     <div>
                         <div className="flex items-center justify-between mb-2">
                             <span
                                 className={`w-6 h-6 rounded-full font-bold text-xs flex items-center justify-center ${
-                                    isAccountActive ? 'bg-violet-600 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                                    isAccountActive 
+                                        ? 'bg-violet-600 text-white' 
+                                        : (isAgreementSigned && isDataSubmitted ? 'bg-orange-500 text-white animate-pulse' : 'bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400')
                                 }`}
                             >
                                 4
@@ -234,21 +280,29 @@ export default function OnboardingStepper({
                             {isAccountActive ? (
                                 <CheckCircle2 className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                             ) : (
-                                <Clock className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+                                <Clock className={`w-5 h-5 ${isAgreementSigned && isDataSubmitted ? 'text-orange-500' : 'text-slate-400'}`} />
                             )}
                         </div>
                         <h4 className="text-xs font-bold text-slate-900 dark:text-white mb-1">الاعتماد والتفعيل النهائي</h4>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                            {isAccountActive ? 'الحساب مفعّل بالكامل' : 'مراجعة وتأكيد الاعتماد من إدارة المنصة'}
+                            {isAccountActive
+                                ? 'الحساب مفعّل بالكامل وجاهز للتمويل'
+                                : (isAgreementSigned && isDataSubmitted 
+                                    ? 'الملف مكتمل وبانتظار اعتماد الإدارة' 
+                                    : 'مراجعة وتأكيد الاعتماد من إدارة المنصة')}
                         </p>
                     </div>
 
                     <span
                         className={`text-[10px] font-bold mt-3 block ${
-                            isAccountActive ? 'text-violet-600 dark:text-violet-400' : 'text-amber-500'
+                            isAccountActive
+                                ? 'text-violet-600 dark:text-violet-400'
+                                : (isAgreementSigned && isDataSubmitted ? 'text-orange-500 font-extrabold' : 'text-slate-400')
                         }`}
                     >
-                        {isAccountActive ? '✓ نشط ومفعل' : '⏳ قيد مراجعة الإدارة'}
+                        {isAccountActive
+                            ? '✓ نشط ومفعل'
+                            : (isAgreementSigned && isDataSubmitted ? '⏳ قيد مراجعة وتفعيل الإدارة' : 'بانتظار الخطوات السابقة')}
                     </span>
                 </div>
             </div>
@@ -257,6 +311,13 @@ export default function OnboardingStepper({
             <LegalAgreementModal
                 isOpen={agreementModalOpen}
                 onClose={() => setAgreementModalOpen(false)}
+                onSuccess={() => {
+                    setAgreementModalOpen(false);
+                    // Automatically trigger Step 3 KYC Modal if not submitted yet
+                    if (!isDataSubmitted && formTemplate) {
+                        setDataModalOpen(true);
+                    }
+                }}
             />
 
             {/* Dynamic Data Modal */}

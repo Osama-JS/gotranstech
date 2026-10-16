@@ -2,17 +2,20 @@ import React from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
+import { useTranslation } from '../../../Utils/i18n';
 import SearchableSelect from '../../../Components/SearchableSelect';
 import DatePicker from '../../../Components/DatePicker';
 import RichTextEditor from '../../../Components/RichTextEditor';
 import { FileText, ArrowRight, ShieldCheck, PlusCircle, Save, ArrowLeft } from 'lucide-react';
 
 export default function AdminContractsCreate({ users = [] }) {
+    const { t, locale } = useTranslation();
+    const isAr = locale === 'ar';
     const { data, setData, post, processing, errors } = useForm({
         user_id: '',
         contract_type: 'investment_agreement',
-        title: 'عقد اتفاقية استثمار وتمويل مهام لوجستية',
-        terms_text: '<p>تم الاتفاق والتراضي بين منصة <strong>GoTransTech</strong> (الطرف الأول) والطرف الثاني الموضح بياناته على تنظيم عمليات التمويل والخدمات اللوجستية وتوزيع نسب العمولات والأرباح وفق القوانين والأنظمة المعمول بها في المملكة العربية السعودية.</p><blockquote style="border-right: 4px solid #6320EE; background-color: #f5f3ff; color: #3b0764; padding: 10px 14px; margin: 12px 0;"><strong>التزام الطرفين:</strong> يلتزم الطرفان بكافة اللوائح والأنظمة الصادرة عن الهيئة العامة للنقل والجهات المختصة.</blockquote>',
+        title: t('admin.contracts.default_contract_title'),
+        terms_text: t('admin.contracts.terms_default_text'),
         commission_rate: '70.00',
         start_date: new Date().toISOString().split('T')[0],
         end_date: '',
@@ -24,30 +27,30 @@ export default function AdminContractsCreate({ users = [] }) {
     };
 
     const userOptions = [
-        { value: '', label: 'اختر المستخدم أو الشركة...' },
+        { value: '', label: t('admin.contracts.opt_select_party_ph') },
         ...users.map(u => ({
             value: u.id,
-            label: `${u.name} (${u.user_type === 'company' ? 'شركة لوجستية' : 'مستثمر'}) - ${u.email}`
+            label: `${u.name} (${u.user_type === 'company' ? t('admin.contracts.party_company') : t('admin.contracts.party_investor')}) - ${u.email}`
         }))
     ];
 
     return (
         <AuthenticatedLayout>
-            <Head title="إنشاء عقد جديد - إدارة المنصة" />
+            <Head title={t('admin.contracts.create_title')} />
 
             <div className="space-y-6 pb-12 max-w-4xl mx-auto">
                 {/* Unified Header */}
                 <AdminPageHeader
-                    title="إنشاء وتوثيق عقد جديد"
-                    subtitle="إصدار عقد إلكتروني وتحديد بنود وشروط الاتفاقية ونسب الأرباح والعمولات"
+                    title={t('admin.contracts.create_title')}
+                    subtitle={t('admin.contracts.create_subtitle')}
                     breadcrumbs={[
-                        { label: 'الرئيسية', url: route('admin.dashboard') },
-                        { label: 'العقود والاتفاقيات', url: route('admin.contracts.index') },
-                        { label: 'إنشاء عقد' }
+                        { label: t('common.home'), url: route('admin.dashboard') },
+                        { label: t('admin.nav.items.contracts'), url: route('admin.contracts.index') },
+                        { label: t('admin.contracts.btn_create_contract') }
                     ]}
                     icon={FileText}
                     iconColor="text-violet-400"
-                    badge={{ text: 'توثيق إلكتروني', color: 'brand' }}
+                    badge={{ text: t('admin.contracts.badge_electronic_verify'), color: 'brand' }}
                 />
 
                 <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl">
@@ -55,13 +58,13 @@ export default function AdminContractsCreate({ users = [] }) {
                         {/* Select User */}
                         <div>
                             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                الطرف الثاني (المستثمر أو الشركة اللوجستية) *
+                                {t('admin.contracts.label_second_party')}
                             </label>
                             <SearchableSelect
                                 options={userOptions}
                                 value={data.user_id}
                                 onChange={(val) => setData('user_id', val)}
-                                placeholder="اختر المستخدم أو الشركة..."
+                                placeholder={t('admin.contracts.opt_select_party_ph')}
                             />
                             {errors.user_id && <p className="text-xs text-rose-500 mt-1">{errors.user_id}</p>}
                         </div>
@@ -69,7 +72,7 @@ export default function AdminContractsCreate({ users = [] }) {
                         {/* Title */}
                         <div>
                             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                عنوان العقد / الاتفاقية *
+                                {t('admin.contracts.label_contract_title')}
                             </label>
                             <input
                                 type="text"
@@ -85,21 +88,21 @@ export default function AdminContractsCreate({ users = [] }) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                    نوع الاتفاقية *
+                                    {t('admin.contracts.label_agreement_type')}
                                 </label>
                                 <select
                                     value={data.contract_type}
                                     onChange={(e) => setData('contract_type', e.target.value)}
                                     className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
                                 >
-                                    <option value="investment_agreement">اتفاقية استثمار وتمويل مهام (للمستثمرين)</option>
-                                    <option value="logistics_service">اتفاقية تقديم وطلب خدمات لوجستية (للشركات)</option>
+                                    <option value="investment_agreement">{t('admin.contracts.opt_type_investment')}</option>
+                                    <option value="logistics_service">{t('admin.contracts.opt_type_logistics')}</option>
                                 </select>
                             </div>
 
                             <div>
                                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                    نسبة العمولة المتفق عليها (%) *
+                                    {t('admin.contracts.label_agreed_commission')}
                                 </label>
                                 <input
                                     type="number"
@@ -118,30 +121,30 @@ export default function AdminContractsCreate({ users = [] }) {
                         {/* Terms & Conditions Rich Text Editor */}
                         <div>
                             <RichTextEditor
-                                label="بنود وشروط العقد والمسؤوليات *"
+                                label={t('admin.contracts.label_terms_and_conditions')}
                                 value={data.terms_text}
                                 onChange={(val) => setData('terms_text', val)}
                                 error={errors.terms_text}
-                                placeholder="اكتب بنود الاتفاقية والشروط والالتزامات والمسؤوليات بالتفصيل، يمكنك إضافة جداول وروابط وصور وعناوين فرعية..."
+                                placeholder={t('admin.contracts.ph_terms_and_conditions')}
                             />
                         </div>
 
                         {/* Dates */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <DatePicker
-                                label="تاريخ بدء السريان *"
+                                label={t('admin.contracts.label_start_date')}
                                 value={data.start_date}
                                 onChange={(val) => setData('start_date', val)}
                                 error={errors.start_date}
-                                placeholder="اختر تاريخ البدء..."
+                                placeholder={t('admin.contracts.ph_start_date')}
                             />
 
                             <DatePicker
-                                label="تاريخ الانتهاء (اختياري)"
+                                label={t('admin.contracts.label_end_date')}
                                 value={data.end_date}
                                 onChange={(val) => setData('end_date', val)}
                                 error={errors.end_date}
-                                placeholder="اختر تاريخ الانتهاء..."
+                                placeholder={t('admin.contracts.ph_end_date')}
                             />
                         </div>
 
@@ -150,7 +153,7 @@ export default function AdminContractsCreate({ users = [] }) {
                                 href={route('admin.contracts.index')}
                                 className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-colors"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </Link>
                             <button
                                 type="submit"
@@ -162,7 +165,7 @@ export default function AdminContractsCreate({ users = [] }) {
                                 ) : (
                                     <>
                                         <Save className="w-4 h-4" />
-                                        <span>إنشاء وتوثيق العقد إلكترونياً</span>
+                                        <span>{t('admin.contracts.btn_create_submit')}</span>
                                     </>
                                 )}
                             </button>

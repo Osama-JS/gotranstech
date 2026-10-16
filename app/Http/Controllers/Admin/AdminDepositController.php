@@ -92,6 +92,9 @@ class AdminDepositController extends Controller
 
         $path = $deposit->receipt_file_path;
 
+        if ($path && Storage::disk('local')->exists($path)) {
+            return Storage::disk('local')->response($path);
+        }
         if ($path && Storage::disk('public')->exists($path)) {
             return Storage::disk('public')->response($path);
         }
@@ -103,7 +106,7 @@ class AdminDepositController extends Controller
     {
         $fileName = 'deposits/' . ($deposit->deposit_number ?: 'DEP-' . $deposit->id) . '_receipt.pdf';
 
-        if (!Storage::disk('public')->exists($fileName)) {
+        if (!Storage::disk('local')->exists($fileName) && !Storage::disk('public')->exists($fileName)) {
             $html = view('pdf.deposit_receipt', [
                 'deposit' => $deposit,
                 'user' => $deposit->user,
@@ -115,13 +118,14 @@ class AdminDepositController extends Controller
                 ->setPaper('a5', 'portrait')
                 ->setOption(['defaultFont' => 'DejaVu Sans']);
 
-            Storage::disk('public')->put($fileName, $pdf->output());
+            Storage::disk('local')->put($fileName, $pdf->output());
 
             $deposit->receipt_file_path = $fileName;
             $deposit->saveQuietly();
         }
 
-        return Storage::disk('public')->response($fileName);
+        $disk = Storage::disk('local')->exists($fileName) ? 'local' : 'public';
+        return Storage::disk($disk)->response($fileName);
     }
 
     public function approve(Request $request, int $id)
@@ -156,6 +160,17 @@ class AdminDepositController extends Controller
             "الموافقة على الإيداع البنكي #{$deposit->deposit_number} بمبلغ {$deposit->amount} ر.س للمستثمر {$deposit->user->name}"
         );
 
+        // Notify Investor of deposit approval
+        \App\Services\NotificationDispatcherService::dispatch(
+            'investor.deposit_credited',
+            "تم شحن محفظتك الاستثمارية: #{$deposit->deposit_number}",
+            "تمت الموافقة على إيداعك البنكي وإضافة مبلغ " . number_format($deposit->amount, 2) . " ر.س في محفظة الاستثمار وهو جاهز للاستثمار الفوري.",
+            route('investor.wallet.investment', [], false),
+            ['deposit_id' => $deposit->id, 'amount' => $deposit->amount],
+            $deposit->user,
+            'success'
+        );
+
         return back()->with('success', 'تم اعتماد الإيداع وشحن محفظة المستثمر بنجاح.');
     }
 
@@ -183,6 +198,17 @@ class AdminDepositController extends Controller
             ['status' => 'pending'],
             ['status' => 'rejected', 'reason' => $deposit->review_notes],
             "رفض الإيداع البنكي #{$deposit->deposit_number} للمستثمر {$deposit->user->name}"
+        );
+
+        // Notify Investor of deposit rejection
+        \App\Services\NotificationDispatcherService::dispatch(
+            'investor.withdrawal_rejected',
+            "رفض طلب الإيداع البنكي: #{$deposit->deposit_number}",
+            "تم رفض طلب الإيداع البنكي رقم #{$deposit->deposit_number}. السبب: {$deposit->review_notes}",
+            route('investor.wallet.investment', [], false),
+            ['deposit_id' => $deposit->id, 'reason' => $deposit->review_notes],
+            $deposit->user,
+            'warning'
         );
 
         return back()->with('success', 'تم رفض طلب الإيداع.');

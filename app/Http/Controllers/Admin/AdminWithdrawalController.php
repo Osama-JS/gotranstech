@@ -130,11 +130,17 @@ class AdminWithdrawalController extends Controller
     {
         $withdrawal = WithdrawalRequest::findOrFail($id);
 
-        if (!$withdrawal->pdf_file_path || !Storage::disk('public')->exists($withdrawal->pdf_file_path)) {
+        $disk = 'local';
+        if ($withdrawal->pdf_file_path && Storage::disk('local')->exists($withdrawal->pdf_file_path)) {
+            $disk = 'local';
+        } elseif ($withdrawal->pdf_file_path && Storage::disk('public')->exists($withdrawal->pdf_file_path)) {
+            $disk = 'public';
+        } else {
             // regenerate if missing
             app(\App\Services\PdfGenerationService::class)->generateWithdrawalPdf($withdrawal);
+            $disk = 'local';
         }
 
-        return Storage::disk('public')->download($withdrawal->pdf_file_path, "withdrawal_{$withdrawal->request_number}.pdf");
+        return Storage::disk($disk)->download($withdrawal->pdf_file_path, "withdrawal_{$withdrawal->request_number}.pdf");
     }
 }

@@ -47,6 +47,11 @@ class AdminCompanyController extends Controller
             $query->where('status', $status);
         }
 
+        // Environment Filter (test vs live)
+        if ($environment = $request->input('environment')) {
+            $query->where('environment', $environment);
+        }
+
         // City Filter
         if ($city = $request->input('city')) {
             $query->where('city', $city);
@@ -67,6 +72,8 @@ class AdminCompanyController extends Controller
             'total' => CompanyProfile::count(),
             'active' => CompanyProfile::where('status', 'active')->count(),
             'suspended' => CompanyProfile::where('status', 'suspended')->count(),
+            'total_test_companies' => CompanyProfile::where('environment', 'test')->count(),
+            'total_live_companies' => CompanyProfile::where('environment', 'live')->count(),
             'total_funding_balance' => Wallet::where('wallet_type', 'company_funding')->sum('balance'),
             'total_debt_balance' => Wallet::where('wallet_type', 'company_debt')->sum('balance'),
             'total_tasks_count' => Task::count(),
@@ -79,7 +86,7 @@ class AdminCompanyController extends Controller
             'companies' => $companies,
             'stats' => $stats,
             'cities' => $cities,
-            'filters' => $request->only(['search', 'status', 'city', 'date_from', 'date_to']),
+            'filters' => $request->only(['search', 'status', 'city', 'environment', 'date_from', 'date_to']),
         ]);
     }
 
@@ -250,14 +257,21 @@ class AdminCompanyController extends Controller
             'tasks' => function ($q) {
                 $q->latest()->take(20);
             },
+            'testTasks' => function ($q) {
+                $q->latest()->take(30);
+            },
+            'approvedByAdmin',
             'withdrawalRequests' => function ($q) {
                 $q->latest()->take(10);
             },
             'debts',
             'contracts',
         ])
-        ->withCount(['tasks', 'withdrawalRequests', 'debts'])
-        ->findOrFail($id);
+        ->withCount(['tasks', 'testTasks', 'withdrawalRequests', 'debts'])
+        ->where(function ($q) use ($id) {
+            $q->where('id', $id)->orWhere('user_id', $id);
+        })
+        ->firstOrFail();
 
         $fundingWallet = $company->user->wallets->firstWhere('wallet_type', 'company_funding');
         $debtWallet = $company->user->wallets->firstWhere('wallet_type', 'company_debt');
@@ -269,6 +283,8 @@ class AdminCompanyController extends Controller
             'debt_balance' => $debtWallet ? $debtWallet->balance : 0,
             'total_withdrawals' => $company->withdrawalRequests->where('status', 'approved')->sum('requested_amount'),
             'active_api_keys_count' => $company->apiKeys->where('status', 'active')->count(),
+            'total_test_tasks_count' => $company->test_tasks_count ?? $company->testTasks()->count(),
+            'total_mock_funded_tasks_count' => $company->testTasks()->where('is_mock_funded', true)->count(),
         ];
 
         return Inertia::render('Admin/Companies/Show', [
@@ -281,23 +297,89 @@ class AdminCompanyController extends Controller
     {
         $request->validate([
             'key_name' => 'required|string|max:100',
+            'environment' => 'nullable|in:test,live',
         ]);
 
         $company = CompanyProfile::findOrFail($id);
-        $result = CompanyApiKey::generateKey($company->id, $request->input('key_name'));
+        $environment = $request->input('environment', $company->environment ?? 'test');
+        $result = CompanyApiKey::generateKey($company->id, $request->input('key_name'), $environment);
 
         $this->auditLogService->log(
             'created',
             $result['model'],
             [],
-            ['key_name' => $result['model']->key_name, 'company_id' => $company->id],
-            "توليد مفتاح API جديد للشركة {$company->company_name}"
+            ['key_name' => $result['model']->key_name, 'company_id' => $company->id, 'environment' => $environment],
+            "توليد مفتاح API جديد ({$environment}) للشركة {$company->company_name}"
         );
 
         return back()->with([
             'success' => 'تم توليد مفتاح API بنجاح. يرجى نسخه وحفظه الآن حيث لن يظهر مجدداً.',
             'generated_key' => $result['plainTextToken'],
         ]);
+    }
+
+    public function toggleEnvironment(Request $request, int $id)
+    {
+        $validated = $request->validate([
+            'environment' => 'required|in:test,live',
+            'test_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $company = CompanyProfile::with('user')->findOrFail($id);
+        $oldEnv = $company->environment ?? 'test';
+        $newEnv = $validated['environment'];
+
+        $company->environment = $newEnv;
+        if (isset($validated['test_notes'])) {
+            $company->test_notes = $validated['test_notes'];
+        }
+
+        if ($newEnv === 'live') {
+            $company->test_mode_approved_at = now();
+            $company->approved_by_admin_id = auth()->id();
+        } else {
+            $company->test_mode_approved_at = null;
+            $company->approved_by_admin_id = null;
+        }
+
+        $company->save();
+
+        $actionDesc = $newEnv === 'live'
+            ? "اعتماد وترقية بيئة ربط الشركة {$company->company_name} إلى البيئة الحية (Live Mode)"
+            : "إعادة ضبط بيئة ربط الشركة {$company->company_name} إلى بيئة الاختبار (Test Mode)";
+
+        $this->auditLogService->log(
+            'environment_changed',
+            $company,
+            ['environment' => $oldEnv],
+            ['environment' => $newEnv, 'test_notes' => $company->test_notes],
+            $actionDesc
+        );
+
+        if ($company->user) {
+            $title = $newEnv === 'live'
+                ? 'تهانينا! تم تفعيل البيئة الحية (Live Mode)'
+                : 'تنبيه: تم تحويل حسابكم إلى بيئة التجارب (Test Mode)';
+            $msg = $newEnv === 'live'
+                ? 'قام مسؤولو المنصة باعتماد اكتمال ربطكم البرمجي وترقية حسابكم إلى بيئة الإنتاج الحية. يمكنكم الآن إرسال مهام حقيقية لطرحها للمستثمرين.'
+                : 'تمت إعادة حسابكم إلى بيئة الاختبار والتجارب البرمجية بواسطة الإدارة.';
+
+            \App\Services\NotificationDispatcherService::dispatch(
+                'company.environment_changed',
+                $title,
+                $msg,
+                route('company.api.index', [], false),
+                ['environment' => $newEnv],
+                $company->user,
+                $newEnv === 'live' ? 'success' : 'warning'
+            );
+        }
+
+        $successMsg = $newEnv === 'live'
+            ? 'تم اعتماد الربط البرمجي وترقية الشركة إلى البيئة الحية (Live Mode) بنجاح.'
+            : 'تم تحويل الشركة إلى بيئة الاختبار (Test Mode) بنجاح.';
+
+        return back()->with('success', $successMsg);
     }
 
     public function updateCommissionRate(Request $request, int $id)

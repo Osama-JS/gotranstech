@@ -71,28 +71,28 @@ export default function Select2({
                 type="button"
                 disabled={disabled}
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full bg-slate-900 border rounded-xl px-3.5 py-2.5 text-xs text-start flex items-center justify-between gap-2 transition-all cursor-pointer select-none ${
+                className={`w-full bg-white dark:bg-slate-900 border rounded-xl px-3.5 py-2.5 text-xs text-start flex items-center justify-between gap-2 transition-all cursor-pointer select-none ${
                     isOpen 
-                        ? 'border-violet-500 ring-2 ring-violet-500/20 text-white' 
-                        : 'border-slate-700/80 hover:border-slate-600 text-white'
+                        ? 'border-violet-500 ring-2 ring-violet-500/20 text-slate-900 dark:text-white' 
+                        : 'border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 text-slate-900 dark:text-white'
                 } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 <div className="flex items-center gap-2 truncate">
                     {selectedOption?.icon && (
-                        <span className="shrink-0 text-violet-400">{selectedOption.icon}</span>
+                        <span className="shrink-0 text-violet-600 dark:text-violet-400">{selectedOption.icon}</span>
                     )}
                     <span className="truncate font-medium">
-                        {selectedOption ? selectedOption.label : <span className="text-slate-500">{placeholder}</span>}
+                        {selectedOption ? selectedOption.label : <span className="text-slate-400 dark:text-slate-500">{placeholder}</span>}
                     </span>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-violet-400' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-violet-600 dark:text-violet-400' : ''}`} />
             </button>
 
             {/* Dropdown Menu (Select2 Box) */}
             {isOpen && (
-                <div className="absolute top-full start-0 mt-1.5 w-full bg-slate-900/98 backdrop-blur-xl border border-slate-700/90 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute top-full start-0 mt-1.5 w-full bg-white dark:bg-slate-900/98 backdrop-blur-xl border border-slate-200 dark:border-slate-700/90 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
                     {/* Select2 Search Box */}
-                    <div className="p-2.5 border-b border-slate-800 bg-slate-950/80 sticky top-0 z-10">
+                    <div className="p-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 sticky top-0 z-10">
                         <div className="relative">
                             <Search className="w-3.5 h-3.5 text-slate-400 absolute start-3 top-2.5 pointer-events-none" />
                             <input
@@ -101,7 +101,7 @@ export default function Select2({
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder={searchPlaceholder}
-                                className="w-full ps-8 pe-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all"
+                                className="w-full ps-8 pe-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all"
                             />
                         </div>
                     </div>
@@ -119,7 +119,7 @@ export default function Select2({
                                         className={`w-full px-3 py-2 rounded-xl text-start text-xs transition-colors flex items-center justify-between gap-2 cursor-pointer ${
                                             isSelected
                                                 ? 'bg-[#6320EE] text-white font-bold shadow-md shadow-violet-600/30'
-                                                : 'hover:bg-slate-800/80 text-slate-200'
+                                                : 'hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-200'
                                         }`}
                                     >
                                         <div className="flex flex-col gap-0.5 truncate">
@@ -128,7 +128,7 @@ export default function Select2({
                                                 <span className="truncate">{opt.label}</span>
                                             </div>
                                             {opt.description && (
-                                                <span className={`text-[10px] leading-tight truncate ${isSelected ? 'text-violet-200' : 'text-slate-400'}`}>
+                                                <span className={`text-[10px] leading-tight truncate ${isSelected ? 'text-violet-200' : 'text-slate-500 dark:text-slate-400'}`}>
                                                     {opt.description}
                                                 </span>
                                             )}
@@ -141,7 +141,7 @@ export default function Select2({
                                 );
                             })
                         ) : (
-                            <div className="py-4 text-center text-xs text-slate-500">
+                            <div className="py-4 text-center text-xs text-slate-400 dark:text-slate-500">
                                 لا توجد نتائج مطابقة للبحث
                             </div>
                         )}

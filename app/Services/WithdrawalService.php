@@ -89,6 +89,18 @@ class WithdrawalService
                 "إنشاء طلب سحب رصيد جديد #{$withdrawalRequest->request_number} بمبلغ {$totalRequestedAmount} ر.س"
             );
 
+            // Notify Admin of Company Withdrawal Request
+            $isLargeAmount = $totalRequestedAmount >= 50000;
+            \App\Services\NotificationDispatcherService::dispatch(
+                $isLargeAmount ? 'admin.large_amount_withdrawal_requested' : 'admin.company_withdrawal_requested',
+                "طلب سحب تمويل: #{$withdrawalRequest->request_number}",
+                "تقدمت الشركة اللوجستية ({$company->company_name}) بطلب سحب رصيد تمويل بمبلغ " . number_format($totalRequestedAmount, 2) . " ر.س بانتظار الاعتماد المالي.",
+                route('admin.withdrawals.show', $withdrawalRequest->id, false),
+                ['withdrawal_id' => $withdrawalRequest->id, 'amount' => $totalRequestedAmount, 'company_id' => $company->id],
+                null,
+                $isLargeAmount ? 'urgent' : 'warning'
+            );
+
             return $withdrawalRequest;
         });
     }
@@ -177,6 +189,17 @@ class WithdrawalService
                 "الموافقة على طلب سحب الرصيد #{$lockedRequest->request_number} وتحديد تاريخ الاستحقاق: {$finalDueDate->toDateString()}"
             );
 
+            // Notify Logistics Company of approval
+            \App\Services\NotificationDispatcherService::dispatch(
+                'company.withdrawal_disbursed',
+                "اعتماد صرف تمويل الشحنة: #{$lockedRequest->request_number}",
+                "تمت الموافقة على طلب سحب رصيد تمويل الشحنات بمبلغ " . number_format($amount, 2) . " ر.س وتم تحويله لحسابكم البنكي مع إصدار السند المالي الرسمي.",
+                route('company.withdrawals.show', $lockedRequest->id, false),
+                ['withdrawal_id' => $lockedRequest->id, 'amount' => $amount],
+                $companyUser,
+                'success'
+            );
+
             return $lockedRequest;
         });
     }
@@ -195,7 +218,8 @@ class WithdrawalService
             }
 
             $amount = (float) $lockedRequest->requested_amount;
-            $fundingWallet = $lockedRequest->company->user->company_funding_wallet;
+            $companyUser = $lockedRequest->company->user;
+            $fundingWallet = $companyUser->company_funding_wallet;
 
             // Unlock locked funds in funding wallet
             $this->walletService->unlockBalance($fundingWallet, $amount);
@@ -216,6 +240,17 @@ class WithdrawalService
                 ['status' => 'pending'],
                 ['status' => 'rejected', 'reason' => $reason],
                 "رفض طلب سحب الرصيد #{$lockedRequest->request_number} للسبب: {$reason}"
+            );
+
+            // Notify Logistics Company of rejection
+            \App\Services\NotificationDispatcherService::dispatch(
+                'company.withdrawal_rejected',
+                "رفض طلب سحب التمويل: #{$lockedRequest->request_number}",
+                "تم رفض طلب سحب التمويل رقم #{$lockedRequest->request_number} وإعادة الرصيد لمحفظتكم. السبب: {$reason}",
+                route('company.withdrawals.show', $lockedRequest->id, false),
+                ['withdrawal_id' => $lockedRequest->id, 'reason' => $reason],
+                $companyUser,
+                'warning'
             );
 
             return $lockedRequest;

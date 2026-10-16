@@ -29,6 +29,7 @@ import {
     Compass,
 } from 'lucide-react';
 import axios from 'axios';
+import { useTranslation } from '../Utils/i18n';
 
 const ICON_MAP = {
     LayoutDashboard,
@@ -53,6 +54,7 @@ const ICON_MAP = {
 const STORAGE_KEY = 'gotrans_quick_search_history';
 
 export default function QuickSearchModal({ isOpen, onClose }) {
+    const { t } = useTranslation();
     const [mounted, setMounted] = useState(false);
     const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(false);
@@ -237,7 +239,7 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="ابحث عن صفحة، مستثمر، شركة، مهمة، أو رقم عقد... (Ctrl + K)"
+                        placeholder={t('admin.quick_search.placeholder')}
                         className="w-full bg-transparent border-none text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-400 text-sm focus:outline-none focus:ring-0 font-sans"
                     />
                     {loading && <Loader2 className="w-4 h-4 text-violet-600 dark:text-violet-400 animate-spin shrink-0" />}
@@ -246,7 +248,7 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                             type="button"
                             onClick={() => setQuery('')}
                             className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-200 dark:hover:bg-violet-900/50 transition-colors"
-                            title="مسح حقل البحث"
+                            title={t('admin.quick_search.clear_input')}
                         >
                             <X className="w-4 h-4" />
                         </button>
@@ -265,7 +267,7 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                     {/* Prompt for min characters */}
                     {query.length > 0 && query.length < 2 && (
                         <div className="py-8 text-center text-slate-500 dark:text-slate-400 text-xs">
-                            يرجى كتابة حرفين على الأقل للبحث السريع...
+                            {t('admin.quick_search.min_chars')}
                         </div>
                     )}
 
@@ -273,8 +275,8 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                     {!loading && query.length >= 2 && results.length === 0 && (
                         <div className="py-12 text-center text-slate-500 dark:text-slate-400">
                             <Search className="w-8 h-8 text-slate-400 dark:text-slate-600 mx-auto mb-2" />
-                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-300">لم يتم العثور على نتائج</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">جرب كلمات بحث أخرى مثل اسم مستثمر أو كود شحنة أو رقم عقد.</p>
+                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-300">{t('admin.quick_search.no_results')}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('admin.quick_search.no_results_desc')}</p>
                         </div>
                     )}
 
@@ -286,7 +288,7 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                                     <div className="px-3 py-1.5 flex items-center justify-between text-xs">
                                         <div className="flex items-center gap-1.5 text-violet-700 dark:text-violet-300 font-bold">
                                             <History className="w-4 h-4 text-orange-500 dark:text-orange-400" />
-                                            <span>عمليات الوصول السريع الأخيرة</span>
+                                            <span>{t('admin.quick_search.recent_searches')}</span>
                                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 font-mono">
                                                 {recentSearches.length}
                                             </span>
@@ -295,10 +297,10 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                                             type="button"
                                             onClick={handleClearAllRecent}
                                             className="text-[11px] text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1 cursor-pointer"
-                                            title="مسح سجل عمليات الوصول السريع"
+                                            title={t('admin.quick_search.clear_history')}
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
-                                            <span>مسح السجل</span>
+                                            <span>{t('admin.quick_search.clear_history')}</span>
                                         </button>
                                     </div>
 
@@ -348,7 +350,7 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                                                     <div className="flex items-center gap-2 shrink-0">
                                                         {isSelected && (
                                                             <div className="flex items-center gap-1 text-[10px] text-orange-500 dark:text-orange-400 font-mono pr-2">
-                                                                <span>انتقال سريع</span>
+                                                                <span>{t('admin.quick_search.quick_jump')}</span>
                                                                 <CornerDownLeft className="w-3.5 h-3.5" />
                                                             </div>
                                                         )}
@@ -356,7 +358,7 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                                                             type="button"
                                                             onClick={(e) => handleRemoveRecent(e, index)}
                                                             className="p-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors opacity-0 group-hover:opacity-100"
-                                                            title="حذف من السجل"
+                                                            title={t('admin.quick_search.delete_item')}
                                                         >
                                                             <X className="w-3.5 h-3.5" />
                                                         </button>
@@ -369,9 +371,9 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                             ) : (
                                 <div className="py-10 text-center text-slate-400 dark:text-slate-500">
                                     <Compass className="w-8 h-8 mx-auto mb-2 text-violet-500/50 dark:text-violet-400/40" />
-                                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">البحث الشامل في GoTransTech</p>
+                                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">{t('admin.quick_search.recent_searches')}</p>
                                     <p className="text-[11px] text-slate-400 mt-1 max-w-sm mx-auto">
-                                        اكتب اسم مستثمر، شركة، كود مهمة، أو صفحة من صفحات النظام للوصول الفوري. سيتم حفظ نتائجك التي تختارها هنا لسهولة الرجوع إليها.
+                                        {t('admin.quick_search.placeholder')}
                                     </p>
                                 </div>
                             )}
@@ -380,16 +382,16 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                             <div className="pt-2 border-t border-slate-200 dark:border-violet-900/30">
                                 <div className="px-3 py-1 text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
                                     <Sparkles className="w-3 h-3 text-orange-500 dark:text-orange-400" />
-                                    <span>روابط واختصارات مقترحة</span>
+                                    <span>{t('admin.nav.groups.home_analytics')}</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2 px-3">
                                     {[
-                                        { label: 'المستثمرون', query: 'المستثمر' },
-                                        { label: 'الشركات اللوجستية', query: 'الشركات' },
-                                        { label: 'المهام والشحنات', query: 'المهام' },
-                                        { label: 'طلبات السحب', query: 'السحب' },
-                                        { label: 'العقود الرسمية', query: 'العقود' },
-                                        { label: 'الإعدادات العامة', query: 'الإعدادات' },
+                                        { label: t('admin.nav.items.investors'), query: 'investor' },
+                                        { label: t('admin.nav.items.companies'), query: 'company' },
+                                        { label: t('admin.nav.items.tasks'), query: 'task' },
+                                        { label: t('admin.nav.items.withdrawals'), query: 'withdrawal' },
+                                        { label: t('admin.nav.items.contracts'), query: 'contract' },
+                                        { label: t('admin.nav.items.settings'), query: 'settings' },
                                     ].map((sug) => (
                                         <button
                                             key={sug.label}
@@ -451,7 +453,7 @@ export default function QuickSearchModal({ isOpen, onClose }) {
 
                                             {isSelected && (
                                                 <div className="flex items-center gap-1 text-[10px] text-orange-500 dark:text-orange-400 font-mono shrink-0 pr-2">
-                                                    <span>انتقال</span>
+                                                    <span>{t('admin.quick_search.quick_jump')}</span>
                                                     <CornerDownLeft className="w-3.5 h-3.5" />
                                                 </div>
                                             )}
@@ -469,14 +471,14 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                         <span className="flex items-center gap-1">
                             <kbd className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-violet-950/60 border border-slate-300 dark:border-violet-800/50 text-slate-700 dark:text-violet-200 font-mono text-[10px]">↑</kbd>
                             <kbd className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-violet-950/60 border border-slate-300 dark:border-violet-800/50 text-slate-700 dark:text-violet-200 font-mono text-[10px]">↓</kbd>
-                            <span>للتنقل</span>
+                            <span>{t('common.details')}</span>
                         </span>
                         <span className="flex items-center gap-1">
                             <kbd className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-violet-950/60 border border-slate-300 dark:border-violet-800/50 text-slate-700 dark:text-violet-200 font-mono text-[10px]">Enter</kbd>
-                            <span>للاختيار</span>
+                            <span>{t('common.view')}</span>
                         </span>
                     </div>
-                    <span className="text-violet-700 dark:text-violet-300 font-medium">منصة GoTransTech - البحث الشامل</span>
+                    <span className="text-violet-700 dark:text-violet-300 font-medium">{t('admin.nav.portal_badge')}</span>
                 </div>
             </div>
         </div>,

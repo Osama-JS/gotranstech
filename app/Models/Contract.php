@@ -47,9 +47,9 @@ class Contract extends Model
         return $this->belongsTo(User::class, 'signed_by_user_id');
     }
 
-    public static function generateContractNumber(string $partyType): string
+    public static function generateContractNumber(string $partyType = 'general'): string
     {
-        $prefix = strtoupper(substr($partyType, 0, 3));
+        $prefix = strtoupper(substr($partyType ?: 'GEN', 0, 3));
         return 'CNT-' . $prefix . '-' . date('Ymd') . '-' . rand(1000, 9999);
     }
 }

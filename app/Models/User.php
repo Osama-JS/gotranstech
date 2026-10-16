@@ -137,6 +137,16 @@ class User extends Authenticatable
         return $this->hasMany(AuditLog::class);
     }
 
+    public function appNotifications(): HasMany
+    {
+        return $this->hasMany(AppNotification::class);
+    }
+
+    public function unreadNotificationsCount(): int
+    {
+        return $this->appNotifications()->where('is_read', false)->count();
+    }
+
     public function getFullPhoneAttribute(): ?string
     {
         if (!$this->phone) {

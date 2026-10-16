@@ -3,6 +3,7 @@ import { Head, router, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
 import Modal from '../../../Components/Modal';
+import { useTranslation } from '@/Utils/useTranslation';
 import { 
     Settings, 
     Lock, 
@@ -31,6 +32,7 @@ import {
 import Select2 from '../../../Components/Select2';
 
 export default function AdminSettings({ settings, currentGroup, groups }) {
+    const { t, isAr } = useTranslation();
     const initialSettings = settings.reduce((acc, s) => {
         acc[s.key] = s.value || '';
         return acc;
@@ -99,31 +101,31 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
     const currentGroupObj = groups.find(g => g.key === currentGroup) || groups[0];
 
     return (
-        <AuthenticatedLayout title="إعدادات النظام المشفرة">
-            <Head title="إعدادات النظام وبوابات الربط - إدارة المنصة" />
+        <AuthenticatedLayout title={t('admin.settings.page_title')}>
+            <Head title={t('admin.settings.page_title')} />
 
             <div className="space-y-6 pb-12 max-w-5xl mx-auto">
                 {/* Unified Header */}
                 <AdminPageHeader
-                    title="إدارة الإعدادات المشفرة وبوابات الربط"
-                    subtitle="ضبط المفاتيح الحساسة، بوابات الدفع HyperPay، خادم SMTP، والقواعد المالية المشفرة في قاعدة البيانات"
+                    title={t('admin.settings.header_title')}
+                    subtitle={t('admin.settings.header_subtitle')}
                     breadcrumbs={[
-                        { label: 'الرئيسية', url: route('admin.dashboard') },
-                        { label: 'إعدادات النظام' }
+                        { label: t('admin.nav.home'), url: route('admin.dashboard') },
+                        { label: t('admin.nav.settings') }
                     ]}
                     icon={Settings}
                     iconColor="text-violet-400"
                     actions={
                         currentGroup === 'mail' ? [
                             {
-                                label: 'إرسال بريد تجريبي لفحص SMTP',
+                                label: t('admin.settings.btn_test_smtp'),
                                 icon: Send,
                                 onClick: () => setTestEmailModalOpen(true),
                                 variant: 'primary',
                             }
                         ] : []
                     }
-                    badge={{ text: 'تشفير AES-256', color: 'brand' }}
+                    badge={{ text: t('admin.settings.badge_encrypted'), color: 'brand' }}
                 />
 
                 {/* Tabs Navigation */}
@@ -143,7 +145,7 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                                 }`}
                             >
                                 <IconComp className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                                <span className="text-center">{g.label_ar}</span>
+                                <span className="text-center">{isAr ? g.label_ar : (g.label_en || g.label_ar || g.name)}</span>
                             </button>
                         );
                     })}
@@ -159,10 +161,10 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                             </div>
                             <div>
                                 <h3 className="font-bold text-white text-sm sm:text-base">
-                                    {currentGroupObj?.label_ar}
+                                    {isAr ? currentGroupObj?.label_ar : (currentGroupObj?.label_en || currentGroupObj?.label_ar || currentGroupObj?.name)}
                                 </h3>
                                 <p className="text-xs text-slate-400">
-                                    {currentGroupObj?.desc}
+                                    {isAr ? currentGroupObj?.desc : (currentGroupObj?.desc_en || currentGroupObj?.desc)}
                                 </p>
                             </div>
                         </div>
@@ -174,7 +176,7 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-1.5 cursor-pointer self-start sm:self-auto"
                             >
                                 <Send className="w-3.5 h-3.5" />
-                                <span>فحص الإرسال الآن</span>
+                                <span>{t('admin.settings.btn_test_now')}</span>
                             </button>
                         )}
                     </div>
@@ -184,9 +186,9 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                         <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3">
                             <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                             <div className="text-xs text-amber-300 space-y-1">
-                                <span className="font-bold block">تنبيه بوابات الدفع HyperPay:</span>
+                                <span className="font-bold block">{t('admin.settings.notice_hyperpay_title')}</span>
                                 <p className="leading-relaxed">
-                                    يتم استخدام رموز التفويض (Access Tokens) ومعرفات الكيانات (Entity IDs) لإنشاء جلسات دفع مشفرة Checkout IDs لبطاقات مدى وفيزا وماستركارد وأبل باي. تأكد من تحديد بيئة العمل (Test / Live) بدقة لتجنب إخفاق العمليات.
+                                    {t('admin.settings.notice_hyperpay_desc')}
                                 </p>
                             </div>
                         </div>
@@ -197,9 +199,9 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                         <div className="p-4 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-start gap-3">
                             <Wrench className="w-5 h-5 text-violet-400 shrink-0 mt-0.5" />
                             <div className="text-xs text-violet-200 space-y-1">
-                                <span className="font-bold block text-white">إشعار شريط المنصة قيد التطوير:</span>
+                                <span className="font-bold block text-white">{t('admin.settings.notice_maintenance_title')}</span>
                                 <p className="leading-relaxed text-slate-300">
-                                    عند تفعيل هذا الخيار، سيظهر شريط تنبيه متحرك احترافي مثبت في أسفل المنصة على مدار الساعة في كافة الصفحات (صفحة الهبوط، تسجيل الدخول، لوحة التحكم، وبوابات المستثمرين والشركات). يتيح لك إبلاغ الزوار والمستخدمين بمرحلة التطوير مع تحديث فوري للنص في أي وقت.
+                                    {t('admin.settings.notice_maintenance_desc')}
                                 </p>
                             </div>
                         </div>
@@ -250,41 +252,41 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                                                     let optionsList = [];
                                                     if (s.key === 'hyperpay_mode') {
                                                         optionsList = [
-                                                            { value: 'test', label: 'تجريبي (Test Sandbox)', description: 'بيئة اختبارية لا تسحب أموالاً حقيقية' },
-                                                            { value: 'live', label: 'إنتاجي حقيقي (Live Production)', description: 'البيئة التشغيلية الحقيقية' },
+                                                            { value: 'test', label: t('admin.settings.opt_hyperpay_test'), description: t('admin.settings.opt_hyperpay_test_desc') },
+                                                            { value: 'live', label: t('admin.settings.opt_hyperpay_live'), description: t('admin.settings.opt_hyperpay_live_desc') },
                                                         ];
                                                     } else if (s.key === 'require_kyc_verification') {
                                                         optionsList = [
-                                                            { value: 'yes', label: 'نعم، إلزامي لجميع الحسابات', description: 'يمنع الاستثمار والتمويل قبل رفع الوثائق' },
-                                                            { value: 'no', label: 'لا، اختياري', description: 'السماح بالوصول دون تحقق إلزامي' },
+                                                            { value: 'yes', label: t('admin.settings.opt_kyc_yes'), description: t('admin.settings.opt_kyc_yes_desc') },
+                                                            { value: 'no', label: t('admin.settings.opt_kyc_no'), description: t('admin.settings.opt_kyc_no_desc') },
                                                         ];
                                                     } else if (s.key === 'enable_two_factor_auth') {
                                                         optionsList = [
-                                                            { value: 'optional', label: 'اختياري حسب رغبة المستخدم', description: 'يمكن للمستخدم تفعيله أو تركه' },
-                                                            { value: 'forced', label: 'إلزامي لجميع المشرفين والمستثمرين', description: 'فرض التحقق الثنائي بكود OTP' },
+                                                            { value: 'optional', label: t('admin.settings.opt_2fa_optional'), description: t('admin.settings.opt_2fa_optional_desc') },
+                                                            { value: 'forced', label: t('admin.settings.opt_2fa_forced'), description: t('admin.settings.opt_2fa_forced_desc') },
                                                         ];
                                                     } else if (s.key === 'sms_provider') {
                                                         optionsList = [
-                                                            { value: 'unifonic', label: 'Unifonic (يونيفونيك)', description: 'بوابة الرسائل السعودية المعتمدة' },
-                                                            { value: 'twilio', label: 'Twilio', description: 'البوابة العالمية Twilio SMS' },
-                                                            { value: 'taqnyat', label: 'تقنيات (Taqnyat)', description: 'بوابة تقنيات للرسائل القصيرة' },
+                                                            { value: 'unifonic', label: t('admin.settings.opt_sms_unifonic'), description: t('admin.settings.opt_sms_unifonic_desc') },
+                                                            { value: 'twilio', label: t('admin.settings.opt_sms_twilio'), description: t('admin.settings.opt_sms_twilio_desc') },
+                                                            { value: 'taqnyat', label: t('admin.settings.opt_sms_taqnyat'), description: t('admin.settings.opt_sms_taqnyat_desc') },
                                                         ];
                                                     } else if (s.key === 'mail_encryption') {
                                                         optionsList = [
-                                                            { value: 'tls', label: 'TLS (المنفذ 587)', description: 'تشفير النقل الموصى به' },
-                                                            { value: 'ssl', label: 'SSL (المنفذ 465)', description: 'تشفير SSL المباشر' },
-                                                            { value: 'null', label: 'بدون تشفير', description: 'اتصال غير مشفر' },
+                                                            { value: 'tls', label: t('admin.settings.opt_mail_tls'), description: t('admin.settings.opt_mail_tls_desc') },
+                                                            { value: 'ssl', label: t('admin.settings.opt_mail_ssl'), description: t('admin.settings.opt_mail_ssl_desc') },
+                                                            { value: 'null', label: t('admin.settings.opt_mail_null'), description: t('admin.settings.opt_mail_null_desc') },
                                                         ];
                                                     } else if (s.key === 'is_under_development') {
                                                         optionsList = [
-                                                            { value: 'no', label: 'معطل (وضع التشغيل الطبيعي)', description: 'إخفاء شريط التنبيه وتعمل المنصة بالشكل المعتاد' },
-                                                            { value: 'yes', label: 'مفعل (إظهار شريط المنصة قيد التطوير)', description: 'تثبيت الشريط المتحرك إجبارياً أسفل كافة الصفحات' },
+                                                            { value: 'no', label: t('admin.settings.opt_maint_no'), description: t('admin.settings.opt_maint_no_desc') },
+                                                            { value: 'yes', label: t('admin.settings.opt_maint_yes'), description: t('admin.settings.opt_maint_yes_desc') },
                                                         ];
                                                     } else if (s.key === 'under_development_speed') {
                                                         optionsList = [
-                                                            { value: 'slow', label: 'حركة بطيئة وهادئة (Slow)', description: 'دوران هادئ ومريح للعين' },
-                                                            { value: 'normal', label: 'حركة معتدلة وسلسة (Normal - مستحسن)', description: 'السرعة القياسية لسهولة قراءة الإعلان' },
-                                                            { value: 'fast', label: 'حركة سريعة (Fast)', description: 'تمرير سريع للتنبيهات العاجلة' },
+                                                            { value: 'slow', label: t('admin.settings.opt_speed_slow'), description: t('admin.settings.opt_speed_slow_desc') },
+                                                            { value: 'normal', label: t('admin.settings.opt_speed_normal'), description: t('admin.settings.opt_speed_normal_desc') },
+                                                            { value: 'fast', label: t('admin.settings.opt_speed_fast'), description: t('admin.settings.opt_speed_fast_desc') },
                                                         ];
                                                     }
 
@@ -293,8 +295,8 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                                                             value={data.settings[s.key] !== undefined ? data.settings[s.key] : (s.value || '')}
                                                             onChange={(val) => handleSettingChange(s.key, val)}
                                                             options={optionsList}
-                                                            placeholder={`اختر ${s.label || s.key}...`}
-                                                            searchPlaceholder="ابحث في الخيارات..."
+                                                            placeholder={t('admin.settings.select_field', { label: s.label || s.key })}
+                                                            searchPlaceholder={t('admin.settings.search_options')}
                                                         />
                                                     );
                                                 })()
@@ -322,7 +324,7 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                                                             type="button"
                                                             onClick={() => togglePasswordVisibility(s.key)}
                                                             className="absolute left-3 top-2.5 text-slate-400 hover:text-white transition-colors"
-                                                            title={visiblePasswords[s.key] ? 'إخفاء' : 'إظهار'}
+                                                            title={visiblePasswords[s.key] ? t('common.hide') : t('common.show')}
                                                         >
                                                             {visiblePasswords[s.key] ? (
                                                                 <EyeOff className="w-4 h-4" />
@@ -348,7 +350,7 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                         <div className="pt-6 border-t border-slate-800 flex flex-wrap items-center justify-between gap-4">
                             <div className="flex items-center gap-2 text-xs text-slate-400">
                                 <Lock className="w-4 h-4 text-orange-500" />
-                                <span>يتم حفظ جميع التغييرات بصيغة مشفرة ويسجل الحدث في سجل التدقيق.</span>
+                                <span>{t('admin.settings.note_encrypted')}</span>
                             </div>
 
                             <button
@@ -361,7 +363,7 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                                 ) : (
                                     <>
                                         <Save className="w-4 h-4" />
-                                        <span>حفظ وتطبيق الإعدادات</span>
+                                        <span>{t('admin.settings.btn_save_settings')}</span>
                                     </>
                                 )}
                             </button>
@@ -374,17 +376,17 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
             <Modal
                 isOpen={testEmailModalOpen}
                 onClose={() => setTestEmailModalOpen(false)}
-                title="إرسال بريد تجريبي لفحص خادم SMTP"
+                title={t('admin.settings.test_mail_title')}
                 maxWidth="md"
             >
                 <form onSubmit={handleSendTestEmail} className="space-y-4">
                     <p className="text-xs text-slate-300 leading-relaxed">
-                        سيقوم النظام بإرسال رسالة بريد إلكتروني تجريبية فورية باستخدام بيانات خادم SMTP المضبوطة حالياً للتأكد من صحة الاتصال وسلامة المنفذ وبيانات الاعتماد.
+                        {t('admin.settings.test_mail_desc')}
                     </p>
 
                     <div>
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                            البريد الإلكتروني المستلم (Recipient Email)
+                            {t('admin.settings.recipient_email')}
                         </label>
                         <div className="relative">
                             <Mail className="w-4 h-4 text-slate-500 absolute right-3.5 top-3" />
@@ -405,7 +407,7 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                             onClick={() => setTestEmailModalOpen(false)}
                             className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -417,7 +419,7 @@ export default function AdminSettings({ settings, currentGroup, groups }) {
                             ) : (
                                 <>
                                     <Send className="w-3.5 h-3.5" />
-                                    <span>إرسال بريد الفحص</span>
+                                    <span>{t('admin.settings.btn_send_test')}</span>
                                 </>
                             )}
                         </button>

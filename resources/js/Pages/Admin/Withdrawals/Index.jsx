@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
+import { useTranslation } from '../../../Utils/i18n';
 import StatCard from '../../../Components/StatCard';
 import SearchableSelect from '../../../Components/SearchableSelect';
 import DatePicker from '../../../Components/DatePicker';
@@ -27,6 +28,8 @@ import {
 } from 'lucide-react';
 
 export default function AdminWithdrawals({ withdrawals, stats, companies = [], filters = {} }) {
+    const { t, locale } = useTranslation();
+    const isAr = locale === 'ar';
     const [search, setSearch] = useState(filters?.search || '');
     const [status, setStatus] = useState(filters?.status || '');
     const [companyId, setCompanyId] = useState(filters?.company_id || '');
@@ -37,7 +40,7 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
     const [approveModalOpen, setApproveModalOpen] = useState(false);
     const [rejectModalOpen, setRejectModalOpen] = useState(false);
     const [dueDate, setDueDate] = useState('');
-    const [adminSignature, setAdminSignature] = useState('مدير عام المنصة');
+    const [adminSignature, setAdminSignature] = useState(t('admin.withdrawals.signature_default'));
     const [adminNotes, setAdminNotes] = useState('');
     const [rejectionReason, setRejectionReason] = useState('');
     const [loading, setLoading] = useState(false);
@@ -103,64 +106,64 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
     };
 
     const statusOptions = [
-        { value: '', label: 'جميع الحالات' },
-        { value: 'pending', label: 'قيد المراجعة والاعتماد' },
-        { value: 'approved', label: 'معتمد وموقع إلكترونياً' },
-        { value: 'rejected', label: 'مرفوض' },
+        { value: '', label: t('admin.withdrawals.filter_search_placeholder') },
+        { value: 'pending', label: t('status.pending') },
+        { value: 'approved', label: t('status.approved') },
+        { value: 'rejected', label: t('status.rejected') },
     ];
 
     const companyOptions = [
-        { value: '', label: 'جميع الشركات اللوجستية' },
+        { value: '', label: t('admin.tasks.filter_company_all') },
         ...companies.map(c => ({ value: c.id, label: c.company_name }))
     ];
 
     return (
-        <AuthenticatedLayout title="طلبات سحب رصيد التمويل للشركات">
-            <Head title="طلبات سحب الرصيد - إدارة المنصة" />
+        <AuthenticatedLayout title={t('admin.withdrawals.page_title')}>
+            <Head title={t('admin.withdrawals.page_title')} />
 
             <div className="space-y-6 pb-12">
                 {/* Unified Header */}
                 <AdminPageHeader
-                    title="طلبات سحب رصيد التمويل للشركات"
-                    subtitle="مراجعة وتوقيع طلبات سحب رصيد المهام المنفذة للشركات اللوجستية وتوليد سندات الدين بصيغة PDF"
+                    title={t('admin.withdrawals.header_title')}
+                    subtitle={t('admin.withdrawals.header_subtitle')}
                     breadcrumbs={[
-                        { label: 'الرئيسية', url: route('admin.dashboard') },
-                        { label: 'طلبات سحب الرصيد' }
+                        { label: t('common.home'), url: route('admin.dashboard') },
+                        { label: t('admin.nav.items.withdrawals') }
                     ]}
                     icon={ArrowDownToLine}
                     iconColor="text-blue-400"
-                    badge={{ text: `${stats?.pending || 0} بانتظار التوقيع`, color: stats?.pending > 0 ? 'amber' : 'blue' }}
+                    badge={{ text: t('admin.withdrawals.badge_pending', { count: stats?.pending || 0 }), color: stats?.pending > 0 ? 'amber' : 'blue' }}
                 />
 
                 {/* Stat Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <StatCard
-                        title="إجمالي طلبات السحب"
+                        title={t('admin.withdrawals.stat_total_withdrawals')}
                         value={stats?.total || 0}
                         icon={ArrowDownToLine}
                         color="blue"
-                        description="إجمالي السحوبات المرفوعة"
+                        description={t('admin.withdrawals.stat_total_desc')}
                     />
                     <StatCard
-                        title="بانتظار الاعتماد"
+                        title={t('admin.withdrawals.stat_pending_withdrawals')}
                         value={stats?.pending || 0}
                         icon={Clock}
                         color="amber"
-                        description={`بقيمة ${Number(stats?.total_pending_amount || 0).toLocaleString('en-US')} ر.س`}
+                        description={t('admin.withdrawals.stat_pending_desc', { amount: Number(stats?.total_pending_amount || 0).toLocaleString(isAr ? 'ar-SA' : 'en-US'), sar: t('common.sar') })}
                     />
                     <StatCard
-                        title="سحوبات معتمدة"
+                        title={t('admin.withdrawals.stat_approved_withdrawals')}
                         value={stats?.approved || 0}
                         icon={CheckCircle}
                         color="brand"
-                        description="تم قيد المديونية وتوقيعها"
+                        description={t('admin.withdrawals.stat_approved_desc')}
                     />
                     <StatCard
-                        title="إجمالي المبالغ المسحوبة"
-                        value={`${Number(stats?.total_approved_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س`}
+                        title={t('admin.withdrawals.stat_total_withdrawals')}
+                        value={`${Number(stats?.total_approved_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${t('common.sar')}`}
                         icon={DollarSign}
                         color="purple"
-                        description="السيولة المصروفة للشركات"
+                        description={t('admin.withdrawals.stat_rejected_desc')}
                     />
                 </div>
 
@@ -169,49 +172,49 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                     <form onSubmit={handleFilter} className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">بحث سريع</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">{t('admin.withdrawals.filter_search_label')}</label>
                                 <div className="relative">
                                     <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute start-3.5 top-3" />
                                     <input
                                         type="text"
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        placeholder="رقم الطلب، اسم الشركة، السجل التجاري..."
+                                        placeholder={t('admin.withdrawals.filter_search_placeholder')}
                                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl ps-10 pe-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all"
                                     />
                                 </div>
                             </div>
 
                             <SearchableSelect
-                                label="الحالة"
+                                label={t('common.status')}
                                 options={statusOptions}
                                 value={status}
                                 onChange={setStatus}
-                                placeholder="اختر الحالة..."
+                                placeholder={t('admin.withdrawals.filter_select_status')}
                             />
 
                             <SearchableSelect
-                                label="الشركة اللوجستية"
+                                label={t('admin.nav.items.companies')}
                                 options={companyOptions}
                                 value={companyId}
                                 onChange={setCompanyId}
-                                placeholder="اختر الشركة..."
+                                placeholder={t('admin.withdrawals.filter_select_company')}
                             />
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-3 border-t border-slate-100 dark:border-slate-800 items-end">
                             <DatePicker
-                                label="من تاريخ"
+                                label={t('admin.tasks.filter_date_from')}
                                 value={dateFrom}
                                 onChange={setDateFrom}
-                                placeholder="من تاريخ..."
+                                placeholder={t('admin.withdrawals.filter_date_from')}
                             />
 
                             <DatePicker
-                                label="إلى تاريخ"
+                                label={t('admin.tasks.filter_date_to')}
                                 value={dateTo}
                                 onChange={setDateTo}
-                                placeholder="إلى تاريخ..."
+                                placeholder={t('admin.withdrawals.filter_date_to')}
                             />
 
                             <div className="flex items-center gap-2">
@@ -220,14 +223,14 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                                     className="flex-1 py-2.5 rounded-2xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
                                 >
                                     <Filter className="w-3.5 h-3.5" />
-                                    <span>تطبيق الفلترة</span>
+                                    <span>{t('admin.tasks.btn_filter')}</span>
                                 </button>
                                 {(search || status || companyId || dateFrom || dateTo) && (
                                     <button
                                         type="button"
                                         onClick={handleReset}
                                         className="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700 cursor-pointer"
-                                        title="إعادة ضبط"
+                                        title={t('admin.tasks.btn_reset')}
                                     >
                                         <RefreshCw className="w-4 h-4" />
                                     </button>
@@ -243,14 +246,14 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                         <table className="w-full text-xs text-right">
                             <thead className="bg-slate-900/90 text-slate-400 font-semibold border-b border-slate-800">
                                 <tr>
-                                    <th className="p-4">رقم الطلب</th>
-                                    <th className="p-4">الشركة اللوجستية</th>
-                                    <th className="p-4">المبلغ المطالب به</th>
-                                    <th className="p-4">عدد المهام</th>
-                                    <th className="p-4">تاريخ الاستحقاق</th>
-                                    <th className="p-4">الحالة</th>
-                                    <th className="p-4">مستند العقد (PDF)</th>
-                                    <th className="p-4 text-center">الإجراءات والاعتماد</th>
+                                    <th className="p-4">{t('admin.withdrawals.table_id')}</th>
+                                    <th className="p-4">{t('admin.withdrawals.table_company')}</th>
+                                    <th className="p-4">{t('admin.withdrawals.table_amount')}</th>
+                                    <th className="p-4">{t('admin.analytics.col_tasks_count')}</th>
+                                    <th className="p-4">{t('admin.withdrawals.field_due_date')}</th>
+                                    <th className="p-4">{t('common.status')}</th>
+                                    <th className="p-4">{t('admin.withdrawals.view_contract')}</th>
+                                    <th className="p-4 text-center">{t('common.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/60">
@@ -275,16 +278,16 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                                                     </div>
                                                 </td>
                                                 <td className="p-4 font-mono font-bold text-white text-sm">
-                                                    {amountVal.toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س
+                                                    {amountVal.toLocaleString('en-US', { minimumFractionDigits: 2 })} {t('common.sar')}
                                                 </td>
                                                 <td className="p-4 font-mono text-slate-300">
-                                                    {w.number_of_tasks || w.items_count || 1} مهمة
+                                                    {t('admin.withdrawals.tasks_count', { count: w.number_of_tasks || w.items_count || 1 })}
                                                 </td>
                                                 <td className="p-4 font-mono text-slate-300">
                                                     {w.due_date ? (
                                                         <span className="text-amber-400 font-semibold">{w.due_date}</span>
                                                     ) : (
-                                                        <span className="text-slate-500 italic">بانتظار التحديد</span>
+                                                        <span className="text-slate-500 italic">{t('admin.withdrawals.waiting_due_date')}</span>
                                                     )}
                                                 </td>
                                                 <td className="p-4">
@@ -296,7 +299,7 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                                                         className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-violet-600 dark:text-violet-400 border border-slate-200 dark:border-slate-700 transition-all inline-flex items-center gap-1.5 text-xs font-semibold"
                                                     >
                                                         <Download className="w-3.5 h-3.5" />
-                                                        <span>تحميل PDF</span>
+                                                        <span>{t('admin.contracts.action_download')}</span>
                                                     </a>
                                                 </td>
                                                 <td className="p-4 text-center">
@@ -308,7 +311,7 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                                                                 className="px-3 py-1.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-violet-600/20 flex items-center gap-1 cursor-pointer"
                                                             >
                                                                 <CheckCircle className="w-3.5 h-3.5" />
-                                                                <span>اعتماد وتوقيع</span>
+                                                                <span>{t('admin.withdrawals.btn_approve_and_contract')}</span>
                                                             </button>
                                                             <button
                                                                 type="button"
@@ -319,17 +322,17 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                                                                 className="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                                                             >
                                                                 <XCircle className="w-3.5 h-3.5" />
-                                                                <span>رفض</span>
+                                                                <span>{t('admin.withdrawals.btn_reject')}</span>
                                                             </button>
                                                         </div>
                                                     ) : w.status === 'approved' ? (
                                                         <div className="text-violet-600 dark:text-violet-400 text-[11px] font-medium flex items-center justify-center gap-1">
                                                             <ShieldCheck className="w-3.5 h-3.5" />
-                                                            <span>معتمد وموقع إلكترونياً</span>
+                                                            <span>{t('admin.withdrawals.approved_and_signed')}</span>
                                                         </div>
                                                     ) : (
                                                         <span className="text-[11px] text-rose-400">
-                                                            مرفوض {w.rejection_reason && `(${w.rejection_reason})`}
+                                                            {t('admin.withdrawals.rejected_with_reason', { reason: w.rejection_reason ? `(${w.rejection_reason})` : '' })}
                                                         </span>
                                                     )}
                                                 </td>
@@ -341,12 +344,12 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                                         <td colSpan="8" className="text-center py-12 text-slate-500">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <ArrowDownToLine className="w-8 h-8 text-slate-600" />
-                                                <p className="text-sm font-semibold">لا توجد طلبات سحب مطابقة لمعايير البحث</p>
+                                                <p className="text-sm font-semibold">{t('admin.withdrawals.empty_withdrawals')}</p>
                                                 <button
                                                     onClick={handleReset}
                                                     className="mt-2 text-xs text-blue-400 hover:text-blue-300 underline"
                                                 >
-                                                    إلغاء الفلاتر
+                                                    {t('admin.withdrawals.clear_filters')}
                                                 </button>
                                             </div>
                                         </td>
@@ -367,17 +370,17 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
             <Modal
                 isOpen={approveModalOpen}
                 onClose={() => setApproveModalOpen(false)}
-                title="اعتماد طلب السحب وتحديد موعد الاستحقاق والتوقيع"
+                title={t('admin.withdrawals.modal_approve_title')}
                 maxWidth="lg"
             >
                 <form onSubmit={handleConfirmApprove} className="space-y-4">
                     <p className="text-xs text-slate-300 leading-relaxed">
-                        عند اعتماد هذا الطلب، سيتم خصم مبلغ <strong className="text-white font-mono">{parseFloat(selectedWithdrawal?.requested_amount || selectedWithdrawal?.total_amount || 0).toLocaleString('en-US')} ر.س</strong> من محفظة تمويل شركة ({selectedWithdrawal?.company?.company_name})، وقيد المديونية عليها في محفظة الديون، وإعادة توليد سند العقد بصيغة PDF حاملاً توقيع واعتماد الإدارة وتاريخ الاستحقاق.
+                        {t('admin.withdrawals.modal_approve_statement', { amount: parseFloat(selectedWithdrawal?.requested_amount || selectedWithdrawal?.total_amount || 0).toLocaleString(isAr ? 'ar-SA' : 'en-US'), sar: t('common.sar'), company: selectedWithdrawal?.company?.company_name })}
                     </p>
 
                     <div>
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                            تاريخ استحقاق سداد الدين (Due Date)
+                            {t('admin.withdrawals.field_due_date')}
                         </label>
                         <input
                             type="date"
@@ -390,13 +393,13 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
 
                     <div>
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                            اسم المفوض بالتوقيع من إدارة المنصة
+                            {t('admin.withdrawals.field_admin_signature')}
                         </label>
                         <input
                             type="text"
                             value={adminSignature}
                             onChange={(e) => setAdminSignature(e.target.value)}
-                            placeholder="الاسم الكامل لمدير المنصة"
+                            placeholder={t('admin.withdrawals.ph_admin_signature')}
                             className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
                             required
                         />
@@ -404,12 +407,12 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
 
                     <div>
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                            ملاحظات إدارية (اختياري)
+                            {t('admin.withdrawals.field_admin_notes')}
                         </label>
                         <textarea
                             value={adminNotes}
                             onChange={(e) => setAdminNotes(e.target.value)}
-                            placeholder="أي شروط إضافية أو ملاحظات تظهر في السند..."
+                            placeholder={t('admin.withdrawals.ph_admin_notes')}
                             className="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-3 text-xs text-white h-20 focus:outline-none focus:border-blue-500"
                         />
                     </div>
@@ -420,7 +423,7 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                             onClick={() => setApproveModalOpen(false)}
                             className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -430,7 +433,7 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                             {loading ? (
                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             ) : (
-                                <span>اعتماد الطلب وتوقيع الـ PDF</span>
+                                <span>{t('admin.withdrawals.btn_approve_and_sign')}</span>
                             )}
                         </button>
                     </div>
@@ -441,16 +444,16 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
             <Modal
                 isOpen={rejectModalOpen}
                 onClose={() => setRejectModalOpen(false)}
-                title="رفض طلب سحب الرصيد"
+                title={t('admin.withdrawals.modal_reject_title')}
                 maxWidth="md"
             >
                 <form onSubmit={handleConfirmReject} className="space-y-4">
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">سبب الرفض</label>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.withdrawals.modal_reject_reason_label')}</label>
                         <textarea
                             value={rejectionReason}
                             onChange={(e) => setRejectionReason(e.target.value)}
-                            placeholder="توضيح سبب رفض سحب الرصيد..."
+                            placeholder={t('admin.withdrawals.ph_reject_reason')}
                             className="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-3 text-xs text-white h-24 focus:outline-none focus:border-rose-500"
                             required
                         />
@@ -462,7 +465,7 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                             onClick={() => setRejectModalOpen(false)}
                             className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -472,7 +475,7 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                             {loading ? (
                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             ) : (
-                                <span>تأكيد الرفض وإلغاء حجز الرصيد</span>
+                                <span>{t('admin.withdrawals.btn_confirm_reject')}</span>
                             )}
                         </button>
                     </div>

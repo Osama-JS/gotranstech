@@ -21,54 +21,61 @@ import {
     AlertCircle,
     ArrowUpRight
 } from 'lucide-react';
+import { useTranslation } from '../../Utils/i18n';
 
 export default function AdminDashboard({ metrics, recentTasks = [], recentTransactions = [], recentAudits = [] }) {
+    const { t, locale } = useTranslation();
+    const isAr = locale === 'ar';
+
     return (
         <AuthenticatedLayout>
-            <Head title="لوحة تحكم الإدارة العامة" />
+            <Head title={t('admin.dashboard.page_title')} />
 
             <div className="space-y-6 pb-12">
                 {/* Unified Header */}
                 <AdminPageHeader
-                    title="لوحة القيادة والتحكم المركزية"
-                    subtitle="مؤشرات الأداء اللحظية، مراقبة تدفق السيولة والمهام اللوجستية، وسجل التدقيق المباشر"
+                    title={t('admin.dashboard.title')}
+                    subtitle={t('admin.dashboard.subtitle')}
                     breadcrumbs={[
-                        { label: 'الرئيسية' }
+                        { label: t('common.home') }
                     ]}
                     icon={LayoutDashboard}
                     iconColor="text-violet-400"
-                    badge={{ text: 'نظام متصل ومباشر', color: 'brand' }}
+                    badge={{ text: t('admin.dashboard.badge_connected'), color: 'brand' }}
                 />
 
                 {/* Top KPI Metrics */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <StatCard
-                        title="إجمالي المستثمرين"
+                        title={t('admin.dashboard.stat_total_investors')}
                         value={metrics?.total_investors || 0}
                         icon={Users}
                         color="brand"
-                        description="مستثمرون مسجلون وموثقون"
+                        description={t('admin.dashboard.stat_total_investors_desc')}
                     />
                     <StatCard
-                        title="الشركات اللوجستية"
+                        title={t('admin.dashboard.stat_total_companies')}
                         value={metrics?.total_companies || 0}
                         icon={Building2}
                         color="orange"
-                        description="شركاء الخدمات اللوجستية"
+                        description={t('admin.dashboard.stat_total_companies_desc')}
                     />
                     <StatCard
-                        title="أرباح عمولات المنصة"
-                        value={`${Number(metrics?.total_platform_revenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س`}
+                        title={t('admin.dashboard.stat_platform_revenue')}
+                        value={`${Number(metrics?.total_platform_revenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${t('common.sar')}`}
                         icon={TrendingUp}
                         color="brand"
-                        description={`من ${metrics?.total_tasks_funded || 0} مهمة ممولة`}
+                        description={t('admin.dashboard.stat_platform_revenue_desc', { count: metrics?.total_tasks_funded || 0 })}
                     />
                     <StatCard
-                        title="بانتظار الاعتماد"
-                        value={`${metrics?.pending_bank_deposits || 0} إيداع • ${metrics?.pending_withdrawals || 0} سحب`}
+                        title={t('admin.dashboard.stat_pending_approval')}
+                        value={t('admin.dashboard.stat_pending_approval_val', {
+                            deposits: metrics?.pending_bank_deposits || 0,
+                            withdrawals: metrics?.pending_withdrawals || 0
+                        })}
                         icon={Receipt}
                         color="orange"
-                        description="حوالات وسحوبات معلقة"
+                        description={t('admin.dashboard.stat_pending_approval_desc')}
                     />
                 </div>
 
@@ -79,24 +86,24 @@ export default function AdminDashboard({ metrics, recentTasks = [], recentTransa
                             <div className="w-8 h-8 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400">
                                 <Truck className="w-4 h-4" />
                             </div>
-                            <h3 className="font-bold text-white text-sm">أحدث المهام اللوجستية المسجلة</h3>
+                            <h3 className="font-bold text-white text-sm">{t('admin.dashboard.recent_tasks_title')}</h3>
                         </div>
                         <Link href={route('admin.tasks.index')} className="text-xs text-orange-400 hover:text-orange-300 font-semibold flex items-center gap-1 transition-colors">
-                            <span>عرض كافة المهام</span>
+                            <span>{t('admin.dashboard.view_all_tasks')}</span>
                             <ChevronLeft className="w-3.5 h-3.5 rtl:rotate-0 ltr:rotate-180" />
                         </Link>
                     </div>
 
                     <div className="overflow-x-auto">
-                        <table className="w-full text-xs text-right">
+                        <table className="w-full text-xs text-right rtl:text-right ltr:text-left">
                             <thead className="bg-slate-900/90 text-slate-400 font-semibold border-b border-slate-800">
                                 <tr>
-                                    <th className="p-3.5">رقم المهمة</th>
-                                    <th className="p-3.5">الشركة اللوجستية</th>
-                                    <th className="p-3.5">العنوان والمسار</th>
-                                    <th className="p-3.5">مبلغ التمويل</th>
-                                    <th className="p-3.5">المستثمر الممول</th>
-                                    <th className="p-3.5">الحالة</th>
+                                    <th className="p-3.5">{t('admin.dashboard.col_task_number')}</th>
+                                    <th className="p-3.5">{t('admin.dashboard.col_company')}</th>
+                                    <th className="p-3.5">{t('admin.dashboard.col_route')}</th>
+                                    <th className="p-3.5">{t('admin.dashboard.col_funding_amount')}</th>
+                                    <th className="p-3.5">{t('admin.dashboard.col_funder')}</th>
+                                    <th className="p-3.5">{t('admin.dashboard.col_status')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/60">
@@ -114,13 +121,13 @@ export default function AdminDashboard({ metrics, recentTasks = [], recentTransa
                                                 <span className="text-[11px] text-slate-400 block">{task.pickup_city} ← {task.dropoff_city}</span>
                                             </td>
                                             <td className="p-3.5 font-mono font-bold text-white">
-                                                {parseFloat(task.funding_amount || task.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س
+                                                {parseFloat(task.funding_amount || task.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} {t('common.sar')}
                                             </td>
                                             <td className="p-3.5 text-slate-300">
                                                 {task.funded_by_investor ? (
                                                     <span className="text-violet-400 font-medium">{task.funded_by_investor.name}</span>
                                                 ) : (
-                                                    <span className="text-slate-500 italic">بانتظار ممول...</span>
+                                                    <span className="text-slate-500 italic">{t('admin.dashboard.waiting_funder')}</span>
                                                 )}
                                             </td>
                                             <td className="p-3.5"><Badge status={task.status} /></td>
@@ -128,7 +135,7 @@ export default function AdminDashboard({ metrics, recentTasks = [], recentTransa
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="6" className="text-center py-8 text-slate-500">لا توجد مهام مسجلة حديثاً</td>
+                                        <td colSpan="6" className="text-center py-8 text-slate-500">{t('admin.dashboard.no_recent_tasks')}</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -145,10 +152,10 @@ export default function AdminDashboard({ metrics, recentTasks = [], recentTransa
                                 <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
                                     <History className="w-4 h-4" />
                                 </div>
-                                <h3 className="font-bold text-white text-sm">سجل التدقيق والرقابة اللحظي</h3>
+                                <h3 className="font-bold text-white text-sm">{t('admin.dashboard.recent_audits_title')}</h3>
                             </div>
                             <Link href={route('admin.audit.index')} className="text-xs text-purple-400 hover:text-purple-300 font-semibold flex items-center gap-1">
-                                <span>عرض كامل السجل</span>
+                                <span>{t('admin.dashboard.view_all_audits')}</span>
                                 <ChevronLeft className="w-3.5 h-3.5 rtl:rotate-0 ltr:rotate-180" />
                             </Link>
                         </div>
@@ -162,17 +169,17 @@ export default function AdminDashboard({ metrics, recentTasks = [], recentTransa
                                                 <span className="font-bold text-purple-400 uppercase text-[10px] bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20 font-mono">
                                                     {log.event_type}
                                                 </span>
-                                                <span className="text-slate-200 font-semibold">{log.user?.name || 'النظام التلقائي'}</span>
+                                                <span className="text-slate-200 font-semibold">{log.user?.name || t('admin.dashboard.auto_system')}</span>
                                             </div>
                                             <p className="text-slate-400 text-xs leading-relaxed">{log.description}</p>
                                         </div>
                                         <span className="text-[10px] font-mono text-slate-500 shrink-0">
-                                            {new Date(log.created_at).toLocaleTimeString('ar-SA')}
+                                            {new Date(log.created_at).toLocaleTimeString(isAr ? 'ar-SA' : 'en-US')}
                                         </span>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-center py-6 text-slate-500 text-xs">لا توجد سجلات تدقيق حديثة</p>
+                                <p className="text-center py-6 text-slate-500 text-xs">{t('admin.dashboard.no_recent_audits')}</p>
                             )}
                         </div>
                     </div>
@@ -184,7 +191,7 @@ export default function AdminDashboard({ metrics, recentTasks = [], recentTransa
                                 <div className="w-8 h-8 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400">
                                     <Wallet className="w-4 h-4" />
                                 </div>
-                                <h3 className="font-bold text-white text-sm">آخر الحركات المحاسبية للمحافظ</h3>
+                                <h3 className="font-bold text-white text-sm">{t('admin.dashboard.recent_tx_title')}</h3>
                             </div>
                         </div>
 
@@ -194,17 +201,17 @@ export default function AdminDashboard({ metrics, recentTasks = [], recentTransa
                                     <div key={tx.id} className="bg-slate-900/80 p-3 rounded-2xl border border-slate-800 text-xs flex items-center justify-between gap-3 hover:border-slate-700 transition-colors">
                                         <div>
                                             <span className="font-bold text-slate-200 block truncate max-w-[220px]">{tx.description}</span>
-                                            <span className="text-[10px] text-slate-500 block">{tx.user?.name} • {new Date(tx.created_at).toLocaleString('ar-SA')}</span>
+                                            <span className="text-[10px] text-slate-500 block">{tx.user?.name} • {new Date(tx.created_at).toLocaleString(isAr ? 'ar-SA' : 'en-US')}</span>
                                         </div>
                                         <span className={`font-mono font-bold text-xs ${
                                             parseFloat(tx.amount) > 0 ? 'text-violet-400' : 'text-slate-300'
                                         }`}>
-                                            {parseFloat(tx.amount) > 0 ? `+${parseFloat(tx.amount).toLocaleString('en-US')}` : parseFloat(tx.amount).toLocaleString('en-US')} ر.س
+                                            {parseFloat(tx.amount) > 0 ? `+${parseFloat(tx.amount).toLocaleString('en-US')}` : parseFloat(tx.amount).toLocaleString('en-US')} {t('common.sar')}
                                         </span>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-center py-6 text-slate-500 text-xs">لا توجد حركات محاسبية حديثة</p>
+                                <p className="text-center py-6 text-slate-500 text-xs">{t('admin.dashboard.no_recent_tx')}</p>
                             )}
                         </div>
                     </div>
@@ -213,3 +220,4 @@ export default function AdminDashboard({ metrics, recentTasks = [], recentTransa
         </AuthenticatedLayout>
     );
 }
+

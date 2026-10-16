@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import AdminPageHeader from '@/Components/AdminPageHeader';
+import { useTranslation } from '@/Utils/i18n';
 import {
     TrendingUp,
     BarChart3,
@@ -23,6 +24,20 @@ import {
 } from 'lucide-react';
 
 export default function AdminAnalytics({
+    period = '30days',
+    kpis = {},
+    fundingTrend = [],
+    cityDistribution = [],
+    cashflowTrend = [],
+    userGrowthTrend = [],
+    taskStatusCounts = {},
+    topInvestors = [],
+    topCompanies = [],
+}) {
+    const { t, locale } = useTranslation();
+    const isAr = locale === 'ar';
+    const { t, locale } = useTranslation();
+    const isAr = locale === 'ar';
     period = '30days',
     kpis = {},
     fundingTrend = [],
@@ -94,24 +109,24 @@ export default function AdminAnalytics({
     const commPolyline = fundingPoints.map((p) => `${p.x.toFixed(1)},${p.yComm.toFixed(1)}`).join(' ');
 
     const periodLabels = {
-        '7days': 'آخر 7 أيام',
-        '30days': 'آخر 30 يوماً',
-        '6months': 'آخر 6 أشهر',
-        '1year': 'آخر سنة',
+        '7days': t('admin.analytics.period_7days'),
+        '30days': t('admin.analytics.period_30days'),
+        '6months': t('admin.analytics.period_6months'),
+        '1year': t('admin.analytics.period_1year'),
     };
 
     return (
-        <AuthenticatedLayout title="إحصائيات وتحليلات المنصة">
-            <Head title="الإحصائيات والتحليلات المتقدمة" />
+        <AuthenticatedLayout title={t('admin.analytics.page_title')}>
+            <Head title={t('admin.analytics.page_title')} />
 
             <div className="space-y-6">
                 {/* Header & Period Switcher */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <AdminPageHeader
-                        title="لوحة الإحصائيات والتحليلات المتقدمة"
-                        subtitle="تحليل متكامل لحجم التمويل اللوجستي، إيرادات العمولات، تدفقات السيولة، والتوزيع الجغرافي للمدن"
+                        title={t('admin.analytics.header_title')}
+                        subtitle={t('admin.analytics.header_subtitle')}
                         icon={BarChart3}
-                        badge={`الفترة: ${periodLabels[period] || periodLabels['30days']}`}
+                        badge={t('admin.analytics.period_badge', { period: periodLabels[period] || periodLabels['30days'] })}
                     />
 
                     {/* Period Switcher */}
@@ -137,59 +152,59 @@ export default function AdminAnalytics({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-violet-900/30 relative overflow-hidden group hover:border-violet-500/40 transition-all">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">إجمالي حجم التمويل</span>
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{t('admin.analytics.card_funding_volume')}</span>
                             <div className="w-9 h-9 rounded-xl bg-violet-500/10 border border-violet-500/20 text-violet-600 dark:text-violet-400 flex items-center justify-center">
                                 <DollarSign className="w-5 h-5" />
                             </div>
                         </div>
                         <div className="text-2xl font-black font-mono text-violet-700 dark:text-violet-400 tracking-tight mb-1">
                             {(parseFloat(kpis.total_funding_volume) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}{' '}
-                            <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">ر.س</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">{t('common.sar')}</span>
                         </div>
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">إجمالي المبالغ الممولة للمهام اللوجستية</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t('admin.analytics.card_funding_volume_desc')}</span>
                     </div>
 
                     <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-orange-900/30 relative overflow-hidden group hover:border-orange-500/40 transition-all">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">صافي عمولات المنصة</span>
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{t('admin.analytics.card_platform_comm')}</span>
                             <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center">
                                 <TrendingUp className="w-5 h-5" />
                             </div>
                         </div>
                         <div className="text-2xl font-black font-mono text-orange-600 dark:text-orange-400 tracking-tight mb-1">
                             {(parseFloat(kpis.total_platform_commission) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}{' '}
-                            <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">ر.س</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">{t('common.sar')}</span>
                         </div>
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">أرباح منصة GoTransTech المحققة</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t('admin.analytics.card_platform_comm_desc')}</span>
                     </div>
 
                     <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-violet-900/30 relative overflow-hidden group hover:border-violet-500/40 transition-all">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">أرباح المستثمرين الموزعة</span>
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{t('admin.analytics.card_investor_profits')}</span>
                             <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                                 <ArrowUpRight className="w-5 h-5" />
                             </div>
                         </div>
                         <div className="text-2xl font-black font-mono text-indigo-600 dark:text-indigo-300 tracking-tight mb-1">
                             {(parseFloat(kpis.total_investor_profits) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}{' '}
-                            <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">ر.س</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">{t('common.sar')}</span>
                         </div>
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">عوائد موزعة لمحفظة المستثمرين فورياً</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t('admin.analytics.card_investor_profits_desc')}</span>
                     </div>
 
                     <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-orange-900/30 relative overflow-hidden group hover:border-orange-500/40 transition-all">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">المهام الممولة بنجاح</span>
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{t('admin.analytics.card_tasks_funded')}</span>
                             <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                                 <CheckCircle2 className="w-5 h-5" />
                             </div>
                         </div>
                         <div className="text-2xl font-black font-mono text-amber-600 dark:text-amber-400 tracking-tight mb-1">
                             {(parseInt(kpis.total_completed_tasks) || 0).toLocaleString('en-US')}{' '}
-                            <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">مهمة</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">{t('common.tasks')}</span>
                         </div>
                         <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                            بمتوسط {(parseFloat(kpis.avg_task_value) || 0).toFixed(1)} ر.س للمهمة
+                            {t('admin.analytics.card_tasks_funded_desc')}
                         </span>
                     </div>
                 </div>
@@ -200,21 +215,21 @@ export default function AdminAnalytics({
                         <div>
                             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                                 <Activity className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                                <span>مسار حجم التمويل وعوائد العمولات خلال الفترة</span>
+                                <span>{t('admin.analytics.chart_funding_title')}</span>
                             </h3>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                تطور حجم المبالغ الممولة وإيرادات المنصة عبر الزمن (مخطط خطي)
+                                {t('admin.analytics.chart_funding_desc')}
                             </p>
                         </div>
 
                         <div className="flex items-center gap-4 text-xs">
                             <div className="flex items-center gap-2">
                                 <span className="w-4 h-1 rounded bg-[#6320EE] block" />
-                                <span className="text-slate-700 dark:text-slate-300 font-medium">حجم التمويل (ر.س)</span>
+                                <span className="text-slate-700 dark:text-slate-300 font-medium">{t('admin.analytics.chart_legend_funded')} ({t('common.sar')})</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <span className="w-4 h-1 rounded bg-[#FF6B00] block" />
-                                <span className="text-slate-700 dark:text-slate-300 font-medium">عمولة المنصة (ر.س)</span>
+                                <span className="text-slate-700 dark:text-slate-300 font-medium">{t('admin.analytics.chart_legend_comm')} ({t('common.sar')})</span>
                             </div>
                         </div>
                     </div>
@@ -222,7 +237,7 @@ export default function AdminAnalytics({
                     {fundingTrend.length === 0 ? (
                         <div className="h-64 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
                             <BarChart3 className="w-8 h-8 mb-2 opacity-40" />
-                            <p className="text-sm">لا توجد عمليات تمويل مسجلة خلال هذه الفترة</p>
+                            <p className="text-sm">{t('admin.analytics.chart_empty')}</p>
                         </div>
                     ) : (
                         <div className="relative w-full">
@@ -238,20 +253,20 @@ export default function AdminAnalytics({
                                 >
                                     <div className="font-bold text-slate-100 border-b border-slate-800 pb-1 mb-1.5 flex items-center justify-between gap-3">
                                         <span>{fundingPoints[hoveredFundingPoint].date}</span>
-                                        <span className="text-[10px] text-slate-400">{fundingPoints[hoveredFundingPoint].count} مهمة</span>
+                                        <span className="text-[10px] text-slate-400">{fundingPoints[hoveredFundingPoint].count} {t('common.task')}</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-violet-300">
                                         <span className="w-2 h-2 rounded-full bg-[#6320EE]" />
-                                        <span>التمويل:</span>
+                                        <span>{t('admin.tasks.pricing_funding')}</span>
                                         <span className="font-mono font-bold">
-                                            {fundingPoints[hoveredFundingPoint].fundedVal.toLocaleString('en-US')} ر.س
+                                            {fundingPoints[hoveredFundingPoint].fundedVal.toLocaleString('en-US')} {t('common.sar')}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2 text-orange-300 mt-1">
                                         <span className="w-2 h-2 rounded-full bg-[#FF6B00]" />
-                                        <span>العمولة:</span>
+                                        <span>{t('admin.tasks.pricing_fee')}</span>
                                         <span className="font-mono font-bold">
-                                            {fundingPoints[hoveredFundingPoint].commVal.toLocaleString('en-US')} ر.س
+                                            {fundingPoints[hoveredFundingPoint].commVal.toLocaleString('en-US')} {t('common.sar')}
                                         </span>
                                     </div>
                                 </div>
@@ -429,14 +444,14 @@ export default function AdminAnalytics({
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                                 <MapPin className="w-5 h-5 text-rose-500" />
-                                <span>التوزيع الجغرافي للمهام والمدن</span>
+                                <span>{t('admin.analytics.city_distribution_title')}</span>
                             </h3>
-                            <span className="text-xs text-slate-500 dark:text-slate-400">أكثر المدن نشاطاً</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">{t('admin.analytics.city_distribution_desc')}</span>
                         </div>
 
                         {cityDistribution.length === 0 ? (
                             <div className="py-12 text-center text-slate-400 dark:text-slate-500 text-xs">
-                                لا توجد بيانات جغرافية للمهام في هذه الفترة.
+                                {t('admin.analytics.empty_geo')}
                             </div>
                         ) : (
                             <div className="space-y-3.5">
@@ -447,12 +462,12 @@ export default function AdminAnalytics({
                                             <div className="flex items-center justify-between text-xs">
                                                 <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                                                     <span className="w-2 h-2 rounded-full bg-rose-500" />
-                                                    <span>{item.city || 'غير محدد'}</span>
+                                                    <span>{item.city || t('admin.analytics.city_unspecified')}</span>
                                                 </span>
                                                 <div className="font-mono text-slate-500 dark:text-slate-400 text-xs">
-                                                    <span className="font-bold text-slate-900 dark:text-slate-100">{item.tasks_count}</span> مهمة •{' '}
+                                                    <span className="font-bold text-slate-900 dark:text-slate-100">{item.tasks_count}</span> {t('common.task')} •{' '}
                                                     <span className="text-violet-600 dark:text-violet-400 font-bold">
-                                                        {parseFloat(item.total_amount).toLocaleString('en-US')} ر.س
+                                                        {parseFloat(item.total_amount).toLocaleString('en-US')} {t('common.sar')}
                                                     </span>
                                                 </div>
                                             </div>
@@ -476,20 +491,20 @@ export default function AdminAnalytics({
                                 <div>
                                     <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                                         <DollarSign className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                                        <span>مقارنة السيولة (الإيداعات مقابل السحوبات)</span>
+                                        <span>{t('admin.analytics.liquidity_title')}</span>
                                     </h3>
                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                        توزيع التدفقات النقدية الداخلة والخارجة (مخطط دائري)
+                                        {t('admin.analytics.liquidity_desc')}
                                     </p>
                                 </div>
                                 <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-500/20">
-                                    دائرة السيولة
+                                    {t('admin.analytics.liquidity_cycle')}
                                 </span>
                             </div>
 
                             {totalLiquidityFlow === 0 ? (
                                 <div className="py-12 text-center text-slate-400 dark:text-slate-500 text-xs">
-                                    لا توجد حركات تدفق نقدي مسجلة في هذه الفترة.
+                                    {t('admin.analytics.empty_cashflow')}
                                 </div>
                             ) : (
                                 <div className="flex flex-col sm:flex-row items-center justify-around gap-6 py-2">
@@ -537,14 +552,14 @@ export default function AdminAnalytics({
                                         {/* Center Content */}
                                         <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-2">
                                             <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block mb-0.5">
-                                                صافي السيولة
+                                                {t('admin.analytics.net_liquidity')}
                                             </span>
                                             <span className="text-base font-black font-mono text-slate-900 dark:text-white leading-tight">
                                                 {netLiquidity >= 0 ? '+' : ''}
                                                 {Math.round(netLiquidity).toLocaleString('en-US')}
                                             </span>
                                             <span className="text-[10px] text-slate-500 dark:text-slate-400 font-sans">
-                                                ر.س
+                                                {t('common.sar')}
                                             </span>
                                         </div>
                                     </div>
@@ -556,7 +571,7 @@ export default function AdminAnalytics({
                                             <div className="flex items-center justify-between text-xs mb-1">
                                                 <div className="flex items-center gap-2">
                                                     <span className="w-3 h-3 rounded-full bg-[#6320EE]" />
-                                                    <span className="font-bold text-slate-800 dark:text-slate-200">الإيداعات البنكية</span>
+                                                    <span className="font-bold text-slate-800 dark:text-slate-200">{t('admin.analytics.total_inflow')}</span>
                                                 </div>
                                                 <span className="font-mono font-bold text-violet-700 dark:text-violet-400 text-sm">
                                                     {depositPercent}%
@@ -564,10 +579,10 @@ export default function AdminAnalytics({
                                             </div>
                                             <div className="text-base font-black font-mono text-violet-700 dark:text-violet-300">
                                                 {totalInflow.toLocaleString('en-US', { minimumFractionDigits: 2 })}{' '}
-                                                <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">ر.س</span>
+                                                <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">{t('common.sar')}</span>
                                             </div>
                                             <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
-                                                إجمالي تدفقات الشحن والاستثمار
+                                                {t('admin.analytics.inflow_desc')}
                                             </span>
                                         </div>
 
@@ -576,7 +591,7 @@ export default function AdminAnalytics({
                                             <div className="flex items-center justify-between text-xs mb-1">
                                                 <div className="flex items-center gap-2">
                                                     <span className="w-3 h-3 rounded-full bg-rose-500" />
-                                                    <span className="font-bold text-slate-800 dark:text-slate-200">طلبات السحب المصروفة</span>
+                                                    <span className="font-bold text-slate-800 dark:text-slate-200">{t('admin.analytics.total_outflow')}</span>
                                                 </div>
                                                 <span className="font-mono font-bold text-rose-600 dark:text-rose-400 text-sm">
                                                     {withdrawalPercent}%
@@ -584,10 +599,10 @@ export default function AdminAnalytics({
                                             </div>
                                             <div className="text-base font-black font-mono text-rose-600 dark:text-rose-300">
                                                 {totalOutflow.toLocaleString('en-US', { minimumFractionDigits: 2 })}{' '}
-                                                <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">ر.س</span>
+                                                <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">{t('common.sar')}</span>
                                             </div>
                                             <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
-                                                المصروفات النقدية للحسابات البنكية
+                                                {t('admin.analytics.outflow_desc')}
                                             </span>
                                         </div>
                                     </div>
@@ -597,9 +612,9 @@ export default function AdminAnalytics({
 
                         {/* Summary Footer */}
                         <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                            <span>إجمالي حجم التداول النقدي:</span>
+                            <span>{t('admin.analytics.liquidity_desc')}:</span>
                             <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
-                                {totalLiquidityFlow.toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س
+                                {totalLiquidityFlow.toLocaleString('en-US', { minimumFractionDigits: 2 })} {t('common.sar')}
                             </span>
                         </div>
                     </div>
@@ -612,17 +627,17 @@ export default function AdminAnalytics({
                         <div>
                             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-4">
                                 <Percent className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                                <span>توزيع الأرباح والعمولات</span>
+                                <span>{t('admin.analytics.comm_split_title')}</span>
                             </h3>
 
                             <div className="space-y-4">
                                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
                                     <div className="flex items-center justify-between text-xs mb-2">
                                         <span className="text-slate-700 dark:text-slate-300 font-bold">
-                                            أرباح المستثمرين ({investorSharePercent}%)
+                                            {t('admin.analytics.investor_profits_share', { percent: investorSharePercent })}
                                         </span>
                                         <span className="font-mono text-violet-700 dark:text-violet-400 font-bold">
-                                            {(parseFloat(kpis.total_investor_profits) || 0).toLocaleString('en-US')} ر.س
+                                            {(parseFloat(kpis.total_investor_profits) || 0).toLocaleString('en-US')} {t('common.sar')}
                                         </span>
                                     </div>
                                     <div className="w-full h-2.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
@@ -636,10 +651,10 @@ export default function AdminAnalytics({
                                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
                                     <div className="flex items-center justify-between text-xs mb-2">
                                         <span className="text-slate-700 dark:text-slate-300 font-bold">
-                                            عمولة المنصة ({platformSharePercent}%)
+                                            {t('admin.analytics.platform_comm_share', { percent: platformSharePercent })}
                                         </span>
                                         <span className="font-mono text-orange-600 dark:text-orange-400 font-bold">
-                                            {(parseFloat(kpis.total_platform_commission) || 0).toLocaleString('en-US')} ر.س
+                                            {(parseFloat(kpis.total_platform_commission) || 0).toLocaleString('en-US')} {t('common.sar')}
                                         </span>
                                     </div>
                                     <div className="w-full h-2.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
@@ -651,9 +666,9 @@ export default function AdminAnalytics({
                                 </div>
 
                                 <div className="p-3 bg-slate-100 dark:bg-slate-950/60 rounded-xl text-center text-xs text-slate-600 dark:text-slate-400">
-                                    إجمالي الأرباح المشتركة المولدة:{' '}
+                                    {t('admin.analytics.total_shared_profits')}{' '}
                                     <strong className="text-slate-900 dark:text-white font-mono">
-                                        {totalProfitsGenerated.toLocaleString('en-US')} ر.س
+                                        {totalProfitsGenerated.toLocaleString('en-US')} {t('common.sar')}
                                     </strong>
                                 </div>
                             </div>
@@ -665,15 +680,15 @@ export default function AdminAnalytics({
                         <div>
                             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-4">
                                 <PieChart className="w-5 h-5 text-orange-500" />
-                                <span>توزيع حالات المهام اللوجستية</span>
+                                <span>{t('admin.analytics.status_distribution_title')}</span>
                             </h3>
 
                             <div className="space-y-3">
                                 {[
-                                    { key: 'funded', label: 'ممولة بنجاح', color: 'bg-violet-600', text: 'text-violet-600 dark:text-violet-400' },
-                                    { key: 'available', label: 'متاحة للتمويل', color: 'bg-[#FF6B00]', text: 'text-orange-600 dark:text-orange-400' },
-                                    { key: 'completed', label: 'مكتملة التوصيل', color: 'bg-indigo-600', text: 'text-indigo-600 dark:text-indigo-400' },
-                                    { key: 'cancelled', label: 'ملغاة', color: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400' },
+                                    { key: 'funded', label: t('admin.analytics.status_funded'), color: 'bg-violet-600', text: 'text-violet-600 dark:text-violet-400' },
+                                    { key: 'available', label: t('admin.analytics.status_available'), color: 'bg-[#FF6B00]', text: 'text-orange-600 dark:text-orange-400' },
+                                    { key: 'completed', label: t('admin.analytics.status_completed'), color: 'bg-indigo-600', text: 'text-indigo-600 dark:text-indigo-400' },
+                                    { key: 'cancelled', label: t('admin.analytics.status_cancelled'), color: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400' },
                                 ].map((item) => {
                                     const count = parseInt(taskStatusCounts[item.key]?.count || 0);
                                     const amount = parseFloat(taskStatusCounts[item.key]?.total_amount || 0);
@@ -695,7 +710,7 @@ export default function AdminAnalytics({
                                                 <div style={{ width: `${percentage}%` }} className={`h-full rounded-full ${item.color}`} />
                                             </div>
                                             <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
-                                                المبلغ: {amount.toLocaleString('en-US')} ر.س
+                                                {t('admin.analytics.hover_amount')} {amount.toLocaleString('en-US')} {t('common.sar')}
                                             </div>
                                         </div>
                                     );
@@ -709,29 +724,29 @@ export default function AdminAnalytics({
                         <div>
                             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-4">
                                 <Layers className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                                <span>مؤشرات السيولة والتشغيل</span>
+                                <span>{t('admin.analytics.liquidity_indicators')}</span>
                             </h3>
 
                             <div className="space-y-3.5 text-xs">
                                 <div className="p-3.5 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-between">
-                                    <span className="text-slate-700 dark:text-slate-300">صافي السيولة النقدية:</span>
+                                    <span className="text-slate-700 dark:text-slate-300">{t('admin.analytics.net_cash_liquidity')}</span>
                                     <span className="font-bold font-mono text-violet-700 dark:text-violet-400 text-sm">
-                                        {(parseFloat(kpis.net_platform_liquidity) || 0).toLocaleString('en-US')} ر.س
+                                        {(parseFloat(kpis.net_platform_liquidity) || 0).toLocaleString('en-US')} {t('common.sar')}
                                     </span>
                                 </div>
 
                                 <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                                    <span className="text-slate-600 dark:text-slate-400">متوسط قيمة المهمة:</span>
+                                    <span className="text-slate-600 dark:text-slate-400">{t('admin.analytics.avg_task_value')}</span>
                                     <span className="font-bold font-mono text-slate-800 dark:text-slate-200">
-                                        {(parseFloat(kpis.avg_task_value) || 0).toFixed(2)} ر.س
+                                        {(parseFloat(kpis.avg_task_value) || 0).toFixed(2)} {t('common.sar')}
                                     </span>
                                 </div>
 
                                 <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                                    <span className="text-slate-600 dark:text-slate-400">حالة المطابقة المحاسبية:</span>
+                                    <span className="text-slate-600 dark:text-slate-400">{t('admin.analytics.matching_status')}</span>
                                     <span className="inline-flex items-center gap-1 font-bold text-violet-700 dark:text-violet-400">
                                         <CheckCircle2 className="w-3.5 h-3.5" />
-                                        <span>100% متطابق</span>
+                                        <span>{t('admin.analytics.matching_100')}</span>
                                     </span>
                                 </div>
                             </div>
@@ -745,11 +760,11 @@ export default function AdminAnalytics({
                     <div className="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
                         <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-4">
                             <Users className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                            <span>أعلى المستثمرين تمويلاً خلال الفترة</span>
+                            <span>{t('admin.analytics.top_investors_title')}</span>
                         </h3>
 
                         {topInvestors.length === 0 ? (
-                            <p className="text-xs text-slate-400 dark:text-slate-500 py-6 text-center">لا توجد سجلات استثمارية في هذه الفترة</p>
+                            <p className="text-xs text-slate-400 dark:text-slate-500 py-6 text-center">{t('admin.analytics.empty_investments')}</p>
                         ) : (
                             <div className="divide-y divide-slate-200 dark:divide-slate-800">
                                 {topInvestors.map((inv, idx) => (
@@ -767,9 +782,9 @@ export default function AdminAnalytics({
                                         </div>
                                         <div className="text-end">
                                             <div className="font-mono font-bold text-violet-700 dark:text-violet-400 text-sm">
-                                                {(parseFloat(inv.total_invested_amount) || 0).toLocaleString('en-US')} ر.س
+                                                {(parseFloat(inv.total_invested_amount) || 0).toLocaleString('en-US')} {t('common.sar')}
                                             </div>
-                                            <div className="text-[10px] text-slate-500 dark:text-slate-400">{inv.total_investments_count || 0} مهمة ممولة</div>
+                                            <div className="text-[10px] text-slate-500 dark:text-slate-400">{t('admin.analytics.tasks_funded_count', { count: inv.total_investments_count || 0 })}</div>
                                         </div>
                                     </div>
                                 ))}
@@ -781,11 +796,11 @@ export default function AdminAnalytics({
                     <div className="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
                         <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-4">
                             <Building2 className="w-5 h-5 text-orange-500" />
-                            <span>أكثر الشركات اللوجستية طلباً للتمويل</span>
+                            <span>{t('admin.analytics.top_companies_title')}</span>
                         </h3>
 
                         {topCompanies.length === 0 ? (
-                            <p className="text-xs text-slate-400 dark:text-slate-500 py-6 text-center">لا توجد مهام مسجلة للشركات في هذه الفترة</p>
+                            <p className="text-xs text-slate-400 dark:text-slate-500 py-6 text-center">{t('admin.analytics.empty_companies')}</p>
                         ) : (
                             <div className="divide-y divide-slate-200 dark:divide-slate-800">
                                 {topCompanies.map((comp, idx) => (
@@ -796,7 +811,7 @@ export default function AdminAnalytics({
                                             </span>
                                             <div>
                                                 <div className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-                                                    {comp.company_name || comp.user?.name || 'شركة لوجستية'}
+                                                    {comp.company_name || comp.user?.name || t('admin.analytics.default_company_name')}
                                                 </div>
                                                 <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                                                     {comp.contact_phone || comp.user?.phone || comp.contact_email || comp.user?.email || 'N/A'}
@@ -805,9 +820,9 @@ export default function AdminAnalytics({
                                         </div>
                                         <div className="text-end">
                                             <div className="font-mono font-bold text-orange-600 dark:text-orange-400 text-sm">
-                                                {(parseFloat(comp.total_tasks_amount) || 0).toLocaleString('en-US')} ر.س
+                                                {(parseFloat(comp.total_tasks_amount) || 0).toLocaleString('en-US')} {t('common.sar')}
                                             </div>
-                                            <div className="text-[10px] text-slate-500 dark:text-slate-400">{comp.total_tasks_count || 0} مهمة</div>
+                                            <div className="text-[10px] text-slate-500 dark:text-slate-400">{comp.total_tasks_count || 0} {t('common.task')}</div>
                                         </div>
                                     </div>
                                 ))}

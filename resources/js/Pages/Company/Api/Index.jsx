@@ -5,13 +5,13 @@ import AdminPageHeader from '../../../Components/AdminPageHeader';
 import Modal from '../../../Components/Modal';
 import Badge from '../../../Components/Badge';
 import ConfirmDialog from '../../../Components/ConfirmDialog';
+import { useTranslation } from '../../../Utils/i18n';
 import {
     Key,
     PlusCircle,
     Copy,
     Check,
     Webhook,
-    Code,
     Trash2,
     ShieldCheck,
     ExternalLink,
@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 
 export default function CompanyApi({ company, apiKeys = [], apiBaseUrl, stats = {} }) {
+    const { t, locale } = useTranslation();
     const { flash } = usePage().props;
     const [createKeyModal, setCreateKeyModal] = useState(false);
     const [revokeModalOpen, setRevokeModalOpen] = useState(false);
@@ -231,50 +232,77 @@ print_r(json_decode($response, true));`;
     };
 
     return (
-        <AuthenticatedLayout title="إعدادات الربط البرمجي ومفاتيح الـ API">
-            <Head title="إعدادات الربط البرمجي والـ API" />
+        <AuthenticatedLayout title={t('company.api.title')}>
+            <Head title={t('company.api.page_title')} />
 
             {/* Professional Page Header */}
             <AdminPageHeader
-                title="إعدادات الربط البرمجي ومفاتيح الـ API"
-                subtitle="إدارة مفاتيح الواجهات البرمجية (REST API) وإعدادات الـ Webhook لأتمتة إرسال المهام واستقبال التمويل اللحظي"
+                title={t('company.api.title')}
+                subtitle={t('company.api.subtitle')}
                 icon={Key}
                 iconColor="text-violet-400"
                 iconBg="bg-violet-500/15 border-violet-500/30"
-                breadcrumbs={[{ label: 'الربط البرمجي والـ API' }]}
+                breadcrumbs={[{ label: t('company.nav.api') }]}
                 badge={{
-                    text: `${stats.active_keys || 0} مفتاح نشط`,
-                    color: 'brand',
+                    text: company.environment === 'live' ? t('company.api.key_env_live') : t('company.api.key_env_test'),
+                    color: company.environment === 'live' ? 'emerald' : 'amber',
                 }}
                 actions={[
                     {
-                        label: 'توليد مفتاح API جديد',
-                        icon: PlusCircle,
-                        onClick: () => setCreateKeyModal(true),
+                        label: t('company.api.btn_sandbox'),
+                        icon: Terminal,
+                        url: route('company.api.sandbox'),
                         variant: 'primary',
                     },
                     {
-                        label: 'إدارة المهام اللوجستية',
+                        label: t('company.api.btn_generate_key'),
+                        icon: PlusCircle,
+                        onClick: () => setCreateKeyModal(true),
+                    },
+                    {
+                        label: t('company.api.btn_manage_tasks'),
                         icon: Truck,
                         url: route('company.tasks.index'),
                     },
-                    {
-                        label: 'محفظة التمويل والمسحوبات',
-                        icon: Wallet,
-                        url: route('company.wallet.funding'),
-                    },
                 ]}
             />
+
+            {/* Environment Status Banner */}
+            <div className={`p-5 rounded-2xl mb-8 border backdrop-blur-xl shadow-md flex items-start gap-3.5 ${
+                company.environment === 'live'
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-950 dark:text-emerald-200'
+                    : 'bg-amber-500/10 border-amber-500/30 text-amber-950 dark:text-amber-200'
+            }`}>
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                    company.environment === 'live'
+                        ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                        : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                }`}>
+                    <Server className="w-5 h-5" />
+                </div>
+                <div>
+                    <h4 className="font-bold text-sm mb-1">
+                        {company.environment === 'live'
+                            ? t('company.api.live_mode_alert_title')
+                            : t('company.api.sandbox_mode_alert_title')}
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {company.environment === 'live'
+                            ? t('company.api.live_mode_alert_desc')
+                            : t('company.api.sandbox_mode_alert_desc')}
+                    </p>
+                </div>
+            </div>
 
             {/* Generated Key Alert Box (Shown only once after generation) */}
             {flash?.generated_key && (
                 <div className="bg-[#6320EE]/10 border-2 border-[#6320EE] p-6 rounded-3xl shadow-xl mb-8 animate-fadeIn text-slate-900 dark:text-white">
                     <div className="flex items-center gap-3 mb-2">
                         <Key className="w-6 h-6 text-[#6320EE]" />
-                        <h4 className="font-bold text-base text-[#6320EE]">تم توليد مفتاح الـ API الجديد بنجاح!</h4>
+                        <h4 className="font-bold text-base text-[#6320EE]">{t('company.api.flash_success_title')}</h4>
                     </div>
                     <p className="text-xs text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
-                        ⚠️ <strong>تنبيه أمني هام:</strong> يرجى نسخ هذا المفتاح فوراً وتخزينه في ملف البيئة الخاص بخوادمكم (مثل <code>.env</code>)، فلن تتمكن من رؤيته مجدداً لأسباب أمنية وتشفيرية.
+                        ⚠️ {t('company.api.flash_security_warning')}
                     </p>
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-[#0A0E2A] p-4 rounded-2xl border border-[#6320EE]/40">
                         <span className="font-mono text-violet-700 dark:text-violet-300 font-bold text-sm select-all break-all">
@@ -286,7 +314,7 @@ print_r(json_decode($response, true));`;
                             className="px-5 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-md"
                         >
                             {copiedKey ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                            <span>{copiedKey ? 'تم النسخ بنجاح!' : 'نسخ المفتاح'}</span>
+                            <span>{copiedKey ? t('company.api.copied_success') : t('company.api.btn_copy_key')}</span>
                         </button>
                     </div>
                 </div>
@@ -297,24 +325,28 @@ print_r(json_decode($response, true));`;
                 {/* Active Keys */}
                 <div className="glass-panel p-5 rounded-2xl border border-violet-500/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">مفاتيح الـ API الفعالة</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.api.kpi_active_keys')}</span>
                         <div className="w-10 h-10 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold">
                             <Key className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-baseline gap-1">
                         {stats.active_keys || 0}
-                        <span className="text-xs font-sans font-bold text-slate-500">من أصل {stats.total_keys || 0}</span>
+                        <span className="text-xs font-sans font-bold text-slate-500">
+                            {t('company.api.kpi_out_of_total', { total: stats.total_keys || 0 })}
+                        </span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        آخر نشاط: {stats.last_key_used_at || 'لم يُستخدم'}
+                        {stats.last_key_used_at
+                            ? t('company.api.kpi_last_used', { time: stats.last_key_used_at })
+                            : t('company.api.never_used')}
                     </p>
                 </div>
 
                 {/* Webhook Status */}
                 <div className="glass-panel p-5 rounded-2xl border border-blue-500/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">إشعارات الـ Webhook</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.api.kpi_webhook')}</span>
                         <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold">
                             <Webhook className="w-5 h-5" />
                         </div>
@@ -323,41 +355,41 @@ print_r(json_decode($response, true));`;
                         {company.webhook_url ? (
                             <>
                                 <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
-                                <span className="text-blue-600 dark:text-blue-400">مفعل ومتصل</span>
+                                <span className="text-blue-600 dark:text-blue-400">{t('company.api.webhook_active')}</span>
                             </>
                         ) : (
                             <>
                                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                                <span className="text-amber-500">غير مضبوط</span>
+                                <span className="text-amber-500">{t('company.api.webhook_unconfigured')}</span>
                             </>
                         )}
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 truncate">
-                        {company.webhook_url ? company.webhook_url : 'قم بضبط الرابط لتلقي التمويل لحظياً'}
+                        {company.webhook_url ? company.webhook_url : t('company.api.webhook_hint_unconfigured')}
                     </p>
                 </div>
 
                 {/* API Ingested Tasks */}
                 <div className="glass-panel p-5 rounded-2xl border border-orange-500/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">المهام المرفوعة آلياً عبر API</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.api.kpi_api_tasks')}</span>
                         <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center font-bold">
                             <Truck className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-orange-500 flex items-baseline gap-1">
                         {stats.api_tasks_count || 0}
-                        <span className="text-xs font-sans font-bold text-slate-500">مهمة</span>
+                        <span className="text-xs font-sans font-bold text-slate-500">{t('company.tasks.unit')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        من أصل {stats.total_tasks_count || 0} مهمة إجمالية مسجلة
+                        {t('company.api.kpi_api_tasks_sub', { total: stats.total_tasks_count || 0 })}
                     </p>
                 </div>
 
                 {/* Base API Endpoint */}
                 <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">رابط الواجهة البرمجية الأساسي</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.api.kpi_base_url')}</span>
                         <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold">
                             <Server className="w-5 h-5" />
                         </div>
@@ -370,13 +402,13 @@ print_r(json_decode($response, true));`;
                             type="button"
                             onClick={() => handleCopy(apiBaseUrl, 'url')}
                             className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer shrink-0"
-                            title="نسخ الرابط الأساسي"
+                            title={t('company.api.btn_copy_base_url')}
                         >
                             {copiedBaseUrl ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        نسخة REST API v1 مع تفويض Bearer
+                        {t('company.api.kpi_base_url_sub')}
                     </p>
                 </div>
             </div>
@@ -386,7 +418,7 @@ print_r(json_decode($response, true));`;
                 <div className="flex items-center gap-2 mb-4">
                     <Zap className="w-5 h-5 text-orange-500" />
                     <h3 className="font-bold text-slate-900 dark:text-white text-base">
-                        كيف يعمل التكامل البرمجي المؤتمت مع GoTech؟
+                        {t('company.api.how_it_works_title')}
                     </h3>
                 </div>
 
@@ -396,10 +428,10 @@ print_r(json_decode($response, true));`;
                             1
                         </div>
                         <h4 className="font-bold text-xs text-slate-900 dark:text-white mb-1">
-                            توليد مفتاح الربط والاعتماد
+                            {t('company.api.step_1_title')}
                         </h4>
                         <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                            قم بتوليد مفتاح API آمن وضعه في خادم نظام إدارة النقل (TMS) الخاص بشركتكم لتفويض كافة الطلبات.
+                            {t('company.api.step_1_desc')}
                         </p>
                     </div>
 
@@ -408,10 +440,10 @@ print_r(json_decode($response, true));`;
                             2
                         </div>
                         <h4 className="font-bold text-xs text-slate-900 dark:text-white mb-1">
-                            رفع المهام اللوجستية آلياً
+                            {t('company.api.step_2_title')}
                         </h4>
                         <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                            يقوم نظامكم بإرسال بيانات الشحنات تلقائياً عبر نقطة <code>POST /tasks</code> لتُعرض فوراً في سوق التمويل للمستثمرين.
+                            {t('company.api.step_2_desc')}
                         </p>
                     </div>
 
@@ -420,10 +452,10 @@ print_r(json_decode($response, true));`;
                             3
                         </div>
                         <h4 className="font-bold text-xs text-slate-900 dark:text-white mb-1">
-                            استلام إشعار التمويل (Webhook)
+                            {t('company.api.step_3_title')}
                         </h4>
                         <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                            بمجرد قيام أي مستثمر بتمويل الشحنة، ترسل المنصة إشعاراً مشفراً لخادمكم، ويصبح الرصيد جاهزاً للصرف فوراً.
+                            {t('company.api.step_3_desc')}
                         </p>
                     </div>
                 </div>
@@ -437,7 +469,7 @@ print_r(json_decode($response, true));`;
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
                                 <Key className="w-5 h-5 text-violet-500" />
-                                <span>مفاتيح الواجهات البرمجية (API Keys)</span>
+                                <span>{t('company.api.keys_card_title')}</span>
                             </h3>
                             <button
                                 type="button"
@@ -445,12 +477,12 @@ print_r(json_decode($response, true));`;
                                 className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#6320EE] hover:bg-[#5217D4] text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm shadow-violet-600/20"
                             >
                                 <PlusCircle className="w-4 h-4" />
-                                <span>توليد مفتاح جديد</span>
+                                <span>{t('company.api.btn_new_key')}</span>
                             </button>
                         </div>
 
                         <p className="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                            استخدم هذه المفاتيح لتفويض طلبات خوادمكم. يُرجى إلغاء أي مفتاح قد تشك في تسريبه فوراً.
+                            {t('company.api.keys_card_desc')}
                         </p>
 
                         <div className="space-y-3">
@@ -461,19 +493,26 @@ print_r(json_decode($response, true));`;
                                         className="bg-slate-50 dark:bg-slate-900/70 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
                                     >
                                         <div>
-                                            <div className="flex items-center gap-2 mb-1">
+                                             <div className="flex items-center gap-2 mb-1">
                                                 <span className="font-bold text-slate-900 dark:text-white text-xs">
                                                     {key.key_name}
                                                 </span>
                                                 <Badge status={key.status} />
+                                                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold ${
+                                                    key.environment === 'live'
+                                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                                }`}>
+                                                    {key.environment === 'live' ? t('company.api.key_env_live') : t('company.api.key_env_test')}
+                                                </span>
                                             </div>
                                             <span className="font-mono text-xs text-violet-600 dark:text-violet-400 font-bold block">
                                                 {key.api_key_prefix}••••••••••••••••••••••••••••
                                             </span>
                                             <div className="flex items-center gap-3 text-[10px] text-slate-500 mt-1">
-                                                <span>إنشاء: {new Date(key.created_at).toLocaleDateString('ar-SA')}</span>
+                                                <span>{t('company.api.key_created_at', { date: new Date(key.created_at).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US') })}</span>
                                                 {key.last_used_at && (
-                                                    <span>آخر استخدام: {new Date(key.last_used_at).toLocaleDateString('ar-SA')}</span>
+                                                    <span>{t('company.api.key_last_used_at', { date: new Date(key.last_used_at).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US') })}</span>
                                                 )}
                                             </div>
                                         </div>
@@ -483,7 +522,7 @@ print_r(json_decode($response, true));`;
                                                 type="button"
                                                 onClick={() => handleOpenRevoke(key)}
                                                 className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-rose-500/20"
-                                                title="إلغاء تنشيط المفتاح"
+                                                title={t('company.api.btn_revoke_tooltip')}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -492,7 +531,7 @@ print_r(json_decode($response, true));`;
                                 ))
                             ) : (
                                 <div className="text-center py-8 text-xs text-slate-500 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-                                    لا توجد أي مفاتيح API مسجلة حالياً. اضغط على زر "توليد مفتاح جديد" أعلاه.
+                                    {t('company.api.no_keys_recorded')}
                                 </div>
                             )}
                         </div>
@@ -500,7 +539,7 @@ print_r(json_decode($response, true));`;
 
                     <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex items-center gap-2">
                         <Lock className="w-4 h-4 text-violet-500 shrink-0" />
-                        <span>يتم تخزين المفاتيح بتشفير SHA-256 أحادي الاتجاه لحماية قصوى لأنظمتكم.</span>
+                        <span>{t('company.api.keys_security_note')}</span>
                     </div>
                 </div>
 
@@ -510,7 +549,7 @@ print_r(json_decode($response, true));`;
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
                                 <Webhook className="w-5 h-5 text-blue-500" />
-                                <span>إعدادات الإشعارات الفورية (Webhooks)</span>
+                                <span>{t('company.api.webhook_card_title')}</span>
                             </h3>
 
                             {company.webhook_url && (
@@ -521,19 +560,19 @@ print_r(json_decode($response, true));`;
                                     className="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                                 >
                                     <Radio className={`w-3.5 h-3.5 ${testingWebhook ? 'animate-spin' : ''}`} />
-                                    <span>{testingWebhook ? 'جاري الفحص...' : 'فحص الاتصال (Ping)'}</span>
+                                    <span>{testingWebhook ? t('company.api.btn_pinging') : t('company.api.btn_ping')}</span>
                                 </button>
                             )}
                         </div>
 
                         <p className="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                            عندما يقوم مستثمر بتمويل أي مهمة لوجستية تابعة لشركتكم، سنقوم فورياً بإرسال إشعار <code>HTTP POST</code> مشفر إلى الرابط المحدد أدناه مع توقيع <code>X-GoTech-Signature</code>.
+                            {t('company.api.webhook_card_desc')}
                         </p>
 
                         <form onSubmit={handleUpdateWebhook} className="space-y-4">
                             <div>
                                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                    رابط استلام الإشعارات (Webhook URL)
+                                    {t('company.api.field_webhook_url')}
                                 </label>
                                 <div className="relative">
                                     <Globe className="w-4 h-4 text-slate-400 absolute right-3.5 top-3" />
@@ -549,7 +588,7 @@ print_r(json_decode($response, true));`;
 
                             <div>
                                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                    المفتاح السري للتحقق من التوقيع (Webhook Secret)
+                                    {t('company.api.field_webhook_secret')}
                                 </label>
                                 <div className="relative">
                                     <Lock className="w-4 h-4 text-slate-400 absolute right-3.5 top-3" />
@@ -562,7 +601,7 @@ print_r(json_decode($response, true));`;
                                     />
                                 </div>
                                 <p className="text-[11px] text-slate-500 mt-1">
-                                    يُستخدم لحساب توقيع <code>HMAC-SHA256</code> للتأكد من أن الطلب صادر حصرياً من GoTech.
+                                    {t('company.api.webhook_secret_note')}
                                 </p>
                             </div>
 
@@ -576,7 +615,7 @@ print_r(json_decode($response, true));`;
                                 ) : (
                                     <>
                                         <Send className="w-3.5 h-3.5" />
-                                        <span>حفظ إعدادات الـ Webhook</span>
+                                        <span>{t('company.api.btn_save_webhook')}</span>
                                     </>
                                 )}
                             </button>
@@ -585,7 +624,7 @@ print_r(json_decode($response, true));`;
 
                     <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex items-center gap-2">
                         <Info className="w-4 h-4 text-blue-500 shrink-0" />
-                        <span>يجب أن يرد خادمكم بكود حالة <code>200 OK</code> خلال أقل من 5 ثوانٍ عند استلام الإشعار.</span>
+                        <span>{t('company.api.webhook_timeout_note')}</span>
                     </div>
                 </div>
             </div>
@@ -599,10 +638,10 @@ print_r(json_decode($response, true));`;
                         </div>
                         <div>
                             <h3 className="font-bold text-slate-900 dark:text-white text-base">
-                                التوثيق البرمجي ونماذج الأكواد التفاعلية
+                                {t('company.api.code_explorer_title')}
                             </h3>
                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                أمثلة حية بلغات متعددة للتكامل السريع مع نظام إدارة الشحن الخاص بكم
+                                {t('company.api.code_explorer_desc')}
                             </p>
                         </div>
                     </div>
@@ -648,7 +687,7 @@ print_r(json_decode($response, true));`;
                             className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
                             <Copy className="w-3.5 h-3.5" />
-                            <span>نسخ الكود</span>
+                            <span>{t('company.api.btn_copy_code')}</span>
                         </button>
                     </div>
 
@@ -661,49 +700,49 @@ print_r(json_decode($response, true));`;
                 <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
                     <h4 className="font-bold text-xs text-slate-900 dark:text-white mb-3 flex items-center gap-1.5">
                         <Info className="w-4 h-4 text-violet-500" />
-                        <span>دليل حقول الطلب (Payload Parameters) لنقطة <code>POST /tasks</code>:</span>
+                        <span>{t('company.api.payload_guide_title')}</span>
                     </h4>
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-xs text-right">
                             <thead className="bg-slate-50 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                                 <tr>
-                                    <th className="p-3">اسم الحقل البرمجي</th>
-                                    <th className="p-3">النوع</th>
-                                    <th className="p-3">إلزامي؟</th>
-                                    <th className="p-3">الوصف والملاحظات</th>
+                                    <th className="p-3">{t('company.api.th_field_name')}</th>
+                                    <th className="p-3">{t('company.api.th_field_type')}</th>
+                                    <th className="p-3">{t('company.api.th_field_required')}</th>
+                                    <th className="p-3">{t('company.api.th_field_desc')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
                                 <tr>
                                     <td className="p-3 font-mono font-bold text-violet-600 dark:text-violet-400">external_task_id</td>
                                     <td className="p-3 font-mono text-slate-500">string</td>
-                                    <td className="p-3"><span className="text-amber-500 font-bold">نعم</span></td>
-                                    <td className="p-3 text-slate-700 dark:text-slate-300">معرف الشحنة في نظامكم الخاص (مثل رقم البوليصة أو المعاملة).</td>
+                                    <td className="p-3"><span className="text-amber-500 font-bold">{t('company.api.required_yes')}</span></td>
+                                    <td className="p-3 text-slate-700 dark:text-slate-300">{t('company.api.field_external_task_id_desc')}</td>
                                 </tr>
                                 <tr>
                                     <td className="p-3 font-mono font-bold text-violet-600 dark:text-violet-400">title</td>
                                     <td className="p-3 font-mono text-slate-500">string</td>
-                                    <td className="p-3"><span className="text-amber-500 font-bold">نعم</span></td>
-                                    <td className="p-3 text-slate-700 dark:text-slate-300">عنوان مختصر ومفهوم لطبيعة الشحنة للمستثمرين.</td>
+                                    <td className="p-3"><span className="text-amber-500 font-bold">{t('company.api.required_yes')}</span></td>
+                                    <td className="p-3 text-slate-700 dark:text-slate-300">{t('company.api.field_title_desc')}</td>
                                 </tr>
                                 <tr>
                                     <td className="p-3 font-mono font-bold text-violet-600 dark:text-violet-400">funding_amount</td>
                                     <td className="p-3 font-mono text-slate-500">number</td>
-                                    <td className="p-3"><span className="text-amber-500 font-bold">نعم</span></td>
-                                    <td className="p-3 text-slate-700 dark:text-slate-300">قيمة التمويل المطلوبة للشحنة بالريال السعودي (SAR).</td>
+                                    <td className="p-3"><span className="text-amber-500 font-bold">{t('company.api.required_yes')}</span></td>
+                                    <td className="p-3 text-slate-700 dark:text-slate-300">{t('company.api.field_funding_amount_desc')}</td>
                                 </tr>
                                 <tr>
                                     <td className="p-3 font-mono font-bold text-violet-600 dark:text-violet-400">pickup_city / dropoff_city</td>
                                     <td className="p-3 font-mono text-slate-500">string</td>
-                                    <td className="p-3"><span className="text-slate-400">اختياري</span></td>
-                                    <td className="p-3 text-slate-700 dark:text-slate-300">مدينة الاستلام والتسليم لتسهيل عرض المسار.</td>
+                                    <td className="p-3"><span className="text-slate-400">{t('company.api.required_no')}</span></td>
+                                    <td className="p-3 text-slate-700 dark:text-slate-300">{t('company.api.field_cities_desc')}</td>
                                 </tr>
                                 <tr>
                                     <td className="p-3 font-mono font-bold text-violet-600 dark:text-violet-400">duration_minutes</td>
                                     <td className="p-3 font-mono text-slate-500">integer</td>
-                                    <td className="p-3"><span className="text-slate-400">اختياري</span></td>
-                                    <td className="p-3 text-slate-700 dark:text-slate-300">المدة المتوقعة لتسليم الشحنة بالدقائق.</td>
+                                    <td className="p-3"><span className="text-slate-400">{t('company.api.required_no')}</span></td>
+                                    <td className="p-3 text-slate-700 dark:text-slate-300">{t('company.api.field_duration_desc')}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -715,23 +754,23 @@ print_r(json_decode($response, true));`;
             <Modal
                 isOpen={createKeyModal}
                 onClose={() => setCreateKeyModal(false)}
-                title="توليد مفتاح API جديد"
+                title={t('company.api.create_modal_title')}
                 maxWidth="md"
             >
                 <form onSubmit={handleCreateKey} className="space-y-4">
                     <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                        حدد اسماً توضيحياً لمفتاح الـ API لتمييز الخادم أو البيئة التي ستستخدمه (مثلاً: خادم الإنتاج الأساسي، تطبيق السائقين، نظام المستودعات).
+                        {t('company.api.create_modal_desc')}
                     </p>
 
                     <div>
                         <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                            اسم المفتاح التعريفي
+                            {t('company.api.field_key_name')}
                         </label>
                         <input
                             type="text"
                             value={keyData.key_name}
                             onChange={(e) => setKeyData('key_name', e.target.value)}
-                            placeholder="مثال: TMS Production Server"
+                            placeholder={t('company.api.field_key_placeholder')}
                             className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
                             required
                         />
@@ -747,7 +786,7 @@ print_r(json_decode($response, true));`;
                         ) : (
                             <>
                                 <PlusCircle className="w-4 h-4" />
-                                <span>توليد وحفظ المفتاح الآن</span>
+                                <span>{t('company.api.btn_confirm_generate')}</span>
                             </>
                         )}
                     </button>
@@ -761,10 +800,13 @@ print_r(json_decode($response, true));`;
                 onConfirm={handleConfirmRevoke}
                 isLoading={revokeLoading}
                 type="danger"
-                title="إلغاء تنشيط مفتاح الـ API"
-                message={`هل أنت متأكد من رغبتك في إلغاء تفعيل المفتاح "${selectedKeyToRevoke?.key_name}" (${selectedKeyToRevoke?.api_key_prefix}...)؟ ستتوقف أي خوادم أو أنظمة تستخدم هذا المفتاح عن الوصول إلى واجهة المنصة فوراً.`}
-                confirmText="نعم، إلغاء تفعيل المفتاح"
-                cancelText="تراجع"
+                title={t('company.api.revoke_modal_title')}
+                message={t('company.api.revoke_modal_message', {
+                    name: selectedKeyToRevoke?.key_name || '',
+                    prefix: selectedKeyToRevoke?.api_key_prefix || ''
+                })}
+                confirmText={t('company.api.revoke_modal_confirm')}
+                cancelText={t('company.api.revoke_modal_cancel')}
             />
         </AuthenticatedLayout>
     );

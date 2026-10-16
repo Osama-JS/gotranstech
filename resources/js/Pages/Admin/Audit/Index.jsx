@@ -7,6 +7,7 @@ import SearchableSelect from '../../../Components/SearchableSelect';
 import DatePicker from '../../../Components/DatePicker';
 import Pagination from '../../../Components/Pagination';
 import Modal from '../../../Components/Modal';
+import { useTranslation } from '@/Utils/useTranslation';
 import { 
     History, 
     Search, 
@@ -25,6 +26,7 @@ import {
 } from 'lucide-react';
 
 export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters = {} }) {
+    const { t, isAr } = useTranslation();
     const [search, setSearch] = useState(filters?.search || '');
     const [eventType, setEventType] = useState(filters?.event_type || '');
     const [dateFrom, setDateFrom] = useState(filters?.date_from || '');
@@ -58,7 +60,7 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
 
     // Format eventTypes options
     const eventTypeOptions = [
-        { value: '', label: 'جميع أنواع العمليات' },
+        { value: '', label: t('admin.audit.filter_event_all') },
         ...Object.entries(eventTypes).map(([key, label]) => ({
             value: key,
             label: `${label} (${key})`
@@ -88,52 +90,52 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
     };
 
     return (
-        <AuthenticatedLayout title="سجل التدقيق والرقابة وتتبع العمليات">
-            <Head title="سجل التدقيق والعمليات - إدارة المنصة" />
+        <AuthenticatedLayout title={t('admin.audit.page_title')}>
+            <Head title={t('admin.audit.page_title')} />
 
             <div className="space-y-6 pb-12">
                 {/* Unified Header */}
                 <AdminPageHeader
-                    title="سجل التدقيق والرقابة وتتبع العمليات"
-                    subtitle="مراقبة وتتبع العمليات الإدارية، التغييرات المالية، تعديلات النظام وعناوين IP لحظياً"
+                    title={t('admin.audit.header_title')}
+                    subtitle={t('admin.audit.header_subtitle')}
                     breadcrumbs={[
-                        { label: 'الرئيسية', url: route('admin.dashboard') },
-                        { label: 'سجل العمليات والتدقيق' }
+                        { label: t('admin.nav.home'), url: route('admin.dashboard') },
+                        { label: t('admin.nav.audit_logs') }
                     ]}
                     icon={History}
                     iconColor="text-purple-400"
-                    badge={{ text: `${stats?.total || 0} عملية مسجلة`, color: 'purple' }}
+                    badge={{ text: t('admin.audit.badge_total_logs', { count: stats?.total || 0 }), color: 'purple' }}
                 />
 
                 {/* Stat Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <StatCard
-                        title="إجمالي السجلات"
+                        title={t('admin.audit.stat_total')}
                         value={stats?.total || 0}
                         icon={Activity}
                         color="blue"
-                        description="سجل العمليات المسجلة للنظام"
+                        description={t('admin.audit.stat_total_desc')}
                     />
                     <StatCard
-                        title="عمليات مالية واعتمادات"
+                        title={t('admin.audit.stat_financial')}
                         value={stats?.financial || 0}
                         icon={ShieldCheck}
                         color="purple"
-                        description="تمويل، اعتماد، ورفض"
+                        description={t('admin.audit.stat_financial_desc')}
                     />
                     <StatCard
-                        title="تعديلات وتحديث بيانات"
+                        title={t('admin.audit.stat_changes')}
                         value={stats?.changes || 0}
                         icon={Sliders}
                         color="cyan"
-                        description="إضافة وتعديل وحذف"
+                        description={t('admin.audit.stat_changes_desc')}
                     />
                     <StatCard
-                        title="تغييرات الإعدادات"
+                        title={t('admin.audit.stat_settings')}
                         value={stats?.settings || 0}
                         icon={Settings}
                         color="amber"
-                        description="تعديلات على ضبط النظام"
+                        description={t('admin.audit.stat_settings_desc')}
                     />
                 </div>
 
@@ -142,41 +144,41 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
                     <form onSubmit={handleFilter} className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3.5">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">بحث سريع</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">{t('admin.audit.filter_search_label')}</label>
                                 <div className="relative">
                                     <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute start-3.5 top-3" />
                                     <input
                                         type="text"
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        placeholder="الوصف، عنوان IP، اسم المستخدم، الكيان..."
+                                        placeholder={t('admin.audit.filter_search_placeholder')}
                                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl ps-10 pe-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-all"
                                     />
                                 </div>
                             </div>
 
                             <SearchableSelect
-                                label="نوع العملية (Event Type)"
+                                label={t('admin.audit.filter_event_label')}
                                 options={eventTypeOptions}
                                 value={eventType}
                                 onChange={setEventType}
-                                placeholder="اختر نوع العملية..."
+                                placeholder={t('admin.audit.filter_event_placeholder')}
                             />
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-3 border-t border-slate-100 dark:border-slate-800 items-end">
                             <DatePicker
-                                label="من تاريخ"
+                                label={t('admin.audit.filter_date_from')}
                                 value={dateFrom}
                                 onChange={setDateFrom}
-                                placeholder="من تاريخ..."
+                                placeholder={t('admin.audit.filter_date_from') + '...'}
                             />
 
                             <DatePicker
-                                label="إلى تاريخ"
+                                label={t('admin.audit.filter_date_to')}
                                 value={dateTo}
                                 onChange={setDateTo}
-                                placeholder="إلى تاريخ..."
+                                placeholder={t('admin.audit.filter_date_to') + '...'}
                             />
 
                             <div className="flex items-center gap-2">
@@ -185,14 +187,14 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
                                     className="flex-1 py-2.5 rounded-2xl text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
                                 >
                                     <Filter className="w-3.5 h-3.5" />
-                                    <span>تطبيق الفلترة</span>
+                                    <span>{t('admin.audit.filter_apply')}</span>
                                 </button>
                                 {(search || eventType || dateFrom || dateTo) && (
                                     <button
                                         type="button"
                                         onClick={handleReset}
                                         className="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700 cursor-pointer"
-                                        title="إعادة ضبط"
+                                        title={t('admin.audit.filter_reset')}
                                     >
                                         <RefreshCw className="w-4 h-4" />
                                     </button>
@@ -208,13 +210,13 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
                         <table className="w-full text-xs text-right">
                             <thead className="bg-slate-900/90 text-slate-400 font-semibold border-b border-slate-800">
                                 <tr>
-                                    <th className="p-4">نوع الحدث</th>
-                                    <th className="p-4">المستخدم المسؤول</th>
-                                    <th className="p-4">الكيان والجدول</th>
-                                    <th className="p-4">وصف العملية</th>
-                                    <th className="p-4">عنوان IP</th>
-                                    <th className="p-4">التاريخ والوقت</th>
-                                    <th className="p-4 text-center">التفاصيل</th>
+                                    <th className="p-4">{t('admin.audit.table_event')}</th>
+                                    <th className="p-4">{t('admin.audit.table_user')}</th>
+                                    <th className="p-4">{t('admin.audit.table_entity')}</th>
+                                    <th className="p-4">{t('admin.audit.table_description')}</th>
+                                    <th className="p-4">{t('admin.audit.table_ip')}</th>
+                                    <th className="p-4">{t('admin.audit.table_time')}</th>
+                                    <th className="p-4 text-center">{t('admin.audit.table_details')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/60">
@@ -233,7 +235,7 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
                                                         <span className="text-[10px] text-slate-400 font-mono block">{log.user.email}</span>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-slate-500 font-medium">النظام / ضيف</span>
+                                                    <span className="text-slate-500 font-medium">{t('admin.audit.system_guest')}</span>
                                                 )}
                                             </td>
                                             <td className="p-4 font-mono text-slate-400">
@@ -252,7 +254,7 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
                                                 {log.ip_address || '-'}
                                             </td>
                                             <td className="p-4 text-slate-400 font-mono text-[11px]">
-                                                {new Date(log.created_at).toLocaleString('ar-SA')}
+                                                {new Date(log.created_at).toLocaleString(isAr ? 'ar-SA' : 'en-US')}
                                             </td>
                                             <td className="p-4 text-center">
                                                 <button
@@ -261,7 +263,7 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
                                                     className="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-400 hover:text-purple-300 flex items-center gap-1 border border-slate-700 transition-all text-xs font-semibold mx-auto cursor-pointer"
                                                 >
                                                     <Eye className="w-3.5 h-3.5" />
-                                                    <span>فحص</span>
+                                                    <span>{t('admin.audit.btn_inspect')}</span>
                                                 </button>
                                             </td>
                                         </tr>
@@ -271,12 +273,12 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
                                         <td colSpan="7" className="text-center py-12 text-slate-500">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <History className="w-8 h-8 text-slate-600" />
-                                                <p className="text-sm font-semibold">لا توجد سجلات مطابقة لمعايير البحث</p>
+                                                <p className="text-sm font-semibold">{t('admin.audit.empty_title')}</p>
                                                 <button
                                                     onClick={handleReset}
                                                     className="mt-2 text-xs text-purple-400 hover:text-purple-300 underline"
                                                 >
-                                                    إلغاء الفلاتر
+                                                    {t('admin.audit.empty_clear')}
                                                 </button>
                                             </div>
                                         </td>
@@ -297,34 +299,34 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
             <Modal
                 isOpen={detailsModalOpen}
                 onClose={() => setDetailsModalOpen(false)}
-                title={`تفاصيل حدث التدقيق #${selectedLog?.id} (${selectedLog?.event_type})`}
+                title={t('admin.audit.modal_title', { id: selectedLog?.id, type: selectedLog?.event_type })}
                 maxWidth="2xl"
             >
                 {selectedLog && (
                     <div className="space-y-4 text-xs font-sans">
                         <div className="grid grid-cols-2 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
                             <div>
-                                <span className="text-slate-500 block mb-0.5">المستخدم:</span>
-                                <strong className="text-white">{selectedLog.user?.name || 'النظام'}</strong>
+                                <span className="text-slate-500 block mb-0.5">{t('admin.audit.modal_user')}</span>
+                                <strong className="text-white">{selectedLog.user?.name || t('admin.audit.system_guest')}</strong>
                             </div>
                             <div>
-                                <span className="text-slate-500 block mb-0.5">عنوان IP:</span>
+                                <span className="text-slate-500 block mb-0.5">{t('admin.audit.modal_ip')}</span>
                                 <strong className="text-purple-400 font-mono">{selectedLog.ip_address || '-'}</strong>
                             </div>
                             <div>
-                                <span className="text-slate-500 block mb-0.5">الكيان والصف:</span>
+                                <span className="text-slate-500 block mb-0.5">{t('admin.audit.modal_entity')}</span>
                                 <strong className="text-slate-300 font-mono">
                                     {selectedLog.auditable_type ? `${selectedLog.auditable_type} #${selectedLog.auditable_id}` : '-'}
                                 </strong>
                             </div>
                             <div>
-                                <span className="text-slate-500 block mb-0.5">التاريخ والوقت:</span>
-                                <strong className="text-slate-300 font-mono">{new Date(selectedLog.created_at).toLocaleString('ar-SA')}</strong>
+                                <span className="text-slate-500 block mb-0.5">{t('admin.audit.modal_time')}</span>
+                                <strong className="text-slate-300 font-mono">{new Date(selectedLog.created_at).toLocaleString(isAr ? 'ar-SA' : 'en-US')}</strong>
                             </div>
                         </div>
 
                         <div>
-                            <span className="font-bold text-slate-300 block mb-1">البيان والوصف:</span>
+                            <span className="font-bold text-slate-300 block mb-1">{t('admin.audit.modal_desc')}</span>
                             <p className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-slate-300 leading-relaxed">
                                 {selectedLog.description}
                             </p>
@@ -339,24 +341,24 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
                             if (allKeys.length === 0) return null;
 
                             const formatVal = (val) => {
-                                if (val === null || val === undefined) return <span className="text-slate-500 italic">فارغ (null)</span>;
-                                if (typeof val === 'boolean') return val ? <span className="text-violet-400 font-bold">صحيح (true)</span> : <span className="text-rose-400 font-bold">خطأ (false)</span>;
+                                if (val === null || val === undefined) return <span className="text-slate-500 italic">{t('admin.audit.diff_empty')}</span>;
+                                if (typeof val === 'boolean') return val ? <span className="text-violet-400 font-bold">{t('admin.audit.diff_true')}</span> : <span className="text-rose-400 font-bold">{t('admin.audit.diff_false')}</span>;
                                 if (typeof val === 'object') return <span className="font-mono text-[10px]">{JSON.stringify(val)}</span>;
                                 return <span className="font-mono">{String(val)}</span>;
                             };
 
                             return (
                                 <div>
-                                    <span className="font-bold text-slate-200 dark:text-slate-200 block mb-2">جدول مقارنة التغييرات:</span>
+                                    <span className="font-bold text-slate-200 dark:text-slate-200 block mb-2">{t('admin.audit.modal_diff_title')}</span>
                                     <div className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-inner">
                                         <div className="overflow-x-auto max-h-64">
                                             <table className="w-full text-xs text-start">
                                                 <thead className="bg-slate-900 border-b border-slate-800 text-slate-400 font-bold">
                                                     <tr>
-                                                        <th className="p-3 text-start">الحقل</th>
-                                                        <th className="p-3 text-start">القيمة السابقة</th>
-                                                        <th className="p-3 text-start">القيمة الجديدة</th>
-                                                        <th className="p-3 text-center">نوع التغيير</th>
+                                                        <th className="p-3 text-start">{t('admin.audit.diff_field')}</th>
+                                                        <th className="p-3 text-start">{t('admin.audit.diff_old')}</th>
+                                                        <th className="p-3 text-start">{t('admin.audit.diff_new')}</th>
+                                                        <th className="p-3 text-center">{t('admin.audit.diff_change_type')}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-slate-800/60">
@@ -381,22 +383,22 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
                                                                 <td className="p-3 text-center">
                                                                     {isAdded && (
                                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400 border border-violet-500/20">
-                                                                            إضافة +
+                                                                            {t('admin.audit.diff_added')}
                                                                         </span>
                                                                     )}
                                                                     {isRemoved && (
                                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                                                                            حذف -
+                                                                            {t('admin.audit.diff_removed')}
                                                                         </span>
                                                                     )}
                                                                     {!isAdded && !isRemoved && isChanged && (
                                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                                                            تعديل ✎
+                                                                            {t('admin.audit.diff_modified')}
                                                                         </span>
                                                                     )}
                                                                     {!isChanged && (
                                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-500">
-                                                                            بدون تغيير
+                                                                            {t('admin.audit.diff_unchanged')}
                                                                         </span>
                                                                     )}
                                                                 </td>
@@ -417,7 +419,7 @@ export default function AdminAuditLogs({ logs, stats, eventTypes = {}, filters =
                                 onClick={() => setDetailsModalOpen(false)}
                                 className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer"
                             >
-                                إغلاق النافذة
+                                {t('admin.audit.btn_close')}
                             </button>
                         </div>
                     </div>

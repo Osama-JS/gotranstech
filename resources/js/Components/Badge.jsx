@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from '../Utils/i18n';
 
 export default function Badge({ status, text }) {
+    const { t } = useTranslation();
     const statusMap = {
         active: {
             bg: 'bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-500/20',
@@ -73,7 +75,7 @@ export default function Badge({ status, text }) {
     return (
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${config.bg}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
-            {text || config.defaultText}
+            {text || t(`status.${status}`, {}, config.defaultText)}
         </span>
     );
 }

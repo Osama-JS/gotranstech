@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import AdminPageHeader from '@/Components/AdminPageHeader';
+import { useTranslation } from '@/Utils/i18n';
 import {
     TrendingUp,
     BarChart3,
@@ -29,6 +30,7 @@ export default function InvestorAnalytics({
     companyPerformance = [],
     cashflowTrend = [],
 }) {
+    const { t, locale } = useTranslation();
     const [hoveredPoint, setHoveredPoint] = useState(null);
 
     const handlePeriodChange = (newPeriod) => {
@@ -36,10 +38,10 @@ export default function InvestorAnalytics({
     };
 
     const periodLabels = {
-        '7days': 'آخر 7 أيام',
-        '30days': 'آخر 30 يوماً',
-        '6months': 'آخر 6 أشهر',
-        '1year': 'آخر سنة',
+        '7days': t('investor.analytics.period_7days'),
+        '30days': t('investor.analytics.period_30days'),
+        '6months': t('investor.analytics.period_6months'),
+        '1year': t('investor.analytics.period_1year'),
     };
 
     // Scaling for Line Chart
@@ -83,19 +85,19 @@ export default function InvestorAnalytics({
     let accumulatedPercent = 0;
 
     return (
-        <AuthenticatedLayout title="التحليلات والمؤشرات الاستثمارية">
-            <Head title="التحليلات الاستثمارية" />
+        <AuthenticatedLayout title={t('investor.analytics.title')}>
+            <Head title={t('investor.analytics.page_title')} />
 
             {/* Professional Page Header */}
             <AdminPageHeader
-                title="التحليلات والمؤشرات الاستثمارية"
-                subtitle="متابعة نمو المحفظة، مسار عوائد الأرباح والعمولات اللحظية، وتوزيع التمويل اللوجستي لاتخاذ قرارات استثمارية دقيقة"
+                title={t('investor.analytics.title')}
+                subtitle={t('investor.analytics.subtitle')}
                 icon={BarChart3}
                 iconColor="text-violet-400"
                 iconBg="bg-violet-500/15 border-violet-500/30"
-                breadcrumbs={[{ label: 'التحليلات والإحصائيات' }]}
+                breadcrumbs={[{ label: t('investor.analytics.breadcrumb') }]}
                 badge={{
-                    text: 'بيانات وإحصائيات حية',
+                    text: t('investor.analytics.live_badge'),
                     color: 'brand',
                 }}
                 actions={
@@ -123,68 +125,68 @@ export default function InvestorAnalytics({
                 {/* Total Invested */}
                 <div className="glass-panel p-5 rounded-2xl border border-violet-500/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">حجم التمويل بالفترة</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('investor.analytics.funding_volume_period')}</span>
                         <div className="w-10 h-10 rounded-xl bg-violet-500/10 text-violet-500 flex items-center justify-center font-bold">
                             <TrendingUp className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-baseline gap-1">
                         {Number(kpis.total_invested || 0).toLocaleString('en-US')}
-                        <span className="text-xs font-sans font-bold text-violet-500">ر.س</span>
+                        <span className="text-xs font-sans font-bold text-violet-500">{t('common.sar')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        الإجمالي التاريخي: {Number(kpis.all_time_invested || 0).toLocaleString('en-US')} ر.س
+                        {t('investor.analytics.all_time_funding')} {Number(kpis.all_time_invested || 0).toLocaleString('en-US')} {t('common.sar')}
                     </p>
                 </div>
 
                 {/* Total Profits */}
                 <div className="glass-panel p-5 rounded-2xl border border-orange-500/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">صافي أرباح العمولات</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('investor.analytics.net_commissions_profit')}</span>
                         <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center font-bold">
                             <DollarSign className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-baseline gap-1">
                         +{Number(kpis.total_profits || 0).toLocaleString('en-US')}
-                        <span className="text-xs font-sans font-bold text-orange-500">ر.س</span>
+                        <span className="text-xs font-sans font-bold text-orange-500">{t('common.sar')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        إجمالي الأرباح التاريخية: +{Number(kpis.all_time_profits || 0).toLocaleString('en-US')} ر.س
+                        {t('investor.analytics.all_time_profits')} +{Number(kpis.all_time_profits || 0).toLocaleString('en-US')} {t('common.sar')}
                     </p>
                 </div>
 
                 {/* ROI Rate */}
                 <div className="glass-panel p-5 rounded-2xl border border-indigo-500/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">معدل العائد (ROI)</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('investor.analytics.roi_rate')}</span>
                         <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold">
                             <Percent className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-baseline gap-1">
                         {kpis.roi_percentage || 0}%
-                        <span className="text-xs font-sans font-bold text-indigo-500">عائد فوري</span>
+                        <span className="text-xs font-sans font-bold text-indigo-500">{t('investor.analytics.instant_roi')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        رصيد العمولات الحالي: {Number(kpis.commission_balance || 0).toLocaleString('en-US')} ر.س
+                        {t('investor.analytics.current_commission_balance')} {Number(kpis.commission_balance || 0).toLocaleString('en-US')} {t('common.sar')}
                     </p>
                 </div>
 
                 {/* Completed Tasks Count */}
                 <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">المهام الممولة بنجاح</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('investor.analytics.funded_tasks_count')}</span>
                         <div className="w-10 h-10 rounded-xl bg-violet-500/10 text-violet-500 flex items-center justify-center font-bold">
                             <Zap className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-baseline gap-1">
                         {kpis.total_investments_count || 0}
-                        <span className="text-xs font-sans font-bold text-slate-500">مهمة</span>
+                        <span className="text-xs font-sans font-bold text-slate-500">{t('investor.analytics.task_unit')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        متوسط المهمة: {Number(kpis.avg_investment_per_task || 0).toLocaleString('en-US')} ر.س
+                        {t('investor.analytics.avg_task_investment')} {Number(kpis.avg_investment_per_task || 0).toLocaleString('en-US')} {t('common.sar')}
                     </p>
                 </div>
             </div>
@@ -195,21 +197,21 @@ export default function InvestorAnalytics({
                     <div>
                         <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                             <TrendingUp className="w-5 h-5 text-violet-500" />
-                            <span>مسار حجم التمويل وعوائد العمولات المكتسبة خلال الفترة (Lines)</span>
+                            <span>{t('investor.analytics.trend_title')}</span>
                         </h3>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                            مقارنة أداء رأس المال المستثمر مع صافي الأرباح المودعة في محفظتك اللحظية
+                            {t('investor.analytics.trend_subtitle')}
                         </p>
                     </div>
 
                     <div className="flex items-center gap-4 text-xs font-bold">
                         <div className="flex items-center gap-1.5">
                             <span className="w-3 h-3 rounded-full bg-[#6320EE]" />
-                            <span className="text-slate-700 dark:text-slate-300">حجم التمويل (ر.س)</span>
+                            <span className="text-slate-700 dark:text-slate-300">{t('investor.analytics.legend_funding')}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                             <span className="w-3 h-3 rounded-full bg-[#FF6B00]" />
-                            <span className="text-slate-700 dark:text-slate-300">صافي الأرباح (ر.س)</span>
+                            <span className="text-slate-700 dark:text-slate-300">{t('investor.analytics.legend_profits')}</span>
                         </div>
                     </div>
                 </div>
@@ -317,23 +319,23 @@ export default function InvestorAnalytics({
                                 }}
                             >
                                 <div className="font-bold text-slate-300 pb-1 border-b border-slate-700 mb-1">
-                                    تاريخ: {points[hoveredPoint].date}
+                                    {t('investor.analytics.tooltip_date')} {points[hoveredPoint].date}
                                 </div>
                                 <div className="text-violet-300 font-bold">
-                                    تمويل: {points[hoveredPoint].fundedVal.toLocaleString('en-US')} ر.س
+                                    {t('investor.analytics.tooltip_funding')} {points[hoveredPoint].fundedVal.toLocaleString('en-US')} {t('common.sar')}
                                 </div>
                                 <div className="text-orange-400 font-bold">
-                                    أرباح: +{points[hoveredPoint].profitVal.toFixed(2)} ر.س
+                                    {t('investor.analytics.tooltip_profits')} +{points[hoveredPoint].profitVal.toFixed(2)} {t('common.sar')}
                                 </div>
                                 <div className="text-slate-400 text-[10px]">
-                                    المهام: {points[hoveredPoint].count} مهمة
+                                    {t('investor.analytics.tooltip_tasks')} {points[hoveredPoint].count} {t('investor.analytics.task_unit')}
                                 </div>
                             </div>
                         )}
                     </div>
                 ) : (
                     <div className="py-12 text-center text-xs text-slate-500">
-                        لا توجد بيانات تمويل كافية خلال الفترة المحددة لعرض المخطط.
+                        {t('investor.analytics.no_trend_data')}
                     </div>
                 )}
             </div>
@@ -344,7 +346,7 @@ export default function InvestorAnalytics({
                 <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-violet-900/35 bg-white dark:bg-[#0A0E2A]/85 shadow-sm dark:shadow-xl">
                     <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
                         <MapPin className="w-5 h-5 text-orange-500" />
-                        <span>التوزيع الجغرافي للتمويل اللوجستي (المدن)</span>
+                        <span>{t('investor.analytics.city_allocation_title')}</span>
                     </h3>
 
                     {cityAllocation.length > 0 ? (
@@ -384,7 +386,7 @@ export default function InvestorAnalytics({
                                     })}
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                                    <span className="text-[10px] text-slate-400 font-medium">المدن النشطة</span>
+                                    <span className="text-[10px] text-slate-400 font-medium">{t('investor.analytics.active_cities')}</span>
                                     <span className="text-lg font-black font-mono text-slate-900 dark:text-white">
                                         {cityAllocation.length}
                                     </span>
@@ -406,12 +408,12 @@ export default function InvestorAnalytics({
                                                     {c.city}
                                                 </span>
                                                 <span className="text-[10px] text-slate-500">
-                                                    ({c.count} مهمة)
+                                                    ({c.count} {t('investor.analytics.task_unit')})
                                                 </span>
                                             </div>
                                             <div className="text-end">
                                                 <span className="font-mono font-bold text-slate-900 dark:text-white block">
-                                                    {Number(c.total_invested || 0).toLocaleString('en-US')} ر.س
+                                                    {Number(c.total_invested || 0).toLocaleString('en-US')} {t('common.sar')}
                                                 </span>
                                                 <span className="text-[10px] text-orange-500 font-bold block">
                                                     {pct}%
@@ -424,7 +426,7 @@ export default function InvestorAnalytics({
                         </div>
                     ) : (
                         <div className="py-12 text-center text-xs text-slate-500">
-                            لا توجد بيانات توزيع جغرافي حالياً.
+                            {t('investor.analytics.no_city_data')}
                         </div>
                     )}
                 </div>
@@ -433,7 +435,7 @@ export default function InvestorAnalytics({
                 <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-violet-900/35 bg-white dark:bg-[#0A0E2A]/85 shadow-sm dark:shadow-xl">
                     <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
                         <Building2 className="w-5 h-5 text-violet-500" />
-                        <span>أعلى الشركات اللوجستية شريكة التمويل</span>
+                        <span>{t('investor.analytics.top_companies_title')}</span>
                     </h3>
 
                     {companyPerformance.length > 0 ? (
@@ -452,17 +454,17 @@ export default function InvestorAnalytics({
                                                 {comp.company_name}
                                             </strong>
                                             <span className="text-[10px] text-slate-500">
-                                                {comp.tasks_count} مهمة ممولة
+                                                {comp.tasks_count} {t('investor.analytics.funded_tasks_label')}
                                             </span>
                                         </div>
                                     </div>
 
                                     <div className="text-end">
                                         <span className="font-mono font-bold text-xs text-slate-900 dark:text-white block">
-                                            {Number(comp.total_invested || 0).toLocaleString('en-US')} ر.س
+                                            {Number(comp.total_invested || 0).toLocaleString('en-US')} {t('common.sar')}
                                         </span>
                                         <span className="text-[11px] font-mono font-bold text-orange-500 block">
-                                            +{Number(comp.total_profit || 0).toFixed(2)} ر.س ربح
+                                            +{Number(comp.total_profit || 0).toFixed(2)} {t('common.sar')} {t('investor.analytics.profit_label')}
                                         </span>
                                     </div>
                                 </div>
@@ -470,7 +472,7 @@ export default function InvestorAnalytics({
                         </div>
                     ) : (
                         <div className="py-12 text-center text-xs text-slate-500">
-                            لا توجد بيانات كافية عن الشركات خلال هذه الفترة.
+                            {t('investor.analytics.no_company_data')}
                         </div>
                     )}
                 </div>
@@ -484,25 +486,28 @@ export default function InvestorAnalytics({
                     </div>
                     <div>
                         <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1">
-                            رؤى استثمارية وتوصيات مساعدة في اتخاذ القرار
+                            {t('investor.analytics.insights_title')}
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3 text-xs text-slate-700 dark:text-slate-300">
                             <div className="p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
-                                <strong className="text-violet-600 dark:text-violet-400 block mb-1">أعلى المدن عائداً</strong>
+                                <strong className="text-violet-600 dark:text-violet-400 block mb-1">{t('investor.analytics.highest_yield_cities')}</strong>
                                 <p>
-                                    تظهر بيانات التمويل أن مهام الشحن في منطقة الرياض وجدة تحقق أعلى معدل سرعة سداد وتدوير لرأس المال بنسبة تدوير تقل عن 48 ساعة.
+                                    {t('investor.analytics.highest_yield_desc')}
                                 </p>
                             </div>
                             <div className="p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
-                                <strong className="text-orange-500 block mb-1">إعادة استثمار العوائد</strong>
+                                <strong className="text-orange-500 block mb-1">{t('investor.analytics.reinvest_profits')}</strong>
                                 <p>
-                                    إعادة ضخ الأرباح المكتسبة البالغة {Number(kpis.commission_balance || 0).toLocaleString('en-US')} ر.س في مهام جديدة فورياً يرفع العائد المركب السنوي بنسبة 18.4%.
+                                    {t('investor.analytics.reinvest_desc', {
+                                        amount: Number(kpis.commission_balance || 0).toLocaleString('en-US'),
+                                        currency: t('common.sar'),
+                                    })}
                                 </p>
                             </div>
                             <div className="p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
-                                <strong className="text-indigo-500 block mb-1">تنويع التمويل اللوجستي</strong>
+                                <strong className="text-indigo-500 block mb-1">{t('investor.analytics.diversify_funding')}</strong>
                                 <p>
-                                    يوصى بتوزيع مبالغ التمويل على عدة شركات لوجستية لتقليل فترات انتظار المهام الحية وتحقيق سيولة مستمرة في محفظة الاستثمار.
+                                    {t('investor.analytics.diversify_desc')}
                                 </p>
                             </div>
                         </div>

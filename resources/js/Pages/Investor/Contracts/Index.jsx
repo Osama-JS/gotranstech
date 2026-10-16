@@ -4,9 +4,11 @@ import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import Badge from '../../../Components/Badge';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
 import LegalAgreementModal from '../../../Components/LegalAgreementModal';
+import { useTranslation } from '../../../Utils/i18n';
 import { FileText, ShieldCheck, CheckCircle2, Calendar, Award, Eye, Printer } from 'lucide-react';
 
 export default function InvestorContracts({ contracts }) {
+    const { t, locale } = useTranslation();
     const [selectedContract, setSelectedContract] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
 
@@ -16,19 +18,19 @@ export default function InvestorContracts({ contracts }) {
     };
 
     return (
-        <AuthenticatedLayout title="عقود واتفاقيات الاستثمار">
-            <Head title="عقود الاستثمار" />
+        <AuthenticatedLayout title={t('investor.contracts.title')}>
+            <Head title={t('investor.contracts.page_title')} />
 
             {/* Professional Page Header */}
             <AdminPageHeader
-                title="عقود واتفاقيات الاستثمار المعتمدة"
-                subtitle="استعراض العقود الإلكترونية المبرمة، ونسب تقاسم العمولات والوثائق القانونية الموثقة مع المنصة"
+                title={t('investor.contracts.header_title')}
+                subtitle={t('investor.contracts.subtitle')}
                 icon={FileText}
                 iconColor="text-violet-400"
                 iconBg="bg-violet-500/15 border-violet-500/30"
-                breadcrumbs={[{ label: 'عقود الاستثمار' }]}
+                breadcrumbs={[{ label: t('investor.contracts.breadcrumb') }]}
                 badge={{
-                    text: `${contracts.length} عقود موثقة`,
+                    text: t('investor.contracts.documented_contracts_badge', { count: contracts.length }),
                     color: 'brand',
                 }}
             />
@@ -44,7 +46,7 @@ export default function InvestorContracts({ contracts }) {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-lg text-white">{contract.title}</h3>
-                                        <span className="text-xs font-mono text-violet-400">رقم العقد: {contract.contract_number}</span>
+                                        <span className="text-xs font-mono text-violet-400">{t('investor.contracts.contract_number')} {contract.contract_number}</span>
                                     </div>
                                 </div>
 
@@ -52,7 +54,7 @@ export default function InvestorContracts({ contracts }) {
                                     <Badge status={contract.status} />
                                     <div className="bg-violet-500/10 border border-violet-500/20 px-3 py-1.5 rounded-xl text-xs font-bold text-violet-400 flex items-center gap-1.5">
                                         <Award className="w-4 h-4" />
-                                        <span>نسبة أرباحك: {contract.commission_rate}%</span>
+                                        <span>{t('investor.contracts.your_commission_rate', { rate: contract.commission_rate })}</span>
                                     </div>
                                     <button
                                         type="button"
@@ -60,14 +62,14 @@ export default function InvestorContracts({ contracts }) {
                                         className="px-3.5 py-1.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-md shadow-violet-600/20 cursor-pointer"
                                     >
                                         <Eye className="w-3.5 h-3.5" />
-                                        <span>عرض وتوسيع الوثيقة</span>
+                                        <span>{t('investor.contracts.view_and_expand')}</span>
                                     </button>
                                 </div>
                             </div>
 
                             {/* Terms */}
                             <div className="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 text-xs leading-relaxed text-slate-300">
-                                <h4 className="font-bold text-slate-200 mb-2">بنود وشروط الاتفاقية:</h4>
+                                <h4 className="font-bold text-slate-200 mb-2">{t('investor.contracts.terms_and_conditions')}</h4>
                                 <p className="line-clamp-3">{contract.terms_text || contract.terms_and_conditions}</p>
                             </div>
 
@@ -76,19 +78,19 @@ export default function InvestorContracts({ contracts }) {
                                 <div className="flex items-center gap-4">
                                     <span className="flex items-center gap-1">
                                         <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                                        <span>تاريخ البدء: {contract.start_date}</span>
+                                        <span>{t('investor.contracts.start_date')} {contract.start_date}</span>
                                     </span>
                                     {contract.end_date && (
                                         <span className="flex items-center gap-1">
                                             <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                                            <span>تاريخ الانتهاء: {contract.end_date}</span>
+                                            <span>{t('investor.contracts.end_date')} {contract.end_date}</span>
                                         </span>
                                     )}
                                 </div>
 
                                 <div className="flex items-center gap-2 text-violet-400 font-semibold">
                                     <ShieldCheck className="w-4 h-4" />
-                                    <span>عقد موثق وموقع إلكترونياً من قبل إدارة Go-Tech</span>
+                                    <span>{t('investor.contracts.digitally_signed')}</span>
                                 </div>
                             </div>
                         </div>
@@ -96,8 +98,8 @@ export default function InvestorContracts({ contracts }) {
                 ) : (
                     <div className="glass-panel p-16 rounded-3xl border border-slate-800 text-center">
                         <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                        <h4 className="font-bold text-white text-base mb-1">لا توجد عقود مسجلة حالياً</h4>
-                        <p className="text-xs text-slate-400">يتم إبرام العقود وتوثيق نسب العمولات بالتنسيق مع إدارة المنصة.</p>
+                        <h4 className="font-bold text-white text-base mb-1">{t('investor.contracts.no_contracts')}</h4>
+                        <p className="text-xs text-slate-400">{t('investor.contracts.no_contracts_desc')}</p>
                     </div>
                 )}
             </div>

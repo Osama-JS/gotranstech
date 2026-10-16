@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
+import { useTranslation } from '../../../Utils/i18n';
 import StatCard from '../../../Components/StatCard';
 import SearchableSelect from '../../../Components/SearchableSelect';
 import DatePicker from '../../../Components/DatePicker';
@@ -28,6 +29,8 @@ import {
 } from 'lucide-react';
 
 export default function AdminDeposits({ deposits, stats, banks = [], filters = {} }) {
+    const { t, locale } = useTranslation();
+    const isAr = locale === 'ar';
     const [search, setSearch] = useState(filters?.search || '');
     const [status, setStatus] = useState(filters?.status || '');
     const [bankName, setBankName] = useState(filters?.bank_name || '');
@@ -100,64 +103,64 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
     };
 
     const statusOptions = [
-        { value: '', label: 'جميع الحالات' },
-        { value: 'pending', label: 'قيد المراجعة والتدقيق' },
-        { value: 'approved', label: 'معتمد ومقيد بالمحفظة' },
-        { value: 'rejected', label: 'مرفوض' },
+        { value: '', label: t('admin.deposits.filter_status_all') },
+        { value: 'pending', label: t('status.pending') },
+        { value: 'approved', label: t('status.approved') },
+        { value: 'rejected', label: t('status.rejected') },
     ];
 
     const bankOptions = [
-        { value: '', label: 'جميع البنوك المحول إليها' },
+        { value: '', label: t('admin.deposits.filter_bank_all') },
         ...banks.map(b => ({ value: b, label: b }))
     ];
 
     return (
-        <AuthenticatedLayout title="مراجعة واعتماد الحوالات البنكية">
-            <Head title="الإيداعات البنكية - إدارة المنصة" />
+        <AuthenticatedLayout title={t('admin.deposits.page_title')}>
+            <Head title={t('admin.deposits.page_title')} />
 
             <div className="space-y-6 pb-12">
                 {/* Unified Header */}
                 <AdminPageHeader
-                    title="سجل ومراجعة الإيداعات البنكية"
-                    subtitle="تدقيق ومطابقة الحوالات البنكية المرفوعة من المستثمرين وشحن محافظهم الاستثمارية"
+                    title={t('admin.deposits.header_title')}
+                    subtitle={t('admin.deposits.header_subtitle')}
                     breadcrumbs={[
-                        { label: 'الرئيسية', url: route('admin.dashboard') },
-                        { label: 'الإيداعات البنكية' }
+                        { label: t('common.home'), url: route('admin.dashboard') },
+                        { label: t('admin.nav.items.deposits') }
                     ]}
                     icon={Receipt}
                     iconColor="text-violet-400"
-                    badge={{ text: `${stats?.pending || 0} بانتظار المراجعة`, color: stats?.pending > 0 ? 'amber' : 'brand' }}
+                    badge={{ text: t('admin.deposits.badge_pending', { count: stats?.pending || 0 }), color: stats?.pending > 0 ? 'amber' : 'brand' }}
                 />
 
                 {/* Stat Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <StatCard
-                        title="إجمالي الإيداعات"
+                        title={t('admin.deposits.stat_total_deposits')}
                         value={stats?.total || 0}
                         icon={Receipt}
                         color="blue"
-                        description="إجمالي طلبات الإيداع"
+                        description={t('admin.deposits.stat_total_desc')}
                     />
                     <StatCard
-                        title="بانتظار المراجعة"
+                        title={t('admin.deposits.stat_pending_deposits')}
                         value={stats?.pending || 0}
                         icon={Clock}
                         color="amber"
-                        description={`بقيمة ${Number(stats?.total_pending_amount || 0).toLocaleString('en-US')} ر.س`}
+                        description={t('admin.deposits.stat_pending_desc', { amount: Number(stats?.total_pending_amount || 0).toLocaleString(isAr ? 'ar-SA' : 'en-US'), sar: t('common.sar') })}
                     />
                     <StatCard
-                        title="إيداعات معتمدة"
+                        title={t('admin.deposits.stat_approved_deposits')}
                         value={stats?.approved || 0}
                         icon={CheckCircle}
                         color="brand"
-                        description="تم قيدها في المحافظ"
+                        description={t('admin.deposits.stat_approved_desc')}
                     />
                     <StatCard
-                        title="إجمالي السيولة المودعة"
-                        value={`${Number(stats?.total_approved_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س`}
+                        title={t('admin.deposits.stat_approved_deposits')}
+                        value={`${Number(stats?.total_approved_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${t('common.sar')}`}
                         icon={DollarSign}
                         color="purple"
-                        description="إجمالي الأموال المعتمدة"
+                        description={t('admin.deposits.stat_rejected_desc')}
                     />
                 </div>
 
@@ -166,49 +169,49 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                     <form onSubmit={handleFilter} className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">بحث سريع</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">{t('admin.deposits.filter_search_label')}</label>
                                 <div className="relative">
                                     <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute start-3.5 top-3" />
                                     <input
                                         type="text"
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        placeholder="رقم الإيداع، المرجع، اسم المستثمر..."
+                                        placeholder={t('admin.deposits.filter_search_placeholder')}
                                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl ps-10 pe-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-violet-500 transition-all"
                                     />
                                 </div>
                             </div>
 
                             <SearchableSelect
-                                label="الحالة"
+                                label={t('common.status')}
                                 options={statusOptions}
                                 value={status}
                                 onChange={setStatus}
-                                placeholder="اختر الحالة..."
+                                placeholder={t('admin.deposits.filter_select_status')}
                             />
 
                             <SearchableSelect
-                                label="البنك"
+                                label={t('admin.deposits.table_bank')}
                                 options={bankOptions}
                                 value={bankName}
                                 onChange={setBankName}
-                                placeholder="اختر البنك..."
+                                placeholder={t('admin.deposits.filter_select_bank')}
                             />
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-3 border-t border-slate-100 dark:border-slate-800 items-end">
                             <DatePicker
-                                label="من تاريخ"
+                                label={t('admin.tasks.filter_date_from')}
                                 value={dateFrom}
                                 onChange={setDateFrom}
-                                placeholder="من تاريخ..."
+                                placeholder={t('admin.deposits.filter_date_from')}
                             />
 
                             <DatePicker
-                                label="إلى تاريخ"
+                                label={t('admin.tasks.filter_date_to')}
                                 value={dateTo}
                                 onChange={setDateTo}
-                                placeholder="إلى تاريخ..."
+                                placeholder={t('admin.deposits.filter_date_to')}
                             />
 
                             <div className="flex items-center gap-2">
@@ -217,14 +220,14 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                                     className="flex-1 py-2.5 rounded-2xl text-xs font-bold bg-[#6320EE] hover:bg-[#5217D4] text-white transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
                                 >
                                     <Filter className="w-3.5 h-3.5" />
-                                    <span>تطبيق الفلترة</span>
+                                    <span>{t('admin.tasks.btn_filter')}</span>
                                 </button>
                                 {(search || status || bankName || dateFrom || dateTo) && (
                                     <button
                                         type="button"
                                         onClick={handleReset}
                                         className="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700 cursor-pointer"
-                                        title="إعادة ضبط"
+                                        title={t('admin.tasks.btn_reset')}
                                     >
                                         <RefreshCw className="w-4 h-4" />
                                     </button>
@@ -240,15 +243,15 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                         <table className="w-full text-xs text-right">
                             <thead className="bg-slate-900/90 text-slate-400 font-semibold border-b border-slate-800">
                                 <tr>
-                                    <th className="p-4">رقم الإيداع</th>
-                                    <th className="p-4">المستثمر</th>
-                                    <th className="p-4">المبلغ المودع</th>
-                                    <th className="p-4">البنك المحول إليه</th>
-                                    <th className="p-4">اسم المحوّل / المرجع</th>
-                                    <th className="p-4">تاريخ التحويل</th>
-                                    <th className="p-4">الحالة</th>
-                                    <th className="p-4">الإيصال</th>
-                                    <th className="p-4 text-center">الإجراءات والاعتماد</th>
+                                    <th className="p-4">{t('admin.deposits.table_id')}</th>
+                                    <th className="p-4">{t('admin.deposits.table_investor')}</th>
+                                    <th className="p-4">{t('admin.deposits.table_amount')}</th>
+                                    <th className="p-4">{t('admin.deposits.table_bank')}</th>
+                                    <th className="p-4">{t('admin.deposits.table_reference')}</th>
+                                    <th className="p-4">{t('admin.deposits.table_date')}</th>
+                                    <th className="p-4">{t('common.status')}</th>
+                                    <th className="p-4">{t('admin.deposits.table_receipt')}</th>
+                                    <th className="p-4 text-center">{t('common.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/60">
@@ -270,12 +273,12 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                                                     </div>
                                                 </td>
                                                 <td className="p-4 font-mono font-bold text-white text-sm">
-                                                    {amountVal.toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س
+                                                    {amountVal.toLocaleString('en-US', { minimumFractionDigits: 2 })} {t('common.sar')}
                                                 </td>
                                                 <td className="p-4">
                                                     <div className="flex items-center gap-1.5 text-slate-200">
                                                         <Building className="w-3.5 h-3.5 text-slate-500" />
-                                                        <span>{dep.bank_name || 'غير محدد'}</span>
+                                                        <span>{dep.bank_name || t('admin.tasks.unspecified')}</span>
                                                     </div>
                                                 </td>
                                                 <td className="p-4">
@@ -283,13 +286,13 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                                                         <span className="text-slate-200 block">{dep.depositor_name || dep.sender_name || '-'}</span>
                                                         {dep.bank_reference_number && (
                                                             <span className="text-[10px] text-slate-400 font-mono block">
-                                                                مرجع: {dep.bank_reference_number}
+                                                                {t('admin.deposits.reference_label', { ref: dep.bank_reference_number })}
                                                             </span>
                                                         )}
                                                     </div>
                                                 </td>
                                                 <td className="p-4 text-slate-400 text-[11px] font-mono">
-                                                    {dep.transfer_date || new Date(dep.created_at).toLocaleDateString('ar-SA')}
+                                                    {dep.transfer_date || new Date(dep.created_at).toLocaleDateString(isAr ? 'ar-SA' : 'en-US')}
                                                 </td>
                                                 <td className="p-4">
                                                     <Badge status={dep.status} />
@@ -301,7 +304,7 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                                                         className="inline-flex items-center gap-1.5 text-violet-400 hover:text-violet-300 font-semibold bg-violet-500/10 hover:bg-[#5217D4]/20 px-2.5 py-1.5 rounded-lg border border-violet-500/20 transition-all text-xs cursor-pointer shadow-sm"
                                                     >
                                                         <Eye className="w-3.5 h-3.5" />
-                                                        <span>عرض الإيصال</span>
+                                                        <span>{t('admin.deposits.btn_view_receipt')}</span>
                                                     </button>
                                                 </td>
                                                 <td className="p-4 text-center">
@@ -313,7 +316,7 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                                                                 className="px-3 py-1.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-violet-600/20 flex items-center gap-1 cursor-pointer"
                                                             >
                                                                 <CheckCircle className="w-3.5 h-3.5" />
-                                                                <span>اعتماد وشحن</span>
+                                                                <span>{t('admin.deposits.btn_approve')}</span>
                                                             </button>
                                                             <button
                                                                 type="button"
@@ -321,16 +324,16 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                                                                 className="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                                                             >
                                                                 <XCircle className="w-3.5 h-3.5" />
-                                                                <span>رفض</span>
+                                                                <span>{t('admin.deposits.btn_reject')}</span>
                                                             </button>
                                                         </div>
                                                     ) : dep.status === 'approved' ? (
                                                         <span className="text-[11px] text-violet-400 font-medium">
-                                                            معتمد بواسطة {dep.reviewer?.name || 'الإدارة'}
+                                                            {t('admin.deposits.approved_by', { name: dep.reviewer?.name || t('admin.deposits.admin_name') })}
                                                         </span>
                                                     ) : (
                                                         <span className="text-[11px] text-rose-400">
-                                                            مرفوض {dep.rejection_reason && `(${dep.rejection_reason})`}
+                                                            {t('admin.deposits.rejected_reason', { reason: dep.rejection_reason ? `(${dep.rejection_reason})` : '' })}
                                                         </span>
                                                     )}
                                                 </td>
@@ -342,12 +345,12 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                                         <td colSpan="9" className="text-center py-12 text-slate-500">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <Receipt className="w-8 h-8 text-slate-600" />
-                                                <p className="text-sm font-semibold">لا توجد إيداعات مطابقة لمعايير البحث</p>
+                                                <p className="text-sm font-semibold">{t('admin.deposits.empty_deposits')}</p>
                                                 <button
                                                     onClick={handleReset}
                                                     className="mt-2 text-xs text-violet-400 hover:text-violet-300 underline"
                                                 >
-                                                    إلغاء الفلاتر
+                                                    {t('admin.deposits.clear_filters')}
                                                 </button>
                                             </div>
                                         </td>
@@ -368,28 +371,28 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
             <Modal
                 isOpen={reviewModalOpen}
                 onClose={() => setReviewModalOpen(false)}
-                title={actionType === 'approve' ? 'اعتماد الحوالة وقيد الرصيد بالمحفظة' : 'رفض طلب الإيداع البنكي'}
+                title={actionType === 'approve' ? t('admin.deposits.modal_approve_title') : t('admin.deposits.modal_reject_title')}
                 maxWidth="md"
             >
                 <div className="space-y-4">
                     <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800/80 space-y-2 text-xs text-slate-300">
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-500">المستثمر:</span>
+                            <span className="text-slate-500">{t('admin.deposits.modal_investor')}</span>
                             <span className="font-bold text-white">{selectedDeposit?.user?.name}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-500">مبلغ التحويل:</span>
+                            <span className="text-slate-500">{t('admin.deposits.modal_amount')}</span>
                             <span className="font-mono font-bold text-violet-400 text-sm">
-                                {parseFloat(selectedDeposit?.amount || 0).toLocaleString('en-US')} ر.س
+                                {parseFloat(selectedDeposit?.amount || 0).toLocaleString('en-US')} {t('common.sar')}
                             </span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-500">البنك المحول إليه:</span>
+                            <span className="text-slate-500">{t('admin.deposits.modal_bank')}</span>
                             <span className="text-white">{selectedDeposit?.bank_name}</span>
                         </div>
                         {selectedDeposit?.depositor_name && (
                             <div className="flex justify-between items-center">
-                                <span className="text-slate-500">اسم صاحب الحساب:</span>
+                                <span className="text-slate-500">{t('admin.deposits.modal_account_holder')}</span>
                                 <span className="text-white">{selectedDeposit?.depositor_name}</span>
                             </div>
                         )}
@@ -397,8 +400,8 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
 
                     <p className="text-xs text-slate-300 leading-relaxed">
                         {actionType === 'approve'
-                            ? `تأكيد قيد المبلغ فوراً في محفظة استثمار المستثمر ${selectedDeposit?.user?.name}؟ سيتم إنشاء قيد مزدوج في سجل العمليات وتحديث رصيد المحفظة تلقائياً.`
-                            : `يرجى تدوين سبب رفض الإيداع البنكي لإشعار المستثمر به:`}
+                            ? t('admin.deposits.modal_approve_confirm', { name: selectedDeposit?.user?.name })
+                            : t('admin.deposits.modal_reject_prompt')}
                     </p>
 
                     {actionType === 'reject' && (
@@ -406,7 +409,7 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                             <textarea
                                 value={rejectionReason}
                                 onChange={(e) => setRejectionReason(e.target.value)}
-                                placeholder="سبب الرفض (مثال: الإيصال غير واضح، أو لم نتحقق من وصول المبلغ للحساب البنكي)..."
+                                placeholder={t('admin.deposits.rejection_reason_placeholder')}
                                 className="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-3 text-xs text-white h-24 focus:outline-none focus:border-rose-500"
                                 required
                             />
@@ -419,7 +422,7 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                             onClick={() => setReviewModalOpen(false)}
                             className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="button"
@@ -434,7 +437,7 @@ export default function AdminDeposits({ deposits, stats, banks = [], filters = {
                             {loading ? (
                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             ) : (
-                                <span>{actionType === 'approve' ? 'تأكيد الاعتماد والشحن' : 'تأكيد الرفض'}</span>
+                                <span>{actionType === 'approve' ? t('admin.deposits.btn_approve') : t('admin.deposits.btn_reject')}</span>
                             )}
                         </button>
                     </div>

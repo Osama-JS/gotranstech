@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronLeft, Home } from 'lucide-react';
+import { useTranslation } from '../Utils/i18n';
 
 export default function AdminPageHeader({
     title,
@@ -15,6 +16,7 @@ export default function AdminPageHeader({
     homeRoute = null,
 }) {
     const { auth } = usePage().props;
+    const { t } = useTranslation();
     const user = auth?.user;
 
     const resolvedHomeRoute = homeRoute || (
@@ -126,7 +128,7 @@ export default function AdminPageHeader({
                         className="flex items-center gap-1 hover:text-orange-500 transition-colors"
                     >
                         <Home className="w-3.5 h-3.5" />
-                        <span>الرئيسية</span>
+                        <span>{t('common.home')}</span>
                     </Link>
 
                     {breadcrumbs.map((item, index) => {

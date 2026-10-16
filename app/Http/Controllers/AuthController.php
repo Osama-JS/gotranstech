@@ -130,6 +130,29 @@ class AuthController extends Controller
 
         $this->auditLogService->log('created', $user, [], ['user_type' => $user->user_type], "إرسال طلب تسجيل حساب جديد: {$user->name}");
 
+        // Dispatch Real-Time Notification to Admin
+        if ($user->isCompany()) {
+            \App\Services\NotificationDispatcherService::dispatch(
+                'admin.new_company_registered',
+                "تسجيل شركة لوجستية جديدة: " . ($validated['company_name'] ?? $user->name),
+                "انضمت شركة لوجستية جديدة ({$user->name} - س.ت: " . ($validated['cr_number'] ?? 'غير مدخل') . ") بانتظار مراجعة التراخيص والسجل التجاري.",
+                route('admin.companies.show', $user->id, false),
+                ['user_id' => $user->id, 'company_name' => $validated['company_name'] ?? $user->name],
+                null,
+                'info'
+            );
+        } else {
+            \App\Services\NotificationDispatcherService::dispatch(
+                'admin.new_investor_registered',
+                "تسجيل مستثمر جديد: {$user->name}",
+                "انضم مستثمر جديد ({$user->name} - {$user->email}) إلى منصة GoTransTech بانتظار استكمال توقيع الاتفاقية.",
+                route('admin.investors.index', [], false),
+                ['user_id' => $user->id, 'name' => $user->name],
+                null,
+                'info'
+            );
+        }
+
         return redirect()->intended($user->isCompany() ? route('company.dashboard') : route('investor.dashboard'))
             ->with('success', 'تم إرسال طلب التسجيل بنجاح، يرجى استكمال توقيع الاتفاقية والبيانات لتفعيل الحساب.');
     }

@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import BrandLogo from '../../Components/BrandLogo';
 import UnderDevelopmentBanner from '../../Components/UnderDevelopmentBanner';
+import ThemeToggle from '../../Components/ThemeToggle';
 
 const LinkedinIcon = ({ className = "w-4 h-4" }) => (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -197,37 +198,39 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
         : defaultFaqs;
 
     return (
-        <div className="relative min-h-screen w-full max-w-full bg-[#06081B] text-slate-100 selection:bg-violet-600 selection:text-white font-sans overflow-x-hidden">
+        <div className="relative min-h-screen w-full max-w-full bg-slate-50 dark:bg-[#06081B] text-slate-900 dark:text-slate-100 selection:bg-violet-600 selection:text-white font-sans overflow-x-hidden transition-colors duration-200">
             <Head title="GoTransTech | نمول حركة الغد - منصة الاستثمار والتمويل اللوجستي" />
 
             {/* Background glowing orbs in GoTransTech Brand Colors - Strictly Contained with Zero Overflow */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 select-none">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] max-w-full h-[480px] bg-violet-600/10 blur-[140px] rounded-full" />
-                <div className="absolute top-[500px] right-0 translate-x-1/4 w-[500px] h-[400px] bg-orange-500/10 blur-[150px] rounded-full" />
-                <div className="absolute top-[1200px] left-0 -translate-x-1/4 w-[500px] h-[450px] bg-violet-600/10 blur-[160px] rounded-full" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] max-w-full h-[480px] bg-violet-600/5 dark:bg-violet-600/10 blur-[140px] rounded-full" />
+                <div className="absolute top-[500px] right-0 translate-x-1/4 w-[500px] h-[400px] bg-orange-500/5 dark:bg-orange-500/10 blur-[150px] rounded-full" />
+                <div className="absolute top-[1200px] left-0 -translate-x-1/4 w-[500px] h-[450px] bg-violet-600/5 dark:bg-violet-600/10 blur-[160px] rounded-full" />
             </div>
 
             {/* Persistent Fixed Header */}
             <header className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
                 scrolled 
-                    ? 'bg-[#06081B]/95 backdrop-blur-xl border-b border-violet-900/50 shadow-2xl shadow-black/60 py-3.5' 
-                    : 'bg-[#06081B]/85 backdrop-blur-md border-b border-violet-900/20 py-4 sm:py-5'
+                    ? 'bg-white/95 dark:bg-[#06081B]/95 backdrop-blur-xl border-b border-slate-200 dark:border-violet-900/50 shadow-md shadow-slate-200/50 dark:shadow-2xl dark:shadow-black/60 py-3.5' 
+                    : 'bg-white/85 dark:bg-[#06081B]/85 backdrop-blur-md border-b border-slate-200/80 dark:border-violet-900/20 py-4 sm:py-5'
             }`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3 group">
-                        <BrandLogo size={branding?.navbar_brand_size || 'md'} showSlogan={false} displayMode={branding?.navbar_brand_display || 'both'} textClassName="text-white" />
+                        <BrandLogo size={branding?.navbar_brand_size || 'md'} showSlogan={false} displayMode={branding?.navbar_brand_display || 'both'} textClassName="text-slate-900 dark:text-white" />
                     </Link>
 
                     {/* Desktop Navigation Links */}
-                    <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-300">
-                        <a href="#how-it-works" className="hover:text-orange-400 transition-colors">آلية العمل</a>
-                        <a href="#features" className="hover:text-orange-400 transition-colors">المميزات</a>
-                        <a href="#api" className="hover:text-orange-400 transition-colors">ربط الشركات (API)</a>
-                        <a href="#faq" className="hover:text-orange-400 transition-colors">الأسئلة الشائعة</a>
+                    <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-300">
+                        <a href="#how-it-works" className="hover:text-orange-500 dark:hover:text-orange-400 transition-colors">آلية العمل</a>
+                        <a href="#features" className="hover:text-orange-500 dark:hover:text-orange-400 transition-colors">المميزات</a>
+                        <a href="#api" className="hover:text-orange-500 dark:hover:text-orange-400 transition-colors">ربط الشركات (API)</a>
+                        <a href="#faq" className="hover:text-orange-500 dark:hover:text-orange-400 transition-colors">الأسئلة الشائعة</a>
                     </nav>
 
-                    {/* Desktop Action Buttons */}
+                    {/* Desktop Action Buttons & Theme Toggle */}
                     <div className="hidden md:flex items-center gap-3">
+                        <ThemeToggle />
+
                         {user ? (
                             <Link
                                 href={dashboardUrl}
@@ -240,7 +243,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                             <>
                                 <Link
                                     href={route('login')}
-                                    className="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition-colors cursor-pointer"
+                                    className="px-4 py-2 text-sm font-bold text-slate-700 hover:text-slate-950 dark:text-slate-300 dark:hover:text-white transition-colors cursor-pointer"
                                 >
                                     تسجيل الدخول
                                 </Link>
@@ -256,10 +259,12 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
 
                     {/* Mobile Hamburger Button & Quick Action */}
                     <div className="flex md:hidden items-center gap-2">
+                        <ThemeToggle className="p-1.5" />
+
                         {user ? (
                             <Link
                                 href={dashboardUrl}
-                                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#6320EE] text-white flex items-center gap-1.5 shadow-sm"
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#6320EE] text-white flex items-center gap-1.5 shadow-sm"
                             >
                                 <LayoutDashboard className="w-3.5 h-3.5" />
                                 <span>لوحتي</span>
@@ -267,7 +272,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                         ) : (
                             <Link
                                 href={route('login')}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 hover:text-white bg-slate-900 border border-violet-900/50"
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-violet-900/50"
                             >
                                 دخول
                             </Link>
@@ -275,10 +280,10 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(true)}
-                            className="w-10 h-10 rounded-xl bg-slate-900/90 border border-violet-900/50 text-slate-200 hover:text-white hover:border-[#6320EE] flex items-center justify-center transition-all focus:outline-none cursor-pointer"
+                            className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-violet-900/50 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:border-[#6320EE] flex items-center justify-center transition-all focus:outline-none cursor-pointer"
                             aria-label="فتح القائمة الرئيسية"
                         >
-                            <Menu className="w-5 h-5 text-orange-400" />
+                            <Menu className="w-5 h-5 text-orange-500 dark:text-orange-400" />
                         </button>
                     </div>
                 </div>
@@ -296,7 +301,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
 
             {/* Slide-in Drawer Container */}
             <aside
-                className={`fixed inset-y-0 right-0 z-50 w-[300px] sm:w-[350px] max-w-[85vw] bg-[#070A24] border-s border-violet-900/60 shadow-2xl flex flex-col justify-between transition-all duration-300 ease-out md:hidden ${
+                className={`fixed inset-y-0 right-0 z-50 w-[300px] sm:w-[350px] max-w-[85vw] bg-white dark:bg-[#070A24] border-s border-slate-200 dark:border-violet-900/60 shadow-2xl flex flex-col justify-between transition-all duration-300 ease-out md:hidden ${
                     mobileMenuOpen 
                         ? 'translate-x-0 opacity-100 visible' 
                         : 'translate-x-full opacity-0 invisible pointer-events-none'
@@ -306,134 +311,134 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
             >
                 <div className="overflow-y-auto flex-1 p-5 sm:p-6 no-scrollbar">
                     {/* Drawer Header with Close Button */}
-                    <div className="flex items-center justify-between pb-4 border-b border-violet-950/80">
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-violet-950/80">
                         <Link href="/" onClick={() => setMobileMenuOpen(false)} className="inline-block">
                             <BrandLogo 
                                 size={Math.min(36, parseInt(branding?.navbar_brand_size, 10) || 30)} 
                                 showSlogan={false} 
                                 displayMode={branding?.navbar_brand_display || 'both'} 
-                                textClassName="text-white" 
+                                textClassName="text-slate-900 dark:text-white" 
                             />
                         </Link>
                         
-                        {/* Highly Prominent Close Button */}
+                        {/* Close Button */}
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-rose-950/40 text-slate-300 hover:text-rose-400 border border-violet-900/60 hover:border-rose-500/50 transition-all text-xs font-bold cursor-pointer shadow-sm"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-rose-950/40 text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-rose-400 border border-slate-200 dark:border-violet-900/60 transition-all text-xs font-bold cursor-pointer shadow-sm"
                             aria-label="إغلاق القائمة"
                             title="إغلاق القائمة (Esc)"
                         >
                             <span>إغلاق</span>
-                            <X className="w-4 h-4 text-orange-400" />
+                            <X className="w-4 h-4 text-orange-500 dark:text-orange-400" />
                         </button>
                     </div>
 
                     {/* Drawer Nav Links */}
                     <nav className="my-5 space-y-1">
-                        <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">أقسام المنصة</span>
+                        <span className="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 mb-2">أقسام المنصة</span>
                         <a
                             href="#top"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-200 hover:text-white hover:bg-violet-950/50 transition-colors"
+                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-200 dark:hover:text-white dark:hover:bg-violet-950/50 transition-colors"
                         >
                             <div className="flex items-center gap-3">
-                                <Sparkles className="w-4 h-4 text-violet-400" />
+                                <Sparkles className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                                 <span>الرئيسية</span>
                             </div>
-                            <ChevronLeft className="w-4 h-4 text-slate-500" />
+                            <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                         </a>
                         <a
                             href="#how-it-works"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-200 hover:text-white hover:bg-violet-950/50 transition-colors"
+                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-200 dark:hover:text-white dark:hover:bg-violet-950/50 transition-colors"
                         >
                             <div className="flex items-center gap-3">
-                                <Layers className="w-4 h-4 text-orange-400" />
+                                <Layers className="w-4 h-4 text-orange-500 dark:text-orange-400" />
                                 <span>آلية العمل (4 خطوات)</span>
                             </div>
-                            <ChevronLeft className="w-4 h-4 text-slate-500" />
+                            <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                         </a>
                         <a
                             href="#features"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-200 hover:text-white hover:bg-violet-950/50 transition-colors"
+                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-200 dark:hover:text-white dark:hover:bg-violet-950/50 transition-colors"
                         >
                             <div className="flex items-center gap-3">
-                                <TrendingUp className="w-4 h-4 text-violet-400" />
+                                <TrendingUp className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                                 <span>المميزات الاستثمارية</span>
                             </div>
-                            <ChevronLeft className="w-4 h-4 text-slate-500" />
+                            <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                         </a>
                         <a
                             href="#api"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-200 hover:text-white hover:bg-violet-950/50 transition-colors"
+                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-200 dark:hover:text-white dark:hover:bg-violet-950/50 transition-colors"
                         >
                             <div className="flex items-center gap-3">
-                                <Code className="w-4 h-4 text-orange-400" />
+                                <Code className="w-4 h-4 text-orange-500 dark:text-orange-400" />
                                 <span>ربط الشركات (API)</span>
                             </div>
-                            <ChevronLeft className="w-4 h-4 text-slate-500" />
+                            <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                         </a>
                         <a
                             href="#faq"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-200 hover:text-white hover:bg-violet-950/50 transition-colors"
+                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-200 dark:hover:text-white dark:hover:bg-violet-950/50 transition-colors"
                         >
                             <div className="flex items-center gap-3">
-                                <HelpCircle className="w-4 h-4 text-violet-400" />
+                                <HelpCircle className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                                 <span>الأسئلة الشائعة</span>
                             </div>
-                            <ChevronLeft className="w-4 h-4 text-slate-500" />
+                            <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                         </a>
                     </nav>
 
                     {/* Dedicated Fast Access Portals */}
                     <div className="space-y-2 mb-5">
-                        <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-1">بوابات الدخول السريع</span>
+                        <span className="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 mb-1">بوابات الدخول السريع</span>
                         <Link
                             href={user ? dashboardUrl : route('login')}
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-between p-3 rounded-xl bg-violet-950/40 border border-violet-900/40 hover:border-[#6320EE] transition-all"
+                            className="flex items-center justify-between p-3 rounded-xl bg-violet-50/70 border border-violet-200/80 dark:bg-violet-950/40 dark:border-violet-900/40 hover:border-[#6320EE] transition-all"
                         >
                             <div className="flex items-center gap-2.5">
-                                <Wallet className="w-4 h-4 text-violet-400" />
+                                <Wallet className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                                 <div>
-                                    <div className="text-xs font-bold text-white">بوابة المستثمرين</div>
-                                    <div className="text-[10px] text-slate-400">عوائد تمويل فورية وموثقة</div>
+                                    <div className="text-xs font-bold text-slate-900 dark:text-white">بوابة المستثمرين</div>
+                                    <div className="text-[10px] text-slate-500 dark:text-slate-400">عوائد تمويل فورية وموثقة</div>
                                 </div>
                             </div>
-                            <ArrowLeft className="w-3.5 h-3.5 text-violet-400" />
+                            <ArrowLeft className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
                         </Link>
                         <Link
                             href={user ? dashboardUrl : route('login')}
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-between p-3 rounded-xl bg-orange-950/20 border border-orange-900/40 hover:border-[#FF6B00] transition-all"
+                            className="flex items-center justify-between p-3 rounded-xl bg-orange-50/70 border border-orange-200/80 dark:bg-orange-950/20 dark:border-orange-900/40 hover:border-[#FF6B00] transition-all"
                         >
                             <div className="flex items-center gap-2.5">
-                                <Truck className="w-4 h-4 text-orange-400" />
+                                <Truck className="w-4 h-4 text-orange-500 dark:text-orange-400" />
                                 <div>
-                                    <div className="text-xs font-bold text-white">بوابة الشركات اللوجستية</div>
-                                    <div className="text-[10px] text-slate-400">سيولة فورية للشحنات اليومية</div>
+                                    <div className="text-xs font-bold text-slate-900 dark:text-white">بوابة الشركات اللوجستية</div>
+                                    <div className="text-[10px] text-slate-500 dark:text-slate-400">سيولة فورية للشحنات اليومية</div>
                                 </div>
                             </div>
-                            <ArrowLeft className="w-3.5 h-3.5 text-orange-400" />
+                            <ArrowLeft className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
                         </Link>
                     </div>
                 </div>
 
                 {/* Drawer Footer Auth & Contact */}
-                <div className="p-5 border-t border-violet-950/80 bg-[#06081E] space-y-3">
+                <div className="p-5 border-t border-slate-200 dark:border-violet-950/80 bg-slate-50 dark:bg-[#06081E] space-y-3">
                     {user ? (
                         <div className="space-y-2.5">
-                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-900 border border-violet-900/40">
+                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-violet-900/40">
                                 <div className="w-8 h-8 rounded-lg bg-[#6320EE] text-white font-bold flex items-center justify-center text-xs">
                                     {user.name ? user.name.charAt(0) : 'U'}
                                 </div>
                                 <div className="overflow-hidden">
-                                    <div className="text-xs font-bold text-white truncate">{user.name}</div>
-                                    <div className="text-[10px] text-slate-400 truncate">{user.email}</div>
+                                    <div className="text-xs font-bold text-slate-900 dark:text-white truncate">{user.name}</div>
+                                    <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{user.email}</div>
                                 </div>
                             </div>
                             <Link
@@ -458,14 +463,14 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                             <Link
                                 href={route('login')}
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="w-full py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-200 border border-violet-900/50 flex items-center justify-center transition-colors"
+                                className="w-full py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-violet-900/50 flex items-center justify-center transition-colors"
                             >
                                 تسجيل الدخول
                             </Link>
                         </div>
                     )}
 
-                    <div className="text-center pt-2 text-[10px] text-slate-500 font-mono">
+                    <div className="text-center pt-2 text-[10px] text-slate-400 dark:text-slate-500 font-mono">
                         GoTransTech - نمول حركة الغد 🇸🇦
                     </div>
                 </div>
@@ -552,46 +557,46 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                 </div>
 
                 {/* Floating Investment Widget (Left - Logistics Liquidity Activity) */}
-                <div className="hidden xl:flex items-center gap-3 absolute top-28 start-4 p-3.5 rounded-2xl bg-[#090C29]/85 border border-violet-800/40 backdrop-blur-md shadow-2xl text-start pointer-events-none max-w-[220px]">
-                    <div className="w-10 h-10 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center shrink-0">
-                        <TrendingUp className="w-5 h-5 text-violet-400" />
+                <div className="hidden xl:flex items-center gap-3 absolute top-28 start-4 p-3.5 rounded-2xl bg-white/95 dark:bg-[#090C29]/85 border border-slate-200 dark:border-violet-800/40 backdrop-blur-md shadow-xl text-start pointer-events-none max-w-[220px]">
+                    <div className="w-10 h-10 rounded-xl bg-violet-600/15 dark:bg-violet-600/20 border border-violet-500/30 flex items-center justify-center shrink-0">
+                        <TrendingUp className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                     </div>
                     <div>
                         <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] text-slate-400 font-bold">مؤشر نمو التمويل</span>
-                            <span className="text-[9px] font-bold text-orange-400 font-mono">+28.4%</span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">مؤشر نمو التمويل</span>
+                            <span className="text-[9px] font-bold text-orange-600 dark:text-orange-400 font-mono">+28.4%</span>
                         </div>
-                        <div className="text-xs font-black text-white font-mono mt-0.5">3,450,000 ر.س</div>
+                        <div className="text-xs font-black text-slate-900 dark:text-white font-mono mt-0.5">3,450,000 ر.س</div>
                     </div>
                 </div>
 
                 {/* Floating Investment Widget (Right - Live Verified Contract) */}
-                <div className="hidden xl:flex items-center gap-3 absolute top-36 end-4 p-3.5 rounded-2xl bg-[#090C29]/85 border border-orange-500/30 backdrop-blur-md shadow-2xl text-start pointer-events-none max-w-[220px]">
+                <div className="hidden xl:flex items-center gap-3 absolute top-36 end-4 p-3.5 rounded-2xl bg-white/95 dark:bg-[#090C29]/85 border border-orange-400/30 dark:border-orange-500/30 backdrop-blur-md shadow-xl text-start pointer-events-none max-w-[220px]">
                     <div className="w-10 h-10 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center shrink-0">
-                        <ShieldCheck className="w-5 h-5 text-orange-400" />
+                        <ShieldCheck className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                     </div>
                     <div>
                         <div className="flex items-center gap-1">
-                            <span className="text-[10px] text-slate-400 font-bold">عقد تمويل لحظي موثق</span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">عقد تمويل لحظي موثق</span>
                             <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-ping"></span>
                         </div>
-                        <div className="text-xs font-black text-white font-mono mt-0.5">شحنة #GTT-9022</div>
+                        <div className="text-xs font-black text-slate-900 dark:text-white font-mono mt-0.5">شحنة #GTT-9022</div>
                     </div>
                 </div>
 
                 {/* Brand Slogan Badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-300 text-xs sm:text-sm font-bold mb-8 animate-fade-in shadow-inner">
-                    <Sparkles className="w-4 h-4 text-orange-400" />
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/30 text-violet-700 dark:text-violet-300 text-xs sm:text-sm font-bold mb-8 animate-fade-in shadow-sm">
+                    <Sparkles className="w-4 h-4 text-orange-500 dark:text-orange-400" />
                     <span>{heroBadge}</span>
                 </div>
 
                 {/* Main Headline */}
-                <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black text-white tracking-tight leading-[1.2] mb-6 max-w-4xl mx-auto">
+                <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black text-slate-950 dark:text-white tracking-tight leading-[1.2] mb-6 max-w-4xl mx-auto">
                     {heroTitle}
                 </h1>
 
                 {/* Subtitle */}
-                <p className="text-sm sm:text-lg lg:text-xl text-slate-300/80 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+                <p className="text-sm sm:text-lg lg:text-xl text-slate-600 dark:text-slate-300/80 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
                     {heroSubtitle}
                 </p>
 
@@ -616,44 +621,44 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                     )}
                     <a
                         href="#api"
-                        className="w-full sm:w-auto px-7 py-3.5 sm:px-8 sm:py-4 rounded-2xl font-bold text-sm sm:text-base bg-[#0E1338]/90 hover:bg-[#151D52] text-slate-200 border border-violet-800/40 hover:border-orange-500/40 flex items-center justify-center gap-2 transition-all shadow-lg"
+                        className="w-full sm:w-auto px-7 py-3.5 sm:px-8 sm:py-4 rounded-2xl font-bold text-sm sm:text-base bg-white hover:bg-slate-50 dark:bg-[#0E1338]/90 dark:hover:bg-[#151D52] text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-violet-800/40 hover:border-orange-500/40 flex items-center justify-center gap-2 transition-all shadow-md"
                     >
-                        <Code className="w-5 h-5 text-orange-400" />
+                        <Code className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                         <span>{heroSecondaryBtn}</span>
                     </a>
                 </div>
 
                 {/* Live Statistics Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto">
-                    <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-violet-900/30 text-center hover:border-violet-500/40 transition-colors">
-                        <span className="block text-xl sm:text-3xl font-black font-mono text-violet-400 mb-1">
+                    <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-violet-900/30 text-center hover:border-violet-500/40 transition-colors shadow-sm">
+                        <span className="block text-xl sm:text-3xl font-black font-mono text-violet-700 dark:text-violet-400 mb-1">
                             {liveStats?.total_funded_tasks ? `+${Number(liveStats.total_funded_tasks).toLocaleString('en-US')}` : '+1,280'}
                         </span>
-                        <span className="text-[11px] sm:text-sm text-slate-400 font-medium">
+                        <span className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                             {statsSection?.funded_tasks_label || statsSection?.stat1_label || 'مهمة لوجستية ممولة'}
                         </span>
                     </div>
-                    <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-violet-900/30 text-center hover:border-orange-500/40 transition-colors">
-                        <span className="block text-xl sm:text-3xl font-black font-mono text-orange-400 mb-1">
+                    <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-violet-900/30 text-center hover:border-orange-500/40 transition-colors shadow-sm">
+                        <span className="block text-xl sm:text-3xl font-black font-mono text-orange-600 dark:text-orange-400 mb-1">
                             {liveStats?.total_invested_amount ? `${Number(liveStats.total_invested_amount).toLocaleString('en-US')} ر.س` : '3,450,000 ر.س'}
                         </span>
-                        <span className="text-[11px] sm:text-sm text-slate-400 font-medium">
+                        <span className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                             {statsSection?.invested_amount_label || statsSection?.stat2_label || 'ريال حجم التمويل المنفذ'}
                         </span>
                     </div>
-                    <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-violet-900/30 text-center hover:border-violet-500/40 transition-colors">
-                        <span className="block text-xl sm:text-3xl font-black font-mono text-violet-300 mb-1">
+                    <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-violet-900/30 text-center hover:border-violet-500/40 transition-colors shadow-sm">
+                        <span className="block text-xl sm:text-3xl font-black font-mono text-violet-700 dark:text-violet-300 mb-1">
                             {liveStats?.active_investors_count ? `+${Number(liveStats.active_investors_count).toLocaleString('en-US')}` : '+150'}
                         </span>
-                        <span className="text-[11px] sm:text-sm text-slate-400 font-medium">
+                        <span className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                             {statsSection?.active_investors_label || statsSection?.stat3_label || 'مستثمر نشط بالمنصة'}
                         </span>
                     </div>
-                    <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-violet-900/30 text-center hover:border-orange-500/40 transition-colors">
-                        <span className="block text-xl sm:text-3xl font-black font-mono text-orange-300 mb-1">
+                    <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-violet-900/30 text-center hover:border-orange-500/40 transition-colors shadow-sm">
+                        <span className="block text-xl sm:text-3xl font-black font-mono text-orange-600 dark:text-orange-300 mb-1">
                             {liveStats?.connected_companies_count ? `+${Number(liveStats.connected_companies_count).toLocaleString('en-US')}` : '+48'}
                         </span>
-                        <span className="text-[11px] sm:text-sm text-slate-400 font-medium">
+                        <span className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                             {statsSection?.companies_label || statsSection?.stat4_label || 'شركة لوجستية مربوطة'}
                         </span>
                     </div>
@@ -661,27 +666,27 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
             </section>
 
             {/* How It Works Section */}
-            <section id="how-it-works" className="py-20 bg-[#080B22]/80 border-y border-violet-950/40">
+            <section id="how-it-works" className="py-20 bg-slate-100/70 dark:bg-[#080B22]/80 border-y border-slate-200 dark:border-violet-950/40">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-3xl mx-auto mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-black text-slate-950 dark:text-white mb-4">
                             {sections?.how_it_works?.title_ar || 'كيف تعمل منصة GoTransTech في 4 خطوات بسيطة؟'}
                         </h2>
-                        <p className="text-slate-400 text-sm sm:text-base">
+                        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
                             {sections?.how_it_works?.subtitle_ar || 'دورة تمويل واستثمار مؤتمتة بالكامل تضمن السرعة والربحية والأمان لجميع الأطراف.'}
                         </p>
                     </div>
 
                     <div className={`grid grid-cols-1 sm:grid-cols-2 ${displaySteps.length <= 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} gap-6`}>
                         {displaySteps.map((stepItem, idx) => (
-                            <div key={idx} className="glass-panel-card p-6 rounded-2xl border border-violet-900/30 hover:border-violet-500/40 transition-all duration-300 relative group">
-                                <div className={`w-10 h-10 rounded-xl ${idx % 2 === 0 ? 'bg-violet-500/10 border-violet-500/30 text-violet-400' : 'bg-orange-500/10 border-orange-500/30 text-orange-400'} border font-mono font-bold flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
+                            <div key={idx} className="glass-panel-card p-6 rounded-2xl border border-slate-200 dark:border-violet-900/30 hover:border-violet-500/40 transition-all duration-300 relative group shadow-sm">
+                                <div className={`w-10 h-10 rounded-xl ${idx % 2 === 0 ? 'bg-violet-50 dark:bg-violet-500/10 border-violet-200 dark:border-violet-500/30 text-violet-700 dark:text-violet-400' : 'bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-400'} border font-mono font-bold flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
                                     {String(idx + 1).padStart(2, '0')}
                                 </div>
-                                <h3 className="text-base font-bold text-white mb-2">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">
                                     {stepItem.title}
                                 </h3>
-                                <p className="text-xs text-slate-400 leading-relaxed">
+                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                                     {stepItem.description}
                                 </p>
                             </div>
@@ -693,48 +698,48 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
             {/* Features & Solutions Section */}
             <section id="features" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-3xl mx-auto mb-16">
-                    <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+                    <h2 className="text-3xl sm:text-4xl font-black text-slate-950 dark:text-white mb-4">
                         {sections?.features?.title_ar || 'حلول ومميزات مصممة خصيصاً للطرفين'}
                     </h2>
-                    <p className="text-slate-400 text-sm sm:text-base">
+                    <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
                         {sections?.features?.subtitle_ar || 'مزايا استثنائية تمكّن المستثمرين من تحقيق عوائد مستمرة وتمنح شركات النقل سيولة تشغيلية فورية.'}
                     </p>
                 </div>
 
                 {/* Core Pillars Overview */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    <div className="glass-panel-card p-6 rounded-2xl border border-violet-900/30 hover:border-violet-500/40 transition-all duration-300">
-                        <div className="w-12 h-12 rounded-xl bg-violet-500/15 border border-violet-500/30 text-violet-400 flex items-center justify-center mb-4">
+                    <div className="glass-panel-card p-6 rounded-2xl border border-slate-200 dark:border-violet-900/30 hover:border-violet-500/40 transition-all duration-300 shadow-sm">
+                        <div className="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-500/15 border border-violet-200 dark:border-violet-500/30 text-violet-700 dark:text-violet-400 flex items-center justify-center mb-4">
                             <ShieldCheck className="w-6 h-6" />
                         </div>
-                        <h3 className="text-lg font-bold text-white mb-2">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
                             {featuresSection?.pillar1_title || 'أمان محاسبي ونظام قيود مزدوجة'}
                         </h3>
-                        <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                             {featuresSection?.pillar1_desc || 'تدقيق محاسبي غير قابل للتلاعب (Double-Entry Ledger) يضمن سلامة كل هللة في النظام وتطابقها التام.'}
                         </p>
                     </div>
 
-                    <div className="glass-panel-card p-6 rounded-2xl border border-violet-900/30 hover:border-orange-500/40 transition-all duration-300">
-                        <div className="w-12 h-12 rounded-xl bg-orange-500/15 border border-orange-500/30 text-orange-400 flex items-center justify-center mb-4">
+                    <div className="glass-panel-card p-6 rounded-2xl border border-slate-200 dark:border-violet-900/30 hover:border-orange-500/40 transition-all duration-300 shadow-sm">
+                        <div className="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-500/15 border border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-4">
                             <TrendingUp className="w-6 h-6" />
                         </div>
-                        <h3 className="text-lg font-bold text-white mb-2">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
                             {featuresSection?.pillar2_title || 'عوائد أرباح فورية وموثقة'}
                         </h3>
-                        <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                             {featuresSection?.pillar2_desc || 'تحصل على نسبتك من أرباح العمولة مباشرة في محفظتك لحظة تمويل المهمة دون انتظار انتهاء فترة التوصيل.'}
                         </p>
                     </div>
 
-                    <div className="glass-panel-card p-6 rounded-2xl border border-violet-900/30 hover:border-violet-500/40 transition-all duration-300">
-                        <div className="w-12 h-12 rounded-xl bg-violet-500/20 border border-violet-500/30 text-violet-300 flex items-center justify-center mb-4">
-                            <Zap className="w-6 h-6 text-orange-400" />
+                    <div className="glass-panel-card p-6 rounded-2xl border border-slate-200 dark:border-violet-900/30 hover:border-violet-500/40 transition-all duration-300 shadow-sm">
+                        <div className="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-500/20 border border-violet-200 dark:border-violet-500/30 text-violet-700 dark:text-violet-300 flex items-center justify-center mb-4">
+                            <Zap className="w-6 h-6 text-orange-500 dark:text-orange-400" />
                         </div>
-                        <h3 className="text-lg font-bold text-white mb-2">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
                             {featuresSection?.pillar3_title || 'ربط برمجي فائق السرعة'}
                         </h3>
-                        <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                             {featuresSection?.pillar3_desc || 'واجهات برمجية RESTful مهيأة وموثقة للربط المباشر مع أنظمة تخطيط الموارد وسجلات الشحنات بسهولة تامة.'}
                         </p>
                     </div>
@@ -743,26 +748,26 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                 {/* Two Dedicated Portals: Investors Hub & Logistics Hub (Dynamic from Admin CMS) */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Investors Portal */}
-                    <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-violet-900/40 relative overflow-hidden flex flex-col justify-between hover:border-violet-500/50 transition-all duration-300">
+                    <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-violet-900/40 relative overflow-hidden flex flex-col justify-between hover:border-violet-500/50 transition-all duration-300 shadow-sm">
                         <div>
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-12 h-12 rounded-2xl bg-violet-600/20 border border-violet-500/30 text-violet-400 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-2xl bg-violet-50 dark:bg-violet-600/20 border border-violet-200 dark:border-violet-500/30 text-violet-700 dark:text-violet-400 flex items-center justify-center">
                                     <TrendingUp className="w-6 h-6" />
                                 </div>
-                                <span className="text-xs font-bold px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-300">
+                                <span className="text-xs font-bold px-3 py-1 rounded-full bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/30 text-violet-700 dark:text-violet-300">
                                     بوابة المستثمرين
                                 </span>
                             </div>
-                            <h3 className="text-xl sm:text-2xl font-black text-white mb-3">
+                            <h3 className="text-xl sm:text-2xl font-black text-slate-950 dark:text-white mb-3">
                                 {featuresSection?.investor_card_title || 'استثمار ذكي وآمن في مهام النقل اللوجستي'}
                             </h3>
-                            <p className="text-xs sm:text-sm text-slate-400 mb-6 leading-relaxed">
+                            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
                                 {featuresSection?.investor_card_desc || 'نوفر للمستثمر بيئة آمنة توفر سيولة مباشرة لمهام نقل حقيقية بعوائد فورية وإدارة متكاملة للمحفظة.'}
                             </p>
                             <ul className="space-y-3.5 mb-8">
                                 {displayInvestorFeatures.map((feat, idx) => (
-                                    <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-200">
-                                        <CheckCircle2 className="w-4 h-4 text-violet-400 shrink-0 mt-0.5" />
+                                    <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-700 dark:text-slate-200">
+                                        <CheckCircle2 className="w-4 h-4 text-violet-600 dark:text-violet-400 shrink-0 mt-0.5" />
                                         <span className="leading-snug">{feat}</span>
                                     </li>
                                 ))}
@@ -778,26 +783,26 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                     </div>
 
                     {/* Logistics Companies Portal */}
-                    <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-violet-900/40 relative overflow-hidden flex flex-col justify-between hover:border-orange-500/50 transition-all duration-300">
+                    <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-violet-900/40 relative overflow-hidden flex flex-col justify-between hover:border-orange-500/50 transition-all duration-300 shadow-sm">
                         <div>
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-12 h-12 rounded-2xl bg-orange-500/20 border border-orange-500/30 text-orange-400 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-500/20 border border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-400 flex items-center justify-center">
                                     <Truck className="w-6 h-6" />
                                 </div>
-                                <span className="text-xs font-bold px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-300">
+                                <span className="text-xs font-bold px-3 py-1 rounded-full bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-300">
                                     بوابة الشركات اللوجستية
                                 </span>
                             </div>
-                            <h3 className="text-xl sm:text-2xl font-black text-white mb-3">
+                            <h3 className="text-xl sm:text-2xl font-black text-slate-950 dark:text-white mb-3">
                                 {featuresSection?.company_card_title || 'سيولة نقدية تشغيلية فورية وتوسع بلا قيود'}
                             </h3>
-                            <p className="text-xs sm:text-sm text-slate-400 mb-6 leading-relaxed">
+                            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
                                 {featuresSection?.company_card_desc || 'حلول تمويلية فورية تغطي مصاريف التشغيل والوقود والصيانة لكل رحلة مع ربط تقني سلس عبر الـ API.'}
                             </p>
                             <ul className="space-y-3.5 mb-8">
                                 {displayCompanyFeatures.map((feat, idx) => (
-                                    <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-200">
-                                        <CheckCircle2 className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
+                                    <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-700 dark:text-slate-200">
+                                        <CheckCircle2 className="w-4 h-4 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
                                         <span className="leading-snug">{feat}</span>
                                     </li>
                                 ))}
@@ -815,32 +820,32 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
             </section>
 
             {/* Land Logistics & Transport Network Section */}
-            <section id="api" className="py-20 bg-[#080B22]/80 border-y border-violet-950/40">
+            <section id="api" className="py-20 bg-slate-100/70 dark:bg-[#080B22]/80 border-y border-slate-200 dark:border-violet-950/40">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div>
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-orange-500/10 border border-orange-500/25 text-orange-400 text-xs font-bold mb-4">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/25 text-orange-600 dark:text-orange-400 text-xs font-bold mb-4">
                                 <Truck className="w-4 h-4" />
                                 <span>للشركات اللوجستية ومزودي النقل</span>
                             </div>
-                            <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
+                            <h2 className="text-3xl sm:text-4xl font-black text-slate-950 dark:text-white mb-6">
                                 بنية رقمية وهندسية متكاملة لتمويل أساطيل النقل البري
                             </h2>
-                            <p className="text-slate-400 text-sm leading-relaxed mb-6">
+                            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
                                 وفر لعملياتك اللوجستية تدفقاً نقدياً فورياً لتغطية مصاريف الوقود والتشغيل والصيانة لكل رحلة. بنية تحتية ذكية تضمن الربط السريع، حوكمة مسارات الشحن، وتأمين السيولة قبل انطلاق الشاحنة.
                             </p>
 
                             <ul className="space-y-3 mb-8 text-sm">
-                                <li className="flex items-center gap-2 text-slate-300">
-                                    <CheckCircle2 className="w-4 h-4 text-orange-400 shrink-0" />
+                                <li className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                                    <CheckCircle2 className="w-4 h-4 text-orange-600 dark:text-orange-400 shrink-0" />
                                     <span>تغطية هندسية شاملة للمسارات ومحاور النقل البري بين كافة مدن المملكة</span>
                                 </li>
-                                <li className="flex items-center gap-2 text-slate-300">
-                                    <CheckCircle2 className="w-4 h-4 text-violet-400 shrink-0" />
+                                <li className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                                    <CheckCircle2 className="w-4 h-4 text-violet-600 dark:text-violet-400 shrink-0" />
                                     <span>حوكمة رقمية وسندات قبض ودين فورية لحماية حقوق الأسطول والمستثمر</span>
                                 </li>
-                                <li className="flex items-center gap-2 text-slate-300">
-                                    <CheckCircle2 className="w-4 h-4 text-orange-400 shrink-0" />
+                                <li className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                                    <CheckCircle2 className="w-4 h-4 text-orange-600 dark:text-orange-400 shrink-0" />
                                     <span>لوحة تحكم مركزية لمراقبة حركة الشحنات، الرصيد المتاح، والمطابقات المالية</span>
                                 </li>
                             </ul>
@@ -855,7 +860,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                         </div>
 
                         {/* Pure Geometric Land Transport & Logistics Art (No text, No names, No stats) */}
-                        <div className="relative p-6 sm:p-10 rounded-3xl border border-violet-800/40 bg-[#090C28]/95 overflow-hidden shadow-2xl flex items-center justify-center min-h-[420px]">
+                        <div className="relative p-6 sm:p-10 rounded-3xl border border-slate-200 dark:border-violet-800/40 bg-white/95 dark:bg-[#090C28]/95 overflow-hidden shadow-xl flex items-center justify-center min-h-[420px]">
                             {/* Subtle Ambient Glow Behind Illustration */}
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-violet-600/15 blur-[100px] pointer-events-none rounded-full" />
                             <div className="absolute bottom-8 right-8 w-48 h-48 bg-orange-500/15 blur-[80px] pointer-events-none rounded-full" />
@@ -1082,30 +1087,30 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
             </section>
 
             {/* FAQ Section */}
-            <section id="faq" className="py-20 bg-[#06081B]">
+            <section id="faq" className="py-20 bg-slate-50 dark:bg-[#06081B] transition-colors duration-200">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-black text-white mb-3">
+                        <h2 className="text-3xl font-black text-slate-950 dark:text-white mb-3">
                             {sections?.faq?.title_ar || 'الأسئلة الشائعة'}
                         </h2>
-                        <p className="text-slate-400 text-sm">
+                        <p className="text-slate-600 dark:text-slate-400 text-sm">
                             {sections?.faq?.subtitle_ar || 'كل ما تحتاج لمعرفته حول الاستثمار والربط في منصة GoTransTech'}
                         </p>
                     </div>
 
                     <div className="space-y-4">
                         {displayFaqs.map((faq, index) => (
-                            <div key={index} className="glass-panel-card rounded-2xl border border-violet-900/30 overflow-hidden">
+                            <div key={index} className="glass-panel-card rounded-2xl border border-slate-200 dark:border-violet-900/30 overflow-hidden shadow-sm">
                                 <button
                                     type="button"
                                     onClick={() => setFaqOpen(faqOpen === index ? null : index)}
-                                    className="w-full p-5 text-start flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-slate-200 hover:text-orange-400 transition-colors"
+                                    className="w-full p-5 text-start flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-slate-900 dark:text-slate-200 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
                                 >
                                     <span>{faq.q}</span>
-                                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${faqOpen === index ? 'rotate-180 text-orange-400' : ''}`} />
+                                    <ChevronDown className={`w-5 h-5 text-slate-500 dark:text-slate-400 transition-transform ${faqOpen === index ? 'rotate-180 text-orange-600 dark:text-orange-400' : ''}`} />
                                 </button>
                                 {faqOpen === index && (
-                                    <div className="px-5 pb-5 text-xs sm:text-sm text-slate-400 leading-relaxed border-t border-violet-950/60 pt-3">
+                                    <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-violet-950/60 pt-3">
                                         {faq.a}
                                     </div>
                                 )}
@@ -1117,40 +1122,40 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
 
             {/* Comprehensive Footer Managed from Admin CMS */}
             {sections?.contact_footer?.is_active !== false && (
-                <footer className="border-t border-violet-900/40 bg-[#040615] text-slate-300 relative overflow-hidden">
+                <footer className="border-t border-slate-200 dark:border-violet-900/40 bg-white dark:bg-[#040615] text-slate-600 dark:text-slate-300 relative overflow-hidden transition-colors duration-200">
                     {/* Subtle background ambient lights */}
                     <div className="absolute bottom-0 right-1/4 w-96 h-48 bg-violet-600/5 blur-[120px] pointer-events-none" />
                     <div className="absolute top-0 left-1/4 w-96 h-48 bg-orange-500/5 blur-[120px] pointer-events-none" />
 
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-10">
                         {/* 4-Column Responsive Layout */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-violet-950/80">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-200 dark:border-violet-950/80">
                             {/* Col 1 & 2: Platform Identity, Bio & Social Networks */}
                             <div className="lg:col-span-2 space-y-5">
                                 <Link href="/" className="inline-block">
-                                    <BrandLogo size={branding?.navbar_brand_size || 'md'} showSlogan={true} displayMode={branding?.navbar_brand_display || 'both'} textClassName="text-white" />
+                                    <BrandLogo size={branding?.navbar_brand_size || 'md'} showSlogan={true} displayMode={branding?.navbar_brand_display || 'both'} textClassName="text-slate-900 dark:text-white" />
                                 </Link>
 
-                                <p className="text-xs text-slate-400 leading-relaxed max-w-md">
+                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-md">
                                     {footerSection?.description_ar || 'المنصة السعودية الذكية الأولى المتخصصة في تمويل المهام والخدمات اللوجستية، نربط بين المستثمرين وشركات النقل لتمكين النمو وتدفق السيولة السريعة بعوائد فورية وموثقة.'}
                                 </p>
 
                                 {/* Trust & Regulatory Badge */}
-                                <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-violet-950/60 border border-violet-800/40 text-[11px] text-violet-300">
-                                    <ShieldCheck className="w-4 h-4 text-orange-400 shrink-0" />
+                                <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800/40 text-[11px] text-violet-700 dark:text-violet-300">
+                                    <ShieldCheck className="w-4 h-4 text-orange-600 dark:text-orange-400 shrink-0" />
                                     <span>منظومة تقنية مالية معتمدة وفق أعلى معايير الحوكمة والشفافية 🇸🇦</span>
                                 </div>
 
                                 {/* Social Media Channels */}
                                 <div className="pt-1">
-                                    <span className="block text-[11px] font-bold text-slate-400 mb-2.5">تابعنا على شبكات التواصل الاجتماعي:</span>
+                                    <span className="block text-[11px] font-bold text-slate-700 dark:text-slate-400 mb-2.5">تابعنا على شبكات التواصل الاجتماعي:</span>
                                     <div className="flex items-center gap-2 flex-wrap">
                                         {footerSection?.twitter_url && (
                                             <a
                                                 href={footerSection.twitter_url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-9 h-9 rounded-xl bg-slate-900 border border-violet-900/40 hover:border-[#6320EE] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-105"
+                                                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-violet-900/40 hover:border-[#6320EE] dark:hover:border-[#6320EE] text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white flex items-center justify-center transition-all hover:scale-105"
                                                 title="منصة X (تويتر)"
                                             >
                                                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -1163,7 +1168,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                                                 href={footerSection.linkedin_url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-9 h-9 rounded-xl bg-slate-900 border border-violet-900/40 hover:border-[#6320EE] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-105"
+                                                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-violet-900/40 hover:border-[#6320EE] dark:hover:border-[#6320EE] text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white flex items-center justify-center transition-all hover:scale-105"
                                                 title="LinkedIn"
                                             >
                                                 <LinkedinIcon className="w-4 h-4" />
@@ -1174,7 +1179,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                                                 href={footerSection.instagram_url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-9 h-9 rounded-xl bg-slate-900 border border-violet-900/40 hover:border-[#6320EE] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-105"
+                                                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-violet-900/40 hover:border-[#6320EE] dark:hover:border-[#6320EE] text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white flex items-center justify-center transition-all hover:scale-105"
                                                 title="Instagram"
                                             >
                                                 <InstagramIcon className="w-4 h-4" />
@@ -1185,7 +1190,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                                                 href={footerSection.facebook_url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-9 h-9 rounded-xl bg-slate-900 border border-violet-900/40 hover:border-[#6320EE] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-105"
+                                                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-violet-900/40 hover:border-[#6320EE] dark:hover:border-[#6320EE] text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white flex items-center justify-center transition-all hover:scale-105"
                                                 title="Facebook"
                                             >
                                                 <FacebookIcon className="w-4 h-4" />
@@ -1196,7 +1201,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                                                 href={footerSection.youtube_url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-9 h-9 rounded-xl bg-slate-900 border border-violet-900/40 hover:border-[#6320EE] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-105"
+                                                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-violet-900/40 hover:border-[#6320EE] dark:hover:border-[#6320EE] text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white flex items-center justify-center transition-all hover:scale-105"
                                                 title="YouTube"
                                             >
                                                 <YoutubeIcon className="w-4 h-4" />
@@ -1207,7 +1212,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                                                 href={footerSection.telegram_url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-9 h-9 rounded-xl bg-slate-900 border border-violet-900/40 hover:border-[#6320EE] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-105"
+                                                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-violet-900/40 hover:border-[#6320EE] dark:hover:border-[#6320EE] text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white flex items-center justify-center transition-all hover:scale-105"
                                                 title="Telegram"
                                             >
                                                 <Send className="w-4 h-4" />
@@ -1219,33 +1224,33 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
 
                             {/* Col 3: Investors Gateway */}
                             <div className="space-y-3.5">
-                                <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                                    <TrendingUp className="w-4 h-4 text-violet-400" />
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                    <TrendingUp className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                                     <span>بوابة المستثمرين</span>
                                 </h4>
-                                <ul className="space-y-2.5 text-xs text-slate-400">
+                                <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-400">
                                     <li>
-                                        <a href="#how-it-works" className="hover:text-orange-400 transition-colors block">
+                                        <a href="#how-it-works" className="hover:text-orange-600 dark:hover:text-orange-400 transition-colors block">
                                             آلية التمويل اللوجستي
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#features" className="hover:text-orange-400 transition-colors block">
+                                        <a href="#features" className="hover:text-orange-600 dark:hover:text-orange-400 transition-colors block">
                                             عوائد الأرباح الفورية
                                         </a>
                                     </li>
                                     <li>
-                                        <Link href={user ? dashboardUrl : route('register')} className="hover:text-orange-400 transition-colors block">
+                                        <Link href={user ? dashboardUrl : route('register')} className="hover:text-orange-600 dark:hover:text-orange-400 transition-colors block">
                                             فتح حساب مستثمر جديد
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href={route('login')} className="hover:text-orange-400 transition-colors block">
+                                        <Link href={route('login')} className="hover:text-orange-600 dark:hover:text-orange-400 transition-colors block">
                                             شحن المحفظة الاستثمارية
                                         </Link>
                                     </li>
                                     <li>
-                                        <a href="#faq" className="hover:text-orange-400 transition-colors block">
+                                        <a href="#faq" className="hover:text-orange-600 dark:hover:text-orange-400 transition-colors block">
                                             ضمانات وحماية رأس المال
                                         </a>
                                     </li>
@@ -1254,33 +1259,33 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
 
                             {/* Col 4: Shippers & Logistics Companies Links */}
                             <div className="space-y-3.5">
-                                <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                                    <Truck className="w-4 h-4 text-orange-400" />
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                    <Truck className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                                     <span>شركات النقل والـ API</span>
                                 </h4>
-                                <ul className="space-y-2.5 text-xs text-slate-400">
+                                <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-400">
                                     <li>
-                                        <a href="#api" className="hover:text-orange-400 transition-colors block">
+                                        <a href="#api" className="hover:text-orange-600 dark:hover:text-orange-400 transition-colors block">
                                             الربط التقني عبر REST API
                                         </a>
                                     </li>
                                     <li>
-                                        <Link href={user ? dashboardUrl : route('register')} className="hover:text-orange-400 transition-colors block">
+                                        <Link href={user ? dashboardUrl : route('register')} className="hover:text-orange-600 dark:hover:text-orange-400 transition-colors block">
                                             طلب تمويل شحنات النقل
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href={route('login')} className="hover:text-orange-400 transition-colors block">
+                                        <Link href={route('login')} className="hover:text-orange-600 dark:hover:text-orange-400 transition-colors block">
                                             توليد مفاتيح الربط البرمجي
                                         </Link>
                                     </li>
                                     <li>
-                                        <a href="#features" className="hover:text-orange-400 transition-colors block">
+                                        <a href="#features" className="hover:text-orange-600 dark:hover:text-orange-400 transition-colors block">
                                             سيولة وقود وصيانة الرحلات
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#faq" className="hover:text-orange-400 transition-colors block">
+                                        <a href="#faq" className="hover:text-orange-600 dark:hover:text-orange-400 transition-colors block">
                                             سندات الصرف وسداد الديون
                                         </a>
                                     </li>
@@ -1289,19 +1294,19 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
 
                             {/* Col 5: Contact & Customer Support */}
                             <div className="space-y-3.5">
-                                <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                                    <PhoneCall className="w-4 h-4 text-blue-400" />
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                    <PhoneCall className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                                     <span>خدمة العملاء والدعم الفني</span>
                                 </h4>
 
-                                <div className="space-y-3 text-xs text-slate-300">
+                                <div className="space-y-3 text-xs text-slate-700 dark:text-slate-300">
                                     {footerSection?.phone && (
                                         <a
                                             href={`tel:${footerSection.phone.replace(/\s+/g, '')}`}
-                                            className="flex items-center gap-2 hover:text-orange-400 transition-colors group"
+                                            className="flex items-center gap-2 hover:text-orange-600 dark:hover:text-orange-400 transition-colors group"
                                         >
-                                            <div className="w-7 h-7 rounded-lg bg-violet-950/80 border border-violet-800/40 flex items-center justify-center shrink-0 group-hover:border-orange-500">
-                                                <Phone className="w-3.5 h-3.5 text-violet-400 group-hover:text-orange-400" />
+                                            <div className="w-7 h-7 rounded-lg bg-violet-50 dark:bg-violet-950/80 border border-violet-200 dark:border-violet-800/40 flex items-center justify-center shrink-0 group-hover:border-orange-500">
+                                                <Phone className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400 group-hover:text-orange-600 dark:group-hover:text-orange-400" />
                                             </div>
                                             <span className="font-mono text-xs">{footerSection.phone}</span>
                                         </a>
@@ -1312,10 +1317,10 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                                             href={`https://wa.me/${footerSection.whatsapp_number.replace(/[^0-9]/g, '')}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex items-center gap-2 hover:text-orange-400 transition-colors group"
+                                            className="flex items-center gap-2 hover:text-orange-600 dark:hover:text-orange-400 transition-colors group"
                                         >
-                                            <div className="w-7 h-7 rounded-lg bg-emerald-950/80 border border-emerald-800/40 flex items-center justify-center shrink-0 group-hover:border-emerald-500">
-                                                <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                                            <div className="w-7 h-7 rounded-lg bg-orange-50 dark:bg-orange-500/15 border border-orange-200 dark:border-orange-500/30 flex items-center justify-center shrink-0 group-hover:border-orange-500">
+                                                <MessageCircle className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
                                             </div>
                                             <span className="font-mono text-xs">{footerSection.whatsapp_number} (واتساب)</span>
                                         </a>
@@ -1324,28 +1329,28 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                                     {footerSection?.email && (
                                         <a
                                             href={`mailto:${footerSection.email}`}
-                                            className="flex items-center gap-2 hover:text-orange-400 transition-colors group break-all"
+                                            className="flex items-center gap-2 hover:text-orange-600 dark:hover:text-orange-400 transition-colors group break-all"
                                         >
-                                            <div className="w-7 h-7 rounded-lg bg-violet-950/80 border border-violet-800/40 flex items-center justify-center shrink-0 group-hover:border-orange-500">
-                                                <Mail className="w-3.5 h-3.5 text-violet-400 group-hover:text-orange-400" />
+                                            <div className="w-7 h-7 rounded-lg bg-violet-50 dark:bg-violet-950/80 border border-violet-200 dark:border-violet-800/40 flex items-center justify-center shrink-0 group-hover:border-orange-500">
+                                                <Mail className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400 group-hover:text-orange-600 dark:group-hover:text-orange-400" />
                                             </div>
                                             <span className="font-mono text-xs">{footerSection.email}</span>
                                         </a>
                                     )}
 
                                     {footerSection?.address && (
-                                        <div className="flex items-start gap-2 text-slate-400 leading-relaxed pt-1">
-                                            <div className="w-7 h-7 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center shrink-0 mt-0.5">
-                                                <MapPin className="w-3.5 h-3.5 text-orange-400" />
+                                        <div className="flex items-start gap-2 text-slate-600 dark:text-slate-400 leading-relaxed pt-1">
+                                            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0 mt-0.5">
+                                                <MapPin className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
                                             </div>
                                             <span className="text-[11px]">{footerSection.address}</span>
                                         </div>
                                     )}
 
                                     {footerSection?.working_hours && (
-                                        <div className="flex items-center gap-2 text-[11px] text-slate-400 pt-0.5">
-                                            <div className="w-7 h-7 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center shrink-0">
-                                                <Clock className="w-3.5 h-3.5 text-blue-400" />
+                                        <div className="flex items-center gap-2 text-[11px] text-slate-600 dark:text-slate-400 pt-0.5">
+                                            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0">
+                                                <Clock className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
                                             </div>
                                             <span>{footerSection.working_hours}</span>
                                         </div>
@@ -1355,7 +1360,7 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                         </div>
 
                         {/* Bottom Bar: Copyrights & Regulatory */}
-                        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+                        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
                             <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-start">
                                 <p>
                                     {footerSection?.copyright_text || `جميع الحقوق محفوظة © ${new Date().getFullYear()} GoTransTech للتقنية المالية والخدمات اللوجستية.`}
@@ -1368,12 +1373,12 @@ export default function LandingIndex({ sections = {}, liveStats = {} }) {
                                 )}
                             </div>
 
-                            <div className="flex items-center gap-4 text-[11px] text-slate-400">
-                                <a href="#faq" className="hover:text-slate-200 transition-colors">شروط الاستخدام</a>
-                                <span className="text-slate-700">•</span>
-                                <a href="#faq" className="hover:text-slate-200 transition-colors">سياسة الخصوصية</a>
-                                <span className="text-slate-700">•</span>
-                                <a href="#faq" className="hover:text-slate-200 transition-colors">مكافحة غسيل الأموال</a>
+                            <div className="flex items-center gap-4 text-[11px] text-slate-500 dark:text-slate-400">
+                                <a href="#faq" className="hover:text-slate-900 dark:hover:text-slate-200 transition-colors">شروط الاستخدام</a>
+                                <span className="text-slate-300 dark:text-slate-700">•</span>
+                                <a href="#faq" className="hover:text-slate-900 dark:hover:text-slate-200 transition-colors">سياسة الخصوصية</a>
+                                <span className="text-slate-300 dark:text-slate-700">•</span>
+                                <a href="#faq" className="hover:text-slate-900 dark:hover:text-slate-200 transition-colors">مكافحة غسيل الأموال</a>
                             </div>
                         </div>
                     </div>

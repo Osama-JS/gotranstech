@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, useForm, router, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
+import { useTranslation } from '../../../Utils/i18n';
 import BrandLogo from '../../../Components/BrandLogo';
 import { 
     LayoutTemplate, 
@@ -29,6 +30,8 @@ import {
 } from 'lucide-react';
 
 export default function AdminLandingCms({ sections = [], branding = {}, landingUrl = null }) {
+    const { t, locale } = useTranslation();
+    const isAr = locale === 'ar';
     const { props } = usePage();
     const [activeTab, setActiveTab] = useState('branding');
 
@@ -57,7 +60,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
         favicon: null,
         site_name_ar: branding?.site_name_ar || 'GoTransTech',
         site_name_en: branding?.site_name_en || 'GoTransTech Platform',
-        site_slogan_ar: branding?.site_slogan_ar || 'نمول حركة الغد',
+        site_slogan_ar: branding?.site_slogan_ar || t('admin.cms.default_site_slogan_ar'),
         site_slogan_en: branding?.site_slogan_en || 'FINANCING WHAT MOVES TOMORROW',
         navbar_brand_display: branding?.navbar_brand_display || 'both',
         navbar_brand_size: parseInt(branding?.navbar_brand_size, 10) || 36,
@@ -92,8 +95,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
     };
 
     const handleDeleteBrandingItem = (type) => {
-        const label = type === 'logo' ? 'شعار المنصة' : (type === 'favicon' ? 'أيقونة المتصفح' : 'الشعار الليلي');
-        if (confirm(`هل أنت متأكد من رغبتك في حذف ${label} والعودة للوضع الافتراضي؟`)) {
+        const label = type === 'logo' ? t('admin.cms.platform_logo_title') : (type === 'favicon' ? t('admin.cms.browser_favicon_title') : t('admin.cms.platform_logo_title'));
+        if (confirm(t('admin.cms.confirm_delete_branding', { label }))) {
             router.delete(route('admin.cms.branding.delete', type), {
                 preserveScroll: true,
             });
@@ -128,10 +131,10 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
         subtitle_ar: statsSec.subtitle_ar || '',
         subtitle_en: statsSec.subtitle_en || '',
         content: {
-            funded_tasks_label: statsSec.content?.funded_tasks_label || 'مهمة لوجستية ممولة',
-            invested_amount_label: statsSec.content?.invested_amount_label || 'ريال حجم التمويل المنفذ',
-            active_investors_label: statsSec.content?.active_investors_label || 'مستثمر نشط بالمنصة',
-            companies_label: statsSec.content?.companies_label || 'شركة لوجستية مربوطة',
+            funded_tasks_label: statsSec.content?.funded_tasks_label || t('admin.cms.default_tasks_label'),
+            invested_amount_label: statsSec.content?.invested_amount_label || t('admin.cms.default_invested_label'),
+            active_investors_label: statsSec.content?.active_investors_label || t('admin.cms.default_investors_label'),
+            companies_label: statsSec.content?.companies_label || t('admin.cms.default_companies_label'),
         },
         is_active: statsSec.is_active ?? true,
     });
@@ -160,16 +163,16 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
         subtitle_ar: featuresSec.subtitle_ar || '',
         subtitle_en: featuresSec.subtitle_en || '',
         content: {
-            investor_card_title: featuresSec.content?.investor_card_title || 'استثمار ذكي وآمن في مهام النقل اللوجستي',
-            investor_card_desc: featuresSec.content?.investor_card_desc || 'نوفر للمستثمر بيئة آمنة توفر سيولة مباشرة لمهام نقل حقيقية بعوائد فورية وإدارة متكاملة للمحفظة.',
-            company_card_title: featuresSec.content?.company_card_title || 'سيولة نقدية تشغيلية فورية وتوسع بلا قيود',
-            company_card_desc: featuresSec.content?.company_card_desc || 'حلول تمويلية فورية تغطي مصاريف التشغيل والوقود والصيانة لكل رحلة مع ربط تقني سلس عبر الـ API.',
-            pillar1_title: featuresSec.content?.pillar1_title || 'أمان محاسبي ونظام قيود مزدوجة',
-            pillar1_desc: featuresSec.content?.pillar1_desc || 'تدقيق محاسبي غير قابل للتلاعب (Double-Entry Ledger) يضمن سلامة كل هللة في النظام وتطابقها التام.',
-            pillar2_title: featuresSec.content?.pillar2_title || 'عوائد أرباح فورية وموثقة',
-            pillar2_desc: featuresSec.content?.pillar2_desc || 'تحصل على نسبتك من أرباح العمولة مباشرة في محفظتك لحظة تمويل المهمة دون انتظار انتهاء فترة التوصيل.',
-            pillar3_title: featuresSec.content?.pillar3_title || 'ربط برمجي فائق السرعة',
-            pillar3_desc: featuresSec.content?.pillar3_desc || 'واجهات برمجية RESTful مهيأة وموثقة للربط المباشر مع أنظمة تخطيط الموارد وسجلات الشحنات بسهولة تامة.',
+            investor_card_title: featuresSec.content?.investor_card_title || t('admin.cms.default_inv_title'),
+            investor_card_desc: featuresSec.content?.investor_card_desc || t('admin.cms.default_inv_desc'),
+            company_card_title: featuresSec.content?.company_card_title || t('admin.cms.default_comp_title'),
+            company_card_desc: featuresSec.content?.company_card_desc || t('admin.cms.default_comp_desc'),
+            pillar1_title: featuresSec.content?.pillar1_title || t('admin.cms.default_p1_title'),
+            pillar1_desc: featuresSec.content?.pillar1_desc || t('admin.cms.default_p1_desc'),
+            pillar2_title: featuresSec.content?.pillar2_title || t('admin.cms.default_p2_title'),
+            pillar2_desc: featuresSec.content?.pillar2_desc || t('admin.cms.default_p2_desc'),
+            pillar3_title: featuresSec.content?.pillar3_title || t('admin.cms.default_p3_title'),
+            pillar3_desc: featuresSec.content?.pillar3_desc || t('admin.cms.default_p3_desc'),
             investor_features: featuresSec.content?.investor_features || [],
             company_features: featuresSec.content?.company_features || [],
         },
@@ -190,17 +193,17 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
 
     // 6. Contact & Footer Form
     const contactForm = useForm({
-        title_ar: contactSec.title_ar || 'معلومات التواصل والفوتر',
+        title_ar: contactSec.title_ar || t('admin.cms.default_contact_title'),
         title_en: contactSec.title_en || 'Contact & Footer Info',
-        subtitle_ar: contactSec.subtitle_ar || 'قنوات الدعم الفني وخدمة العملاء والروابط الرسمية',
+        subtitle_ar: contactSec.subtitle_ar || t('admin.cms.default_contact_sub'),
         subtitle_en: contactSec.subtitle_en || 'Technical support channels, customer service, and official links',
         content: {
-            description_ar: contactSec.content?.description_ar || 'المنصة السعودية الذكية الأولى المتخصصة في تمويل المهام والخدمات اللوجستية، نربط بين المستثمرين وشركات النقل لتمكين النمو وتدفق السيولة السريعة بعوائد فورية وموثقة.',
+            description_ar: contactSec.content?.description_ar || t('admin.cms.default_contact_desc'),
             email: contactSec.content?.email || 'support@gotranstech.sa',
             phone: contactSec.content?.phone || '+966 11 234 5678',
             whatsapp_number: contactSec.content?.whatsapp_number || '+966501234567',
-            address: contactSec.content?.address || 'الرياض - طريق الملك فهد - مركز الملك عبد الله المالي (KAFD)',
-            working_hours: contactSec.content?.working_hours || 'الأحد - الخميس: 9:00 ص - 6:00 م',
+            address: contactSec.content?.address || t('admin.cms.default_contact_addr'),
+            working_hours: contactSec.content?.working_hours || t('admin.cms.default_contact_hours'),
             twitter_url: contactSec.content?.twitter_url || 'https://x.com',
             linkedin_url: contactSec.content?.linkedin_url || 'https://linkedin.com',
             instagram_url: contactSec.content?.instagram_url || 'https://instagram.com',
@@ -209,7 +212,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
             telegram_url: contactSec.content?.telegram_url || '',
             cr_number: contactSec.content?.cr_number || '1010889900',
             tax_number: contactSec.content?.tax_number || '300099887700003',
-            copyright_text: contactSec.content?.copyright_text || 'جميع الحقوق محفوظة © منصة GoTransTech للتقنية المالية والخدمات اللوجستية المحدودة',
+            copyright_text: contactSec.content?.copyright_text || t('admin.cms.default_contact_copy'),
         },
         is_active: contactSec.is_active ?? true,
     });
@@ -222,40 +225,40 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
     };
 
     const tabs = [
-        { id: 'branding', label: 'الشعار وأيقونة المتصفح (Branding)', icon: Palette, sec: null },
-        { id: 'hero', label: 'القسم الرئيسي (Hero)', icon: Sparkles, sec: heroSec },
-        { id: 'stats', label: 'شريط الإحصائيات (Stats)', icon: BarChart3, sec: statsSec },
-        { id: 'how', label: 'خطوات العمل (How it works)', icon: Layers, sec: howSec },
-        { id: 'features', label: 'المميزات والحلول (Features)', icon: CheckCircle2, sec: featuresSec },
-        { id: 'faq', label: 'الأسئلة الشائعة (FAQ)', icon: HelpCircle, sec: faqSec },
-        { id: 'contact', label: 'الفوتر والتواصل (Footer)', icon: PhoneCall, sec: contactSec },
+        { id: 'branding', label: t('admin.cms.tab_branding'), icon: Palette, sec: null },
+        { id: 'hero', label: t('admin.cms.tab_hero_short'), icon: Sparkles, sec: heroSec },
+        { id: 'stats', label: t('admin.cms.tab_stats_short'), icon: BarChart3, sec: statsSec },
+        { id: 'how', label: t('admin.cms.tab_how_short'), icon: Layers, sec: howSec },
+        { id: 'features', label: t('admin.cms.tab_features_short'), icon: CheckCircle2, sec: featuresSec },
+        { id: 'faq', label: t('admin.cms.tab_faq_short'), icon: HelpCircle, sec: faqSec },
+        { id: 'contact', label: t('admin.cms.tab_footer_short'), icon: PhoneCall, sec: contactSec },
     ];
 
     return (
         <AuthenticatedLayout>
-            <Head title="إدارة هوية المنصة وصفحة الهبوط - إدارة المنصة" />
+            <Head title={t('admin.cms.page_title')} />
 
             <div className="space-y-6 pb-12 max-w-6xl mx-auto">
                 {/* Header */}
                 <AdminPageHeader
-                    title="إدارة هوية المنصة ومحتوى صفحة الهبوط (CMS & Branding)"
-                    subtitle="التحكم الكامل بالشعار الرسمي للمنصة، أيقونة المتصفح (Favicon)، النصوص والإحصائيات، وبيانات التواصل"
+                    title={t('admin.cms.header_title')}
+                    subtitle={t('admin.cms.header_subtitle')}
                     breadcrumbs={[
-                        { label: 'الرئيسية', url: route('admin.dashboard') },
-                        { label: 'إدارة الهوية وصفحة الهبوط' }
+                        { label: t('common.home'), url: route('admin.dashboard') },
+                        { label: t('admin.cms.header_title') }
                     ]}
                     icon={LayoutTemplate}
                     iconColor="text-violet-400"
-                    badge={{ text: 'تحكم مركزي مباشر', color: 'brand' }}
+                    badge={{ text: t('admin.cms.badge_central_control'), color: 'brand' }}
                     actions={
                         <a
                             href={previewUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 border border-slate-700 cursor-pointer shadow-sm hover:border-[#6320EE]"
-                            title="معاينة صفحة الهبوط في نافذة جديدة"
+                            title={t('admin.cms.preview_landing_title')}
                         >
-                            <span>معاينة صفحة الهبوط الحية</span>
+                            <span>{t('admin.cms.preview_landing_btn')}</span>
                             <ArrowUpRight className="w-4 h-4 text-[#FF6B00]" />
                         </a>
                     }
@@ -291,15 +294,15 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div>
                                 <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                     <Palette className="w-5 h-5 text-violet-400" />
-                                    <span>إدارة الشعار الرسمي وأيقونة المتصفح (Branding & Identity)</span>
+                                    <span>{t('admin.cms.branding_title')}</span>
                                 </h3>
                                 <p className="text-xs text-slate-500 mt-0.5">
-                                    ارفع شعار المنصة المعتمد وأيقونة المتصفح (Favicon) ليتم تطبيقها فورياً على جميع صفحات الهبوط ولوحات التحكم
+                                    {t('admin.cms.branding_desc')}
                                 </p>
                             </div>
                             {branding?.logo && (
                                 <span className="text-[11px] font-bold bg-violet-500/10 text-violet-400 border border-violet-500/20 px-3 py-1 rounded-full self-start sm:self-center">
-                                    تم رفع شعار مخصص نشط
+                                    {t('admin.cms.active_custom_logo')}
                                 </span>
                             )}
                         </div>
@@ -312,7 +315,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     <div className="flex items-center justify-between">
                                         <label className="text-xs font-bold text-white flex items-center gap-2">
                                             <Image className="w-4 h-4 text-violet-400" />
-                                            <span>شعار المنصة الرسمي (Platform Logo)</span>
+                                            <span>{t('admin.cms.platform_logo_title')}</span>
                                         </label>
                                         {branding?.logo && (
                                             <button
@@ -321,7 +324,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                                 className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 font-semibold transition-colors cursor-pointer"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
-                                                <span>حذف واستعادة الافتراضي</span>
+                                                <span>{t('admin.cms.btn_restore_default')}</span>
                                             </button>
                                         )}
                                     </div>
@@ -332,11 +335,11 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             <div className="space-y-2 w-full flex flex-col items-center">
                                                 <img
                                                     src={logoPreview || branding?.logo}
-                                                    alt="معاينة الشعار"
+                                                    alt={t('admin.cms.logo_preview_alt')}
                                                     className="max-h-16 w-auto object-contain mx-auto drop-shadow-md"
                                                 />
                                                 <span className="text-[10px] text-slate-400 block font-mono">
-                                                    {logoPreview ? 'معاينة الملف المختار قبل الحفظ' : 'الشعار المعتمد الحالي على المنصة'}
+                                                    {logoPreview ? t('admin.cms.preview_selected_file') : t('admin.cms.current_active_logo')}
                                                 </span>
                                                 {branding?.logo && !logoPreview && (
                                                     <div className="w-full text-[10px] text-violet-300 font-mono bg-violet-950/60 p-2 rounded-lg border border-violet-800/40 break-all select-all flex items-center justify-between gap-2">
@@ -346,7 +349,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="text-violet-400 hover:text-white shrink-0 p-1 hover:bg-violet-800/30 rounded"
-                                                            title="فتح الصورة في تبويب جديد"
+                                                            title={t('admin.cms.open_image_tab')}
                                                         >
                                                             <ExternalLink className="w-3.5 h-3.5" />
                                                         </a>
@@ -357,7 +360,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             <div className="space-y-2">
                                                 <BrandLogo size="md" forceVector={true} />
                                                 <span className="text-[10px] text-slate-500 block">
-                                                    الشعار الافتراضي المتجهي (لم يتم رفع ملف مخصص حتى الآن)
+                                                    {t('admin.cms.default_vector_logo')}
                                                 </span>
                                             </div>
                                         )}
@@ -377,10 +380,10 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             className="w-full py-2.5 px-4 rounded-xl bg-violet-600/10 hover:bg-violet-600/20 text-violet-400 border border-violet-500/30 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
                                         >
                                             <UploadCloud className="w-4 h-4" />
-                                            <span>{branding?.logo ? 'اختيار وتغيير الشعار...' : 'رفع ملف الشعار...'}</span>
+                                            <span>{branding?.logo ? t('admin.cms.btn_change_logo') : t('admin.cms.btn_upload_logo')}</span>
                                         </label>
                                         <p className="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
-                                            يدعم PNG أو SVG أو WebP بخلفية شفافة بدقة موصى بها (ارتفاع 60-100px، بحد أقصى 4MB).
+                                            {t('admin.cms.logo_specs_hint')}
                                         </p>
                                         {brandingForm.errors.logo && (
                                             <p className="text-[11px] text-rose-400 mt-1 font-semibold">{brandingForm.errors.logo}</p>
@@ -393,7 +396,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     <div className="flex items-center justify-between">
                                         <label className="text-xs font-bold text-white flex items-center gap-2">
                                             <Globe className="w-4 h-4 text-orange-400" />
-                                            <span>أيقونة المتصفح (Browser Favicon)</span>
+                                            <span>{t('admin.cms.browser_favicon_title')}</span>
                                         </label>
                                         {branding?.favicon && (
                                             <button
@@ -402,14 +405,14 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                                 className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 font-semibold transition-colors cursor-pointer"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
-                                                <span>استعادة الافتراضية</span>
+                                                <span>{t('admin.cms.btn_restore_favicon')}</span>
                                             </button>
                                         )}
                                     </div>
 
                                     {/* Mock Browser Tab Preview */}
                                     <div className="p-4 rounded-xl bg-slate-900/90 border border-dashed border-slate-700 flex flex-col items-center justify-center min-h-[140px] text-center">
-                                        <span className="text-[10px] text-slate-500 mb-2 font-mono">محاكاة تبويب المتصفح (Browser Tab Preview)</span>
+                                        <span className="text-[10px] text-slate-500 mb-2 font-mono">{t('admin.cms.browser_tab_preview')}</span>
                                         <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-slate-800 rounded-t-xl border border-b-0 border-slate-700 shadow-md">
                                             <img
                                                 src={faviconPreview || branding?.favicon || '/favicon.ico'}
@@ -429,7 +432,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-orange-400 hover:text-white shrink-0 p-1 hover:bg-orange-800/30 rounded"
-                                                    title="فتح الأيقونة في تبويب جديد"
+                                                    title={t('admin.cms.open_favicon_tab')}
                                                 >
                                                     <ExternalLink className="w-3.5 h-3.5" />
                                                 </a>
@@ -451,10 +454,10 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             className="w-full py-2.5 px-4 rounded-xl bg-orange-600/10 hover:bg-orange-600/20 text-orange-400 border border-orange-500/30 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
                                         >
                                             <UploadCloud className="w-4 h-4" />
-                                            <span>{branding?.favicon ? 'تغيير أيقونة المتصفح...' : 'رفع أيقونة Favicon...'}</span>
+                                            <span>{branding?.favicon ? t('admin.cms.btn_change_favicon') : t('admin.cms.btn_upload_favicon')}</span>
                                         </label>
                                         <p className="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
-                                            الملفات المدعومة: ICO, PNG, SVG بمقاس مربع موصى به 32×32 أو 64×64 بكسل.
+                                            {t('admin.cms.favicon_specs_hint')}
                                         </p>
                                         {brandingForm.errors.favicon && (
                                             <p className="text-[11px] text-rose-400 mt-1 font-semibold">{brandingForm.errors.favicon}</p>
@@ -467,22 +470,22 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-800 space-y-4">
                                 <h4 className="text-xs font-bold text-white flex items-center gap-2">
                                     <Sparkles className="w-4 h-4 text-violet-400" />
-                                    <span>مسميات المنصة والشعار اللفظي (Brand Names & Slogans)</span>
+                                    <span>{t('admin.cms.brand_names_title')}</span>
                                 </h4>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-400 mb-1">اسم المنصة بالعربية</label>
+                                        <label className="block text-xs font-semibold text-slate-400 mb-1">{t('admin.cms.field_platform_name_ar')}</label>
                                         <input
                                             type="text"
                                             value={brandingForm.data.site_name_ar}
                                             onChange={(e) => brandingForm.setData('site_name_ar', e.target.value)}
-                                            placeholder="مثال: GoTransTech"
+                                            placeholder={t('admin.cms.ph_platform_name_ar')}
                                             className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:border-violet-500 focus:outline-none"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-400 mb-1">اسم المنصة بالإنجليزية</label>
+                                        <label className="block text-xs font-semibold text-slate-400 mb-1">{t('admin.cms.field_platform_name_en')}</label>
                                         <input
                                             type="text"
                                             value={brandingForm.data.site_name_en}
@@ -492,17 +495,17 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-400 mb-1">الشعار اللفظي بالعربية (Slogan)</label>
+                                        <label className="block text-xs font-semibold text-slate-400 mb-1">{t('admin.cms.field_slogan_ar')}</label>
                                         <input
                                             type="text"
                                             value={brandingForm.data.site_slogan_ar}
                                             onChange={(e) => brandingForm.setData('site_slogan_ar', e.target.value)}
-                                            placeholder="مثال: نمول حركة الغد"
+                                            placeholder={t('admin.cms.ph_slogan_ar')}
                                             className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:border-violet-500 focus:outline-none"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-400 mb-1">الشعار اللفظي بالإنجليزية</label>
+                                        <label className="block text-xs font-semibold text-slate-400 mb-1">{t('admin.cms.field_slogan_en')}</label>
                                         <input
                                             type="text"
                                             value={brandingForm.data.site_slogan_en}
@@ -520,14 +523,14 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     <div>
                                         <h4 className="text-xs font-bold text-white flex items-center gap-2">
                                             <LayoutTemplate className="w-4 h-4 text-violet-400" />
-                                            <span>طريقة عرض الهوية في الشريط العلوي (Navbar Display Mode)</span>
+                                            <span>{t('admin.cms.navbar_display_mode_title')}</span>
                                         </h4>
                                         <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                                            اختر ما إذا كنت ترغب في عرض الشعار الرسمي فقط، أو اسم المنصة النصي فقط، أو كليهما معاً في الـ Navbar بصفحة الهبوط الرئيسية
+                                            {t('admin.cms.navbar_display_mode_desc')}
                                         </p>
                                     </div>
                                     <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 self-start sm:self-center shrink-0">
-                                        الحالي: {brandingForm.data.navbar_brand_display === 'logo' ? 'الشعار فقط' : brandingForm.data.navbar_brand_display === 'name' ? 'اسم المنصة فقط' : 'الشعار والاسم معاً'}
+                                        {t('admin.cms.current_mode')} {brandingForm.data.navbar_brand_display === 'logo' ? t('admin.cms.mode_logo_only') : brandingForm.data.navbar_brand_display === 'name' ? t('admin.cms.mode_name_only') : t('admin.cms.mode_both')}
                                     </span>
                                 </div>
 
@@ -542,7 +545,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                         }`}
                                     >
                                         <div className="flex items-center justify-between">
-                                            <span className="font-bold text-slate-200">الشعار واسم المنصة معاً (الافتراضي)</span>
+                                            <span className="font-bold text-slate-200">{t('admin.cms.mode_both_title')}</span>
                                             <input
                                                 type="radio"
                                                 name="navbar_brand_display"
@@ -556,7 +559,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             <BrandLogo size="sm" displayMode="both" forceVector={!branding?.logo} />
                                         </div>
                                         <p className="text-[10px] text-slate-400 leading-relaxed">
-                                            يعرض الأيقونة أو الشعار المرفوع وبجانبه اسم المنصة النصي بالكامل.
+                                            {t('admin.cms.mode_both_desc')}
                                         </p>
                                     </div>
 
@@ -570,7 +573,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                         }`}
                                     >
                                         <div className="flex items-center justify-between">
-                                            <span className="font-bold text-slate-200">الشعار الرسمي فقط</span>
+                                            <span className="font-bold text-slate-200">{t('admin.cms.mode_logo_title')}</span>
                                             <input
                                                 type="radio"
                                                 name="navbar_brand_display"
@@ -584,7 +587,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             <BrandLogo size="sm" displayMode="logo" forceVector={!branding?.logo} />
                                         </div>
                                         <p className="text-[10px] text-slate-400 leading-relaxed">
-                                            يعرض أيقونة الشعار فقط دون النص (مظهر عصري وموجز).
+                                            {t('admin.cms.mode_logo_desc')}
                                         </p>
                                     </div>
 
@@ -598,7 +601,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                         }`}
                                     >
                                         <div className="flex items-center justify-between">
-                                            <span className="font-bold text-slate-200">اسم المنصة النصي فقط</span>
+                                            <span className="font-bold text-slate-200">{t('admin.cms.mode_name_title')}</span>
                                             <input
                                                 type="radio"
                                                 name="navbar_brand_display"
@@ -612,7 +615,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             <BrandLogo size="sm" displayMode="name" />
                                         </div>
                                         <p className="text-[10px] text-slate-400 leading-relaxed">
-                                            يعرض الاسم المعتمد للمنصة GoTransTech بنص بارز بدون أيقونة الشعار.
+                                            {t('admin.cms.mode_name_desc')}
                                         </p>
                                     </div>
                                 </div>
@@ -625,15 +628,15 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     <div>
                                         <h4 className="text-xs font-bold text-white flex items-center gap-2">
                                             <Sliders className="w-4 h-4 text-[#FF6B00]" />
-                                            <span>شريط التحكم في مقاس وارتفاع الشعار (Logo Size Slider)</span>
+                                            <span>{t('admin.cms.logo_slider_title')}</span>
                                         </h4>
                                         <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                                            اسحب الخط لزيادة أو إنقاص حجم وارتفاع الشعار، وستلاحظ تغيّر المقاس بالكامل لحظياً وتفاعلياً
+                                            {t('admin.cms.logo_slider_desc')}
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-2 self-start sm:self-center">
                                         <div className="px-3.5 py-1.5 rounded-xl bg-slate-900 border border-violet-900/60 flex items-center gap-1.5 shadow-sm">
-                                            <span className="text-[11px] text-slate-400">الارتفاع المختار:</span>
+                                            <span className="text-[11px] text-slate-400">{t('admin.cms.selected_height')}</span>
                                             <span className="text-sm font-black text-[#FF6B00] font-mono">{brandingForm.data.navbar_brand_size}</span>
                                             <span className="text-[11px] text-slate-400 font-mono">px</span>
                                         </div>
@@ -641,10 +644,10 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             type="button"
                                             onClick={() => brandingForm.setData('navbar_brand_size', 36)}
                                             className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700 text-[11px] font-semibold flex items-center gap-1 transition-all cursor-pointer"
-                                            title="إعادة ضبط للحجم القياسي الموصى به (36px)"
+                                            title={t('admin.cms.reset_size_hint')}
                                         >
                                             <RotateCcw className="w-3.5 h-3.5 text-violet-400" />
-                                            <span>الافتراضي (36px)</span>
+                                            <span>{t('admin.cms.default_36')}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -657,7 +660,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             type="button"
                                             onClick={() => brandingForm.setData('navbar_brand_size', Math.max(20, (parseInt(brandingForm.data.navbar_brand_size, 10) || 36) - 2))}
                                             className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-[#6320EE] text-slate-300 hover:text-white border border-slate-700 hover:border-[#6320EE] flex items-center justify-center transition-all shrink-0 cursor-pointer shadow-sm active:scale-95"
-                                            title="إنقاص الحجم بمقدار 2 بكسل"
+                                            title={t('admin.cms.dec_size_hint')}
                                         >
                                             <Minus className="w-4 h-4" />
                                         </button>
@@ -680,42 +683,42 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                                     onClick={() => brandingForm.setData('navbar_brand_size', 24)}
                                                     className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 24 ? 'text-[#FF6B00] font-black' : ''}`}
                                                 >
-                                                    24px (صغير)
+                                                    {t('admin.cms.sz_small')}
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => brandingForm.setData('navbar_brand_size', 36)}
                                                     className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 36 ? 'text-[#FF6B00] font-black' : ''}`}
                                                 >
-                                                    36px (متوسط)
+                                                    {t('admin.cms.sz_medium')}
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => brandingForm.setData('navbar_brand_size', 48)}
                                                     className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 48 ? 'text-[#FF6B00] font-black' : ''}`}
                                                 >
-                                                    48px (كبير)
+                                                    {t('admin.cms.sz_large')}
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => brandingForm.setData('navbar_brand_size', 64)}
                                                     className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 64 ? 'text-[#FF6B00] font-black' : ''}`}
                                                 >
-                                                    64px (عريض)
+                                                    {t('admin.cms.sz_wide')}
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => brandingForm.setData('navbar_brand_size', 80)}
                                                     className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 80 ? 'text-[#FF6B00] font-black' : ''}`}
                                                 >
-                                                    80px (فائق)
+                                                    {t('admin.cms.sz_ultra')}
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => brandingForm.setData('navbar_brand_size', 96)}
                                                     className={`hover:text-white transition-colors cursor-pointer ${brandingForm.data.navbar_brand_size === 96 ? 'text-[#FF6B00] font-black' : ''}`}
                                                 >
-                                                    96px (أقصى مقاس)
+                                                    {t('admin.cms.sz_max')}
                                                 </button>
                                             </div>
                                         </div>
@@ -725,7 +728,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             type="button"
                                             onClick={() => brandingForm.setData('navbar_brand_size', Math.min(96, (parseInt(brandingForm.data.navbar_brand_size, 10) || 36) + 2))}
                                             className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-[#6320EE] text-slate-300 hover:text-white border border-slate-700 hover:border-[#6320EE] flex items-center justify-center transition-all shrink-0 cursor-pointer shadow-sm active:scale-95"
-                                            title="زيادة الحجم بمقدار 2 بكسل"
+                                            title={t('admin.cms.inc_size_hint')}
                                         >
                                             <Plus className="w-4 h-4" />
                                         </button>
@@ -733,13 +736,13 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
 
                                     {/* Quick Preset Buttons */}
                                     <div className="flex items-center gap-2 pt-3 border-t border-slate-800/90 flex-wrap">
-                                        <span className="text-[11px] text-slate-400 font-medium">أحجام سريعة:</span>
+                                        <span className="text-[11px] text-slate-400 font-medium">{t('admin.cms.quick_sizes')}</span>
                                         {[
-                                            { px: 28, label: 'مدمج (28px)' },
-                                            { px: 36, label: 'قياسي (36px)' },
-                                            { px: 44, label: 'بارز (44px)' },
-                                            { px: 54, label: 'كبير (54px)' },
-                                            { px: 68, label: 'عريض (68px)' },
+                                            { px: 28, label: t('admin.cms.preset_compact') },
+                                            { px: 36, label: t('admin.cms.preset_standard') },
+                                            { px: 44, label: t('admin.cms.preset_prominent') },
+                                            { px: 54, label: t('admin.cms.preset_large') },
+                                            { px: 68, label: t('admin.cms.preset_wide') },
                                         ].map((preset) => (
                                             <button
                                                 key={preset.px}
@@ -762,10 +765,10 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     <div className="flex items-center justify-between text-xs">
                                         <span className="font-semibold text-slate-300 flex items-center gap-1.5">
                                             <span className="w-2 h-2 rounded-full bg-[#FF6B00] animate-pulse" />
-                                            <span>معاينة حية ومباشرة للشعار أثناء تحريك الخط:</span>
+                                            <span>{t('admin.cms.live_preview_title')}</span>
                                         </span>
                                         <span className="text-[11px] font-mono text-slate-400">
-                                            الارتفاع الحالي: <strong className="text-white">{brandingForm.data.navbar_brand_size}px</strong>
+                                            {t('admin.cms.current_height')} <strong className="text-white">{brandingForm.data.navbar_brand_size}px</strong>
                                         </span>
                                     </div>
 
@@ -780,8 +783,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                         </div>
 
                                         <div className="mt-4 pt-3 border-t border-slate-800/80 w-full flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                                            <span>نمط العرض المعتمد: {brandingForm.data.navbar_brand_display === 'logo' ? 'الشعار فقط' : brandingForm.data.navbar_brand_display === 'name' ? 'الاسم فقط' : 'الشعار والاسم معاً'}</span>
-                                            <span>ارتفاع الشعار: {brandingForm.data.navbar_brand_size}px</span>
+                                            <span>{t('admin.cms.approved_display_mode')} {brandingForm.data.navbar_brand_display === 'logo' ? t('admin.cms.mode_logo_only') : brandingForm.data.navbar_brand_display === 'name' ? t('admin.cms.mode_name_only') : t('admin.cms.mode_both')}</span>
+                                            <span>{t('admin.cms.logo_height')} {brandingForm.data.navbar_brand_size}px</span>
                                         </div>
                                     </div>
                                 </div>
@@ -795,7 +798,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     className="px-6 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-violet-600/20 flex items-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     <Save className="w-4 h-4" />
-                                    <span>{brandingForm.processing ? 'جارِ الحفظ والرفع...' : 'حفظ تعديلات الهوية والشعار'}</span>
+                                    <span>{brandingForm.processing ? t('admin.cms.saving_branding') : t('admin.cms.btn_save_branding')}</span>
                                 </button>
                             </div>
                         </form>
@@ -807,29 +810,29 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                     <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-6 animate-fadeIn">
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                             <div>
-                                <h3 className="text-base font-bold text-slate-900 dark:text-white">تعديل القسم الرئيسي (Hero Section)</h3>
-                                <p className="text-xs text-slate-500">أول ما يراه الزائر عند دخول المنصة: الشارة الترحيبية، العنوان العريض، والوصف</p>
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('admin.cms.hero_section_title')}</h3>
+                                <p className="text-xs text-slate-500">{t('admin.cms.hero_section_desc')}</p>
                             </div>
                         </div>
 
                         <form onSubmit={(e) => submitForm(heroForm, heroSec.id, e)} className="space-y-4">
                             <div>
                                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                    نص الشارة العلوية (Badge Text)
-                                </label>
+                                        {t('admin.cms.badge_text')}
+                                    </label>
                                 <input
                                     type="text"
                                     value={heroForm.data.content.badge_text}
                                     onChange={(e) => heroForm.setData('content', { ...heroForm.data.content, badge_text: e.target.value })}
                                     className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
-                                    placeholder="منصة التمويل والاستثمار اللوجستي..."
+                                    placeholder={t('admin.cms.ph_badge_text')}
                                 />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        العنوان الرئيسي (عربي) *
+                                        {t('admin.cms.hero_title_ar')}
                                     </label>
                                     <textarea
                                         value={heroForm.data.title_ar}
@@ -840,7 +843,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        العنوان الرئيسي (English)
+                                        {t('admin.cms.hero_title_en')}
                                     </label>
                                     <textarea
                                         value={heroForm.data.title_en}
@@ -853,7 +856,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        الوصف والشرح الترويجي (عربي)
+                                        {t('admin.cms.hero_desc_ar')}
                                     </label>
                                     <textarea
                                         value={heroForm.data.subtitle_ar}
@@ -863,7 +866,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        الوصف والشرح الترويجي (English)
+                                        {t('admin.cms.hero_desc_en')}
                                     </label>
                                     <textarea
                                         value={heroForm.data.subtitle_en}
@@ -876,7 +879,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        نص زر الدعوة الرئيسي (Primary CTA)
+                                        {t('admin.cms.hero_primary_cta')}
                                     </label>
                                     <input
                                         type="text"
@@ -887,7 +890,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        نص زر الدعوة الثانوي (Secondary CTA)
+                                        {t('admin.cms.hero_secondary_cta')}
                                     </label>
                                     <input
                                         type="text"
@@ -905,7 +908,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     className="px-6 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     <Save className="w-4 h-4" />
-                                    <span>{heroForm.processing ? 'جاري الحفظ...' : 'حفظ تغييرات القسم الرئيسي'}</span>
+                                    <span>{heroForm.processing ? t('common.loading') : t('admin.cms.btn_save_hero')}</span>
                                 </button>
                             </div>
                         </form>
@@ -917,8 +920,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                     <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-6 animate-fadeIn">
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                             <div>
-                                <h3 className="text-base font-bold text-slate-900 dark:text-white">تعديل مسميات وعناوين بطاقات الإحصاءات</h3>
-                                <p className="text-xs text-slate-500">الأرقام تأتي تلقائياً من النظام، ويمكنك هنا تخصيص تسميات البطاقات المعروضة</p>
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('admin.cms.stats_section_title')}</h3>
+                                <p className="text-xs text-slate-500">{t('admin.cms.stats_section_desc')}</p>
                             </div>
                         </div>
 
@@ -926,7 +929,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        عنوان بطاقة المهام الممولة
+                                        {t('admin.cms.stat_funded_tasks_title')}
                                     </label>
                                     <input
                                         type="text"
@@ -937,7 +940,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        عنوان بطاقة حجم الاستثمارات
+                                        {t('admin.cms.stat_investments_vol_title')}
                                     </label>
                                     <input
                                         type="text"
@@ -951,7 +954,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        عنوان بطاقة المستثمرين
+                                        {t('admin.cms.stat_investors_count_title')}
                                     </label>
                                     <input
                                         type="text"
@@ -962,7 +965,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        عنوان بطاقة الشركات اللوجستية
+                                        {t('admin.cms.stat_companies_count_title')}
                                     </label>
                                     <input
                                         type="text"
@@ -980,7 +983,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     className="px-6 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     <Save className="w-4 h-4" />
-                                    <span>{statsForm.processing ? 'جاري الحفظ...' : 'حفظ تسميات الإحصاءات'}</span>
+                                    <span>{statsForm.processing ? t('common.loading') : t('admin.cms.btn_save_stats')}</span>
                                 </button>
                             </div>
                         </form>
@@ -992,8 +995,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                     <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-6 animate-fadeIn">
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                             <div>
-                                <h3 className="text-base font-bold text-slate-900 dark:text-white">خطوات العمل وآلية التمويل اللوجستي</h3>
-                                <p className="text-xs text-slate-500">تعديل نصوص وتفاصيل الخطوات التي تشرح آلية عمل المنصة للمستخدم</p>
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('admin.cms.how_section_title')}</h3>
+                                <p className="text-xs text-slate-500">{t('admin.cms.how_section_desc')}</p>
                             </div>
                             <button
                                 type="button"
@@ -1002,14 +1005,14 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     const nextNum = currentSteps.length + 1;
                                     const updated = [
                                         ...currentSteps,
-                                        { step: nextNum, title: `خطوة جديدة ${nextNum}`, description: 'شرح وتفاصيل هذه الخطوة...' }
+                                        { step: nextNum, title: t('admin.cms.new_step_title', { num: nextNum }), description: t('admin.cms.new_step_desc') }
                                     ];
                                     howForm.setData('content', { ...howForm.data.content, steps: updated });
                                 }}
                                 className="px-4 py-2 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span>إضافة خطوة جديدة</span>
+                                <span>{t('admin.cms.btn_add_step')}</span>
                             </button>
                         </div>
 
@@ -1018,27 +1021,27 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        عنوان قسم خطوات العمل
+                                        {t('admin.cms.how_sec_title')}
                                     </label>
                                     <input
                                         type="text"
                                         value={howForm.data.title_ar}
                                         onChange={(e) => howForm.setData('title_ar', e.target.value)}
                                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500 font-bold"
-                                        placeholder="كيف تعمل المنصة؟"
+                                        placeholder={t('admin.cms.ph_how_sec_title')}
                                         required
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        الوصف التوضيحي للقسم
+                                        {t('admin.cms.how_sec_desc')}
                                     </label>
                                     <input
                                         type="text"
                                         value={howForm.data.subtitle_ar}
                                         onChange={(e) => howForm.setData('subtitle_ar', e.target.value)}
                                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
-                                        placeholder="دورة تمويل واستثمار مؤتمتة بالكامل..."
+                                        placeholder={t('admin.cms.ph_how_sec_desc')}
                                     />
                                 </div>
                             </div>
@@ -1051,7 +1054,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                                 <span className="w-6 h-6 rounded-full bg-[#6320EE] text-white font-bold text-xs flex items-center justify-center">
                                                     {idx + 1}
                                                 </span>
-                                                <span className="font-bold text-xs text-slate-900 dark:text-white">الخطوة {idx + 1}</span>
+                                                <span className="font-bold text-xs text-slate-900 dark:text-white">{t('admin.cms.step_label', { num: idx + 1 })}</span>
                                             </div>
                                             {howForm.data.content.steps.length > 2 && (
                                                 <button
@@ -1061,7 +1064,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                                         howForm.setData('content', { ...howForm.data.content, steps: updated });
                                                     }}
                                                     className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer"
-                                                    title="حذف هذه الخطوة"
+                                                    title={t('admin.cms.btn_delete_step')}
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -1071,8 +1074,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                             <div>
                                                 <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                                                    عنوان الخطوة
-                                                </label>
+                                                        {t('admin.cms.field_step_title')}
+                                                    </label>
                                                 <input
                                                     type="text"
                                                     value={step.title}
@@ -1087,8 +1090,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                             </div>
                                             <div>
                                                 <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                                                    شرح وتفاصيل الخطوة
-                                                </label>
+                                                        {t('admin.cms.field_step_desc')}
+                                                    </label>
                                                 <input
                                                     type="text"
                                                     value={step.description}
@@ -1113,7 +1116,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     className="px-6 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     <Save className="w-4 h-4" />
-                                    <span>{howForm.processing ? 'جاري الحفظ...' : 'حفظ خطوات العمل'}</span>
+                                    <span>{howForm.processing ? t('common.loading') : t('admin.cms.btn_save_how')}</span>
                                 </button>
                             </div>
                         </form>
@@ -1125,8 +1128,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                     <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-6 animate-fadeIn">
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                             <div>
-                                <h3 className="text-base font-bold text-slate-900 dark:text-white">مميزات وحلول المستثمرين والشركات اللوجستية</h3>
-                                <p className="text-xs text-slate-500">إضافة وتعديل وحذف المزايا المعروضة لكل من المستثمرين وشركات الشحن</p>
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('admin.cms.features_section_title')}</h3>
+                                <p className="text-xs text-slate-500">{t('admin.cms.features_section_desc')}</p>
                             </div>
                         </div>
 
@@ -1135,86 +1138,86 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        عنوان قسم المميزات والحلول
+                                        {t('admin.cms.features_sec_title')}
                                     </label>
                                     <input
                                         type="text"
                                         value={featuresForm.data.title_ar}
                                         onChange={(e) => featuresForm.setData('title_ar', e.target.value)}
                                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500 font-bold"
-                                        placeholder="حلول ومميزات مصممة خصيصاً للطرفين"
+                                        placeholder={t('admin.cms.ph_features_sec_title')}
                                         required
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        الوصف التوضيحي للقسم
+                                        {t('admin.cms.how_sec_desc')}
                                     </label>
                                     <input
                                         type="text"
                                         value={featuresForm.data.subtitle_ar}
                                         onChange={(e) => featuresForm.setData('subtitle_ar', e.target.value)}
                                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
-                                        placeholder="مزايا استثنائية تمكّن المستثمرين وشركات النقل..."
+                                        placeholder={t('admin.cms.ph_features_sec_desc')}
                                     />
                                 </div>
                             </div>
 
                             {/* 3 Core Highlight Pillars Customization */}
                             <div className="space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-                                <h4 className="font-bold text-xs text-slate-700 dark:text-slate-300">البطاقات التمهيدية الثلاث (ركائز الأمان والقيمة):</h4>
+                                <h4 className="font-bold text-xs text-slate-700 dark:text-slate-300">{t('admin.cms.pillars_title')}</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                     <div className="space-y-1.5 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                                        <label className="block text-[11px] font-bold text-violet-600 dark:text-violet-400">الركيزة 1 (الأمان المحاسبي)</label>
+                                        <label className="block text-[11px] font-bold text-violet-600 dark:text-violet-400">{t('admin.cms.pillar1_label')}</label>
                                         <input
                                             type="text"
                                             value={featuresForm.data.content.pillar1_title}
                                             onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar1_title: e.target.value })}
                                             className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
-                                            placeholder="العنوان"
+                                            placeholder={t('admin.cms.ph_pillar_title')}
                                         />
                                         <textarea
                                             value={featuresForm.data.content.pillar1_desc}
                                             onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar1_desc: e.target.value })}
                                             className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white resize-none"
                                             rows="2"
-                                            placeholder="الوصف"
+                                            placeholder={t('admin.cms.ph_pillar_desc')}
                                         />
                                     </div>
 
                                     <div className="space-y-1.5 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                                        <label className="block text-[11px] font-bold text-orange-500">الركيزة 2 (العوائد الفورية)</label>
+                                        <label className="block text-[11px] font-bold text-orange-500">{t('admin.cms.pillar2_label')}</label>
                                         <input
                                             type="text"
                                             value={featuresForm.data.content.pillar2_title}
                                             onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar2_title: e.target.value })}
                                             className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
-                                            placeholder="العنوان"
+                                            placeholder={t('admin.cms.ph_pillar_title')}
                                         />
                                         <textarea
                                             value={featuresForm.data.content.pillar2_desc}
                                             onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar2_desc: e.target.value })}
                                             className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white resize-none"
                                             rows="2"
-                                            placeholder="الوصف"
+                                            placeholder={t('admin.cms.ph_pillar_desc')}
                                         />
                                     </div>
 
                                     <div className="space-y-1.5 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                                        <label className="block text-[11px] font-bold text-violet-400">الركيزة 3 (الربط البرمجي)</label>
+                                        <label className="block text-[11px] font-bold text-violet-400">{t('admin.cms.pillar3_label')}</label>
                                         <input
                                             type="text"
                                             value={featuresForm.data.content.pillar3_title}
                                             onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar3_title: e.target.value })}
                                             className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
-                                            placeholder="العنوان"
+                                            placeholder={t('admin.cms.ph_pillar_title')}
                                         />
                                         <textarea
                                             value={featuresForm.data.content.pillar3_desc}
                                             onChange={(e) => featuresForm.setData('content', { ...featuresForm.data.content, pillar3_desc: e.target.value })}
                                             className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white resize-none"
                                             rows="2"
-                                            placeholder="الوصف"
+                                            placeholder={t('admin.cms.ph_pillar_desc')}
                                         />
                                     </div>
                                 </div>
@@ -1226,8 +1229,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
                                             <label className="block text-[11px] font-bold text-violet-700 dark:text-violet-300 mb-1">
-                                                عنوان بطاقة بوابة المستثمرين
-                                            </label>
+                                            {t('admin.cms.investor_card_title_label')}
+                                        </label>
                                             <input
                                                 type="text"
                                                 value={featuresForm.data.content.investor_card_title}
@@ -1237,8 +1240,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                         </div>
                                         <div>
                                             <label className="block text-[11px] font-bold text-violet-700 dark:text-violet-300 mb-1">
-                                                الوصف التوضيحي للبطاقة
-                                            </label>
+                                            {t('admin.cms.investor_card_desc_label')}
+                                        </label>
                                             <input
                                                 type="text"
                                                 value={featuresForm.data.content.investor_card_desc}
@@ -1250,17 +1253,17 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                 </div>
 
                                 <div className="flex items-center justify-between">
-                                    <h4 className="font-bold text-sm text-[#6320EE]">قائمة مميزات المستثمرين:</h4>
+                                    <h4 className="font-bold text-sm text-[#6320EE]">{t('admin.cms.investor_features_list_title')}</h4>
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            const updated = [...(featuresForm.data.content.investor_features || []), 'ميزة جديدة للمستثمر'];
+                                            const updated = [...(featuresForm.data.content.investor_features || []), t('admin.cms.new_inv_feature')];
                                             featuresForm.setData('content', { ...featuresForm.data.content, investor_features: updated });
                                         }}
                                         className="px-3 py-1 bg-violet-50 dark:bg-violet-500/10 hover:bg-violet-100 dark:hover:bg-[#5217D4]/20 text-violet-600 dark:text-violet-400 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
                                     >
                                         <Plus className="w-3.5 h-3.5" />
-                                        <span>إضافة ميزة</span>
+                                        <span>{t('admin.cms.btn_add_feature')}</span>
                                     </button>
                                 </div>
 
@@ -1284,7 +1287,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                                     featuresForm.setData('content', { ...featuresForm.data.content, investor_features: updated });
                                                 }}
                                                 className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer"
-                                                title="حذف الميزة"
+                                                title={t('admin.cms.btn_delete_feature')}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -1299,8 +1302,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
                                             <label className="block text-[11px] font-bold text-orange-700 dark:text-orange-300 mb-1">
-                                                عنوان بطاقة بوابة الشركات اللوجستية
-                                            </label>
+                                            {t('admin.cms.company_card_title_label')}
+                                        </label>
                                             <input
                                                 type="text"
                                                 value={featuresForm.data.content.company_card_title}
@@ -1310,8 +1313,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                         </div>
                                         <div>
                                             <label className="block text-[11px] font-bold text-orange-700 dark:text-orange-300 mb-1">
-                                                الوصف التوضيحي للبطاقة
-                                            </label>
+                                            {t('admin.cms.investor_card_desc_label')}
+                                        </label>
                                             <input
                                                 type="text"
                                                 value={featuresForm.data.content.company_card_desc}
@@ -1323,17 +1326,17 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                 </div>
 
                                 <div className="flex items-center justify-between">
-                                    <h4 className="font-bold text-sm text-[#FF6B00]">قائمة مميزات الشركات اللوجستية:</h4>
+                                    <h4 className="font-bold text-sm text-[#FF6B00]">{t('admin.cms.company_features_list_title')}</h4>
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            const updated = [...(featuresForm.data.content.company_features || []), 'ميزة جديدة للشركات اللوجستية'];
+                                            const updated = [...(featuresForm.data.content.company_features || []), t('admin.cms.new_comp_feature')];
                                             featuresForm.setData('content', { ...featuresForm.data.content, company_features: updated });
                                         }}
                                         className="px-3 py-1 bg-orange-50 dark:bg-orange-500/10 hover:bg-orange-100 dark:hover:bg-orange-500/20 text-[#FF6B00] rounded-xl text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
                                     >
                                         <Plus className="w-3.5 h-3.5" />
-                                        <span>إضافة ميزة</span>
+                                        <span>{t('admin.cms.btn_add_feature')}</span>
                                     </button>
                                 </div>
 
@@ -1357,7 +1360,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                                     featuresForm.setData('content', { ...featuresForm.data.content, company_features: updated });
                                                 }}
                                                 className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer"
-                                                title="حذف الميزة"
+                                                title={t('admin.cms.btn_delete_feature')}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -1373,7 +1376,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     className="px-6 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     <Save className="w-4 h-4" />
-                                    <span>{featuresForm.processing ? 'جاري الحفظ...' : 'حفظ المميزات والحلول'}</span>
+                                    <span>{featuresForm.processing ? t('common.loading') : t('admin.cms.btn_save_features')}</span>
                                 </button>
                             </div>
                         </form>
@@ -1385,22 +1388,22 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                     <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-6 animate-fadeIn">
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                             <div>
-                                <h3 className="text-base font-bold text-slate-900 dark:text-white">إدارة الأسئلة الشائعة (FAQ)</h3>
-                                <p className="text-xs text-slate-500">إضافة وتعديل الأسئلة الشائعة والإجابات عنها لإرشاد زوار المنصة</p>
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('admin.cms.faq_section_title')}</h3>
+                                <p className="text-xs text-slate-500">{t('admin.cms.faq_section_desc')}</p>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => {
                                     const updated = [
                                         ...(faqForm.data.content.faqs || []),
-                                        { q: 'سؤال شائع جديد؟', a: 'الإجابة التفصيلية عن هذا السؤال...' }
+                                        { q: t('admin.cms.new_faq_q'), a: t('admin.cms.new_faq_a') }
                                     ];
                                     faqForm.setData('content', { ...faqForm.data.content, faqs: updated });
                                 }}
                                 className="px-4 py-2 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span>إضافة سؤال جديد</span>
+                                <span>{t('admin.cms.btn_add_faq')}</span>
                             </button>
                         </div>
 
@@ -1409,27 +1412,27 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        عنوان قسم الأسئلة الشائعة
+                                        {t('admin.cms.faq_sec_title')}
                                     </label>
                                     <input
                                         type="text"
                                         value={faqForm.data.title_ar}
                                         onChange={(e) => faqForm.setData('title_ar', e.target.value)}
                                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500 font-bold"
-                                        placeholder="الأسئلة الشائعة"
+                                        placeholder={t('admin.cms.ph_faq_sec_title')}
                                         required
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        الوصف التوضيحي للقسم
+                                        {t('admin.cms.how_sec_desc')}
                                     </label>
                                     <input
                                         type="text"
                                         value={faqForm.data.subtitle_ar}
                                         onChange={(e) => faqForm.setData('subtitle_ar', e.target.value)}
                                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
-                                        placeholder="كل ما تحتاج لمعرفته حول الاستثمار والربط..."
+                                        placeholder={t('admin.cms.ph_faq_sec_desc')}
                                     />
                                 </div>
                             </div>
@@ -1438,7 +1441,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                 {faqForm.data.content.faqs?.map((faq, idx) => (
                                     <div key={idx} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 relative group">
                                         <div className="flex items-center justify-between">
-                                            <span className="font-bold text-xs text-violet-600 dark:text-violet-400">سؤال #{idx + 1}</span>
+                                            <span className="font-bold text-xs text-violet-600 dark:text-violet-400">{t('admin.cms.question_num', { num: idx + 1 })}</span>
                                             <button
                                                 type="button"
                                                 onClick={() => {
@@ -1446,7 +1449,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                                     faqForm.setData('content', { ...faqForm.data.content, faqs: updated });
                                                 }}
                                                 className="p-1 text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
-                                                title="حذف هذا السؤال"
+                                                title={t('admin.cms.btn_delete_faq')}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -1454,8 +1457,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
 
                                         <div>
                                             <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                                                نص السؤال
-                                            </label>
+                                                    {t('admin.cms.field_question')}
+                                                </label>
                                             <input
                                                 type="text"
                                                 value={faq.q}
@@ -1471,8 +1474,8 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
 
                                         <div>
                                             <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                                                الإجابة التفصيلية
-                                            </label>
+                                                    {t('admin.cms.field_answer')}
+                                                </label>
                                             <textarea
                                                 value={faq.a}
                                                 onChange={(e) => {
@@ -1495,7 +1498,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     className="px-6 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     <Save className="w-4 h-4" />
-                                    <span>{faqForm.processing ? 'جاري الحفظ...' : 'حفظ الأسئلة الشائعة'}</span>
+                                    <span>{faqForm.processing ? t('common.loading') : t('admin.cms.btn_save_faq')}</span>
                                 </button>
                             </div>
                         </form>
@@ -1509,10 +1512,10 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div>
                                 <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                     <PhoneCall className="w-5 h-5 text-violet-400" />
-                                    <span>إدارة وتخصيص فوتر صفحة الهبوط وبيانات التواصل (Footer & Contact)</span>
+                                    <span>{t('admin.cms.footer_section_title')}</span>
                                 </h3>
                                 <p className="text-xs text-slate-500 mt-0.5">
-                                    التحكم الكامل بمحتوى أسفل الصفحة الرئيسية (Footer): النبذة، قنوات التواصل، أرقام الهاتف، الواتساب، والبيانات النظامية
+                                    {t('admin.cms.footer_section_desc')}
                                 </p>
                             </div>
                             <div className="flex items-center gap-2 self-start sm:self-center">
@@ -1523,7 +1526,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                         onChange={(e) => contactForm.setData('is_active', e.target.checked)}
                                         className="rounded text-[#6320EE] focus:ring-[#6320EE]"
                                     />
-                                    <span>عرض الفوتر في صفحة الهبوط</span>
+                                    <span>{t('admin.cms.chk_show_footer')}</span>
                                 </label>
                             </div>
                         </div>
@@ -1533,16 +1536,16 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 space-y-4">
                                 <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                     <Sparkles className="w-4 h-4 text-violet-400" />
-                                    <span>النبذة التعريفية للمنصة في الفوتر</span>
+                                    <span>{t('admin.cms.platform_summary_title')}</span>
                                 </h4>
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                        النص التعريفي (يظهر تحت شعار المنصة في العمود الأول من الفوتر)
+                                        {t('admin.cms.summary_desc_hint')}
                                     </label>
                                     <textarea
                                         value={contactForm.data.content.description_ar}
                                         onChange={(e) => contactForm.setData('content', { ...contactForm.data.content, description_ar: e.target.value })}
-                                        placeholder="نبذة مختصرة عن المنصة ورسالتها اللوجستية والمالية..."
+                                        placeholder={t('admin.cms.ph_summary_desc')}
                                         className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-900 dark:text-white h-20 leading-relaxed focus:outline-none focus:border-violet-500"
                                     />
                                 </div>
@@ -1552,13 +1555,13 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 space-y-4">
                                 <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                     <PhoneCall className="w-4 h-4 text-orange-400" />
-                                    <span>أرقام وقنوات التواصل وخدمة العملاء</span>
+                                    <span>{t('admin.cms.contact_channels_title')}</span>
                                 </h4>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            رقم هاتف الاتصال / الموحد
+                                            {t('admin.cms.field_phone_hotline')}
                                         </label>
                                         <input
                                             type="text"
@@ -1570,7 +1573,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     </div>
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            رقم الواتساب (WhatsApp المباشر)
+                                            {t('admin.cms.field_whatsapp')}
                                         </label>
                                         <input
                                             type="text"
@@ -1582,7 +1585,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     </div>
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            البريد الإلكتروني للدعم
+                                            {t('admin.cms.field_support_email')}
                                         </label>
                                         <input
                                             type="email"
@@ -1594,13 +1597,13 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     </div>
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            أوقات العمل الرسمية
+                                            {t('admin.cms.field_working_hours')}
                                         </label>
                                         <input
                                             type="text"
                                             value={contactForm.data.content.working_hours}
                                             onChange={(e) => contactForm.setData('content', { ...contactForm.data.content, working_hours: e.target.value })}
-                                            placeholder="الأحد - الخميس: 9:00 ص - 6:00 م"
+                                            placeholder={t('admin.cms.ph_working_hours')}
                                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
                                         />
                                     </div>
@@ -1611,13 +1614,13 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 space-y-4">
                                 <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                     <Globe className="w-4 h-4 text-violet-400" />
-                                    <span>روابط قنوات التواصل الاجتماعي (Social Media)</span>
+                                    <span>{t('admin.cms.social_links_title')}</span>
                                 </h4>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            رابط منصة X (تويتر سابقاً)
+                                            {t('admin.cms.link_twitter')}
                                         </label>
                                         <input
                                             type="url"
@@ -1629,7 +1632,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     </div>
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            رابط شبكة LinkedIn
+                                            {t('admin.cms.link_linkedin')}
                                         </label>
                                         <input
                                             type="url"
@@ -1641,7 +1644,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     </div>
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            رابط حساب Instagram
+                                            {t('admin.cms.link_instagram')}
                                         </label>
                                         <input
                                             type="url"
@@ -1653,7 +1656,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     </div>
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            رابط صفحة Facebook
+                                            {t('admin.cms.link_facebook')}
                                         </label>
                                         <input
                                             type="url"
@@ -1665,7 +1668,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     </div>
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            رابط قناة YouTube
+                                            {t('admin.cms.link_youtube')}
                                         </label>
                                         <input
                                             type="url"
@@ -1677,7 +1680,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     </div>
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            رابط قناة / حساب Telegram
+                                            {t('admin.cms.link_telegram')}
                                         </label>
                                         <input
                                             type="url"
@@ -1694,26 +1697,26 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                             <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 space-y-4">
                                 <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                     <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                                    <span>المقر والبيانات التجارية وحقوق النشر</span>
+                                    <span>{t('admin.cms.hq_business_info_title')}</span>
                                 </h4>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <div className="sm:col-span-3">
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            العنوان والمقر الرئيسي للمنصة
+                                            {t('admin.cms.field_address_hq')}
                                         </label>
                                         <input
                                             type="text"
                                             value={contactForm.data.content.address}
                                             onChange={(e) => contactForm.setData('content', { ...contactForm.data.content, address: e.target.value })}
-                                            placeholder="الرياض - طريق الملك فهد - مركز الملك عبد الله المالي (KAFD)"
+                                            placeholder={t('admin.cms.ph_address_hq')}
                                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
                                         />
                                     </div>
 
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            رقم السجل التجاري (CR Number)
+                                            {t('admin.cms.field_cr_num')}
                                         </label>
                                         <input
                                             type="text"
@@ -1726,7 +1729,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
 
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            الرقم الضريبي الموحد (VAT / Tax Number)
+                                            {t('admin.cms.field_vat_num')}
                                         </label>
                                         <input
                                             type="text"
@@ -1739,13 +1742,13 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
 
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                                            نص حقوق الملكية (Copyright Text)
+                                            {t('admin.cms.field_copyright')}
                                         </label>
                                         <input
                                             type="text"
                                             value={contactForm.data.content.copyright_text}
                                             onChange={(e) => contactForm.setData('content', { ...contactForm.data.content, copyright_text: e.target.value })}
-                                            placeholder="جميع الحقوق محفوظة © منصة GoTransTech للتقنية المالية"
+                                            placeholder={t('admin.cms.ph_copyright')}
                                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
                                         />
                                     </div>
@@ -1759,7 +1762,7 @@ export default function AdminLandingCms({ sections = [], branding = {}, landingU
                                     className="px-6 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-2xl text-xs font-bold transition-all shadow-md shadow-violet-600/20 flex items-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     <Save className="w-4 h-4" />
-                                    <span>{contactForm.processing ? 'جاري الحفظ...' : 'حفظ إعدادات الفوتر وبيانات التواصل'}</span>
+                                    <span>{contactForm.processing ? t('common.loading') : t('admin.cms.btn_save_footer')}</span>
                                 </button>
                             </div>
                         </form>

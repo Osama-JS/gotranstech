@@ -5,6 +5,7 @@ import AdminPageHeader from '../../../Components/AdminPageHeader';
 import Modal from '../../../Components/Modal';
 import Badge from '../../../Components/Badge';
 import ReceiptViewerModal from '../../../Components/ReceiptViewerModal';
+import { useTranslation } from '../../../Utils/i18n';
 import {
     ArrowDownToLine,
     PlusCircle,
@@ -28,6 +29,7 @@ export default function CompanyWithdrawals({
     fundingWallet,
     stats = {},
 }) {
+    const { t, locale } = useTranslation();
     const [createModal, setCreateModal] = useState(false);
     const [selectedTaskIds, setSelectedTaskIds] = useState([]);
     const [signature, setSignature] = useState('');
@@ -62,7 +64,7 @@ export default function CompanyWithdrawals({
 
         post(route('company.withdrawals.store', {
             task_ids: selectedTaskIds,
-            company_signature: signature || 'توقيع إلكتروني مفوض',
+            company_signature: signature || t('company.withdrawals.default_signature'),
         }), {
             onSuccess: () => {
                 setCreateModal(false);
@@ -74,7 +76,7 @@ export default function CompanyWithdrawals({
     const handleViewPdf = (withdrawal) => {
         setSelectedPdf({
             ...withdrawal,
-            title: `سند صرف واتفاقية تمويل #${withdrawal.request_number}`,
+            title: t('company.withdrawals.voucher_modal_title', { number: withdrawal.request_number }),
             receipt_url: route('company.withdrawals.view-pdf', withdrawal.id),
             is_pdf: true,
             amount: withdrawal.requested_amount,
@@ -83,35 +85,35 @@ export default function CompanyWithdrawals({
     };
 
     return (
-        <AuthenticatedLayout title="سحب رصيد تمويل المهام وسندات الصرف (PDF)">
-            <Head title="سحب رصيد التمويل" />
+        <AuthenticatedLayout title={t('company.withdrawals.title')}>
+            <Head title={t('company.withdrawals.page_title')} />
 
             {/* Professional Page Header */}
             <AdminPageHeader
-                title="سحب رصيد تمويل المهام وسندات الصرف"
-                subtitle="تقديم طلبات صرف سيولة المهام الممولة، توليد وتوقيع سندات الصرف بصيغة PDF، ومتابعة اعتماد الإدارة"
+                title={t('company.withdrawals.title')}
+                subtitle={t('company.withdrawals.subtitle')}
                 icon={ArrowDownToLine}
                 iconColor="text-violet-400"
                 iconBg="bg-violet-500/15 border-violet-500/30"
-                breadcrumbs={[{ label: 'سحب رصيد التمويل' }]}
+                breadcrumbs={[{ label: t('company.withdrawals.page_title') }]}
                 badge={{
-                    text: `رصيد متاح: ${Number(stats.available_to_withdraw || fundingWallet?.available_balance || 0).toLocaleString('en-US')} ر.س`,
+                    text: t('company.withdrawals.badge_available', { amount: Number(stats.available_to_withdraw || fundingWallet?.available_balance || 0).toLocaleString('en-US') }),
                     color: 'brand',
                 }}
                 actions={[
                     {
-                        label: 'إنشاء طلب سحب رصيد جديد',
+                        label: t('company.withdrawals.btn_create_request'),
                         icon: PlusCircle,
                         onClick: () => setCreateModal(true),
                         variant: 'primary',
                     },
                     {
-                        label: 'محفظة التمويل والمسحوبات',
+                        label: t('company.withdrawals.btn_funding_wallet'),
                         icon: Wallet,
                         url: route('company.wallet.funding'),
                     },
                     {
-                        label: 'محفظة الديون والالتزامات',
+                        label: t('company.withdrawals.btn_debt_wallet'),
                         icon: DollarSign,
                         url: route('company.wallet.debt'),
                     },
@@ -123,68 +125,68 @@ export default function CompanyWithdrawals({
                 {/* Available to Withdraw */}
                 <div className="glass-panel p-5 rounded-2xl border border-violet-500/40 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">الرصيد المتاح للمطالبة والصرف</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.withdrawals.kpi_available')}</span>
                         <div className="w-10 h-10 rounded-xl bg-violet-500/20 text-violet-400 flex items-center justify-center font-bold border border-violet-500/30">
                             <ArrowDownToLine className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-violet-600 dark:text-violet-400 flex items-baseline gap-1">
                         {Number(stats.available_to_withdraw || fundingWallet?.available_balance || 0).toLocaleString('en-US')}
-                        <span className="text-xs font-sans font-bold text-violet-500">ر.س</span>
+                        <span className="text-xs font-sans font-bold text-violet-500">{t('common.sar')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 font-mono">
-                        الرصيد الكلي: {Number(stats.current_balance || fundingWallet?.balance || 0).toLocaleString('en-US')} ر.س
+                        {t('company.withdrawals.kpi_total_balance_note', { amount: Number(stats.current_balance || fundingWallet?.balance || 0).toLocaleString('en-US') })}
                     </p>
                 </div>
 
                 {/* Total Withdrawn */}
                 <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-violet-900/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">إجمالي المبالغ المصروفة</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.withdrawals.kpi_total_disbursed')}</span>
                         <div className="w-10 h-10 rounded-xl bg-violet-500/10 text-violet-500 flex items-center justify-center font-bold">
                             <CheckCircle2 className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-baseline gap-1">
                         {Number(stats.total_withdrawn || 0).toLocaleString('en-US')}
-                        <span className="text-xs font-sans font-bold text-slate-500">ر.س</span>
+                        <span className="text-xs font-sans font-bold text-slate-500">{t('common.sar')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        {stats.approved_withdrawals_count || 0} طلب سحب معتمد ومحول
+                        {t('company.withdrawals.kpi_total_disbursed_note', { count: stats.approved_withdrawals_count || 0 })}
                     </p>
                 </div>
 
                 {/* Pending Under Review */}
                 <div className="glass-panel p-5 rounded-2xl border border-amber-500/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">قيد التدقيق والاعتماد</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.withdrawals.kpi_under_review')}</span>
                         <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold">
                             <Clock className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-amber-500 flex items-baseline gap-1">
                         {Number(stats.pending_withdrawals_amount || 0).toLocaleString('en-US')}
-                        <span className="text-xs font-sans font-bold text-amber-500">ر.س</span>
+                        <span className="text-xs font-sans font-bold text-amber-500">{t('common.sar')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        {stats.pending_withdrawals_count || 0} طلب سحب بانتظار موافقة الإدارة
+                        {t('company.withdrawals.kpi_under_review_note', { count: stats.pending_withdrawals_count || 0 })}
                     </p>
                 </div>
 
                 {/* Claimable Tasks Total */}
                 <div className="glass-panel p-5 rounded-2xl border border-orange-500/30 bg-white dark:bg-[#0A0E2A]/85 relative overflow-hidden shadow-sm dark:shadow-xl">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">مهام جاهزة لطلب السحب</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('company.withdrawals.kpi_claimable_tasks')}</span>
                         <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center font-bold">
                             <Truck className="w-5 h-5" />
                         </div>
                     </div>
                     <div className="text-2xl font-black font-mono text-orange-500 flex items-baseline gap-1">
                         {Number(stats.claimable_tasks_total || 0).toLocaleString('en-US')}
-                        <span className="text-xs font-sans font-bold text-orange-500">ر.س</span>
+                        <span className="text-xs font-sans font-bold text-orange-500">{t('common.sar')}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                        في {stats.claimable_tasks_count || 0} مهمة ممولة لم تُطلب بعد
+                        {t('company.withdrawals.kpi_claimable_tasks_note', { count: stats.claimable_tasks_count || 0 })}
                     </p>
                 </div>
             </div>
@@ -194,25 +196,25 @@ export default function CompanyWithdrawals({
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
                         <FileText className="w-5 h-5 text-violet-500" />
-                        <span>سجل طلبات سحب رصيد التمويل وسندات الأمر</span>
+                        <span>{t('company.withdrawals.table_title')}</span>
                     </h3>
                     <span className="text-xs font-mono text-slate-500">
-                        إجمالي الطلبات: {withdrawals.total || withdrawals.data?.length || 0}
+                        {t('company.withdrawals.total_requests_label', { count: withdrawals.total || withdrawals.data?.length || 0 })}
                     </span>
                 </div>
 
                 {withdrawals.data && withdrawals.data.length > 0 ? (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-xs text-right">
+                        <table className="w-full text-xs rtl:text-right ltr:text-left">
                             <thead className="bg-slate-50 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                                 <tr>
-                                    <th className="p-3">رقم الطلب والسند</th>
-                                    <th className="p-3">المبلغ المطالب بسحبه</th>
-                                    <th className="p-3">عدد المهام المشمولة</th>
-                                    <th className="p-3">تاريخ استحقاق السداد</th>
-                                    <th className="p-3">حالة الطلب</th>
-                                    <th className="p-3">تاريخ التقديم</th>
-                                    <th className="p-3 text-center">معاينة وتنزيل السند (PDF)</th>
+                                    <th className="p-3">{t('company.withdrawals.th_req_no')}</th>
+                                    <th className="p-3">{t('company.withdrawals.th_req_amount')}</th>
+                                    <th className="p-3">{t('company.withdrawals.th_tasks_count')}</th>
+                                    <th className="p-3">{t('company.withdrawals.th_due_date')}</th>
+                                    <th className="p-3">{t('company.withdrawals.th_status')}</th>
+                                    <th className="p-3">{t('company.withdrawals.th_created_at')}</th>
+                                    <th className="p-3 text-center">{t('company.withdrawals.th_actions_pdf')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60">
@@ -222,23 +224,23 @@ export default function CompanyWithdrawals({
                                             #{w.request_number}
                                         </td>
                                         <td className="p-3 font-mono font-bold text-slate-900 dark:text-white">
-                                            {parseFloat(w.requested_amount).toLocaleString('en-US')} ر.س
+                                            {parseFloat(w.requested_amount).toLocaleString('en-US')} {t('common.sar')}
                                         </td>
                                         <td className="p-3 text-slate-700 dark:text-slate-300 font-mono font-semibold">
-                                            {w.number_of_tasks} مهام
+                                            {w.number_of_tasks} {t('company.withdrawals.unit_tasks')}
                                         </td>
                                         <td className="p-3 text-slate-500 font-mono">
                                             {w.due_date ? (
                                                 <span className="font-semibold text-slate-900 dark:text-white">{w.due_date}</span>
                                             ) : (
-                                                <span className="text-slate-400">يحدد عند الاعتماد</span>
+                                                <span className="text-slate-400">{t('company.withdrawals.due_date_upon_approval')}</span>
                                             )}
                                         </td>
                                         <td className="p-3">
                                             <Badge status={w.status} />
                                         </td>
                                         <td className="p-3 text-slate-500 font-mono">
-                                            {new Date(w.created_at).toLocaleDateString('ar-SA')}
+                                            {new Date(w.created_at).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US')}
                                         </td>
                                         <td className="p-3 text-center">
                                             <div className="flex items-center justify-center gap-2">
@@ -246,17 +248,17 @@ export default function CompanyWithdrawals({
                                                     type="button"
                                                     onClick={() => handleViewPdf(w)}
                                                     className="px-2.5 py-1.5 rounded-xl bg-violet-500/10 hover:bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-500/20 transition-colors inline-flex items-center gap-1.5 text-xs font-bold cursor-pointer"
-                                                    title="معاينة السند بدقة عالية"
+                                                    title={t('company.withdrawals.btn_view_note')}
                                                 >
                                                     <Eye className="w-3.5 h-3.5" />
-                                                    <span>عرض السند</span>
+                                                    <span>{t('company.withdrawals.btn_view_note')}</span>
                                                 </button>
                                                 <a
                                                     href={route('company.withdrawals.pdf', w.id)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors inline-flex items-center"
-                                                    title="تنزيل ملف PDF"
+                                                    title={t('common.download')}
                                                 >
                                                     <Download className="w-3.5 h-3.5" />
                                                 </a>
@@ -269,7 +271,7 @@ export default function CompanyWithdrawals({
                     </div>
                 ) : (
                     <div className="py-12 text-center text-xs text-slate-500">
-                        لا توجد طلبات سحب رصيد مسجلة حتى الآن.
+                        {t('company.withdrawals.no_withdrawals_recorded')}
                     </div>
                 )}
 
@@ -299,12 +301,12 @@ export default function CompanyWithdrawals({
             <Modal
                 isOpen={createModal}
                 onClose={() => setCreateModal(false)}
-                title="إنشاء طلب سحب رصيد تمويل مهام"
+                title={t('company.withdrawals.create_modal_title')}
                 maxWidth="3xl"
             >
                 <form onSubmit={handleSubmitWithdrawal} className="space-y-5">
                     <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                        حدد المهام الممولة التي ترغب في سحب رصيدها من محفظة التمويل. سيتم توليد مستند PDF رسمي يربط هذه المهام بالطلب وتسجيل المبلغ المسحوب في محفظة الديون بعد الاعتماد.
+                        {t('company.withdrawals.create_modal_desc')}
                     </p>
 
                     {/* Task Selection Header */}
@@ -319,11 +321,11 @@ export default function CompanyWithdrawals({
                             ) : (
                                 <Square className="w-4 h-4" />
                             )}
-                            <span>تحديد الكل ({claimableTasks.length} مهمة متاحة للسحب)</span>
+                            <span>{t('company.withdrawals.select_all_label', { count: claimableTasks.length })}</span>
                         </button>
 
                         <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                            المحدد: <span className="text-violet-600 dark:text-violet-400 font-mono font-bold">{selectedTaskIds.length}</span> مهمة
+                            {t('company.withdrawals.selected_label', { count: selectedTaskIds.length })}
                         </span>
                     </div>
 
@@ -359,14 +361,14 @@ export default function CompanyWithdrawals({
                                         </div>
 
                                         <div className="text-left font-mono font-bold text-sm text-slate-900 dark:text-white">
-                                            {parseFloat(task.funding_amount).toLocaleString('en-US')} ر.س
+                                            {parseFloat(task.funding_amount).toLocaleString('en-US')} {t('common.sar')}
                                         </div>
                                     </div>
                                 );
                             })
                         ) : (
                             <p className="text-xs text-slate-500 text-center py-6">
-                                لا توجد مهام ممولة جديدة متاحة للسحب حالياً.
+                                {t('company.withdrawals.no_claimable_tasks')}
                             </p>
                         )}
                     </div>
@@ -374,23 +376,23 @@ export default function CompanyWithdrawals({
                     {/* Selected Total Box */}
                     <div className="bg-slate-100 dark:bg-slate-900/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
                         <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                            إجمالي المبلغ المطالب بسحبه:
+                            {t('company.withdrawals.selected_total_label')}
                         </span>
                         <span className="text-xl font-black font-mono text-violet-600 dark:text-violet-400">
-                            {selectedTotal.toLocaleString('en-US')} ر.س
+                            {selectedTotal.toLocaleString('en-US')} {t('common.sar')}
                         </span>
                     </div>
 
                     {/* Digital Signature */}
                     <div>
                         <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                            اسم المفوض بالتوقيع الإلكتروني على السند
+                            {t('company.withdrawals.field_signatory_name')}
                         </label>
                         <input
                             type="text"
                             value={signature}
                             onChange={(e) => setSignature(e.target.value)}
-                            placeholder="الاسم الكامل للممثل النظامي للشركة"
+                            placeholder={t('company.withdrawals.signatory_placeholder')}
                             className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-violet-500"
                         />
                     </div>
@@ -403,7 +405,7 @@ export default function CompanyWithdrawals({
                         {processing ? (
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         ) : (
-                            <span>تقديم الطلب وتوليد مستند الـ PDF</span>
+                            <span>{t('company.withdrawals.btn_submit_generate_pdf')}</span>
                         )}
                     </button>
                 </form>

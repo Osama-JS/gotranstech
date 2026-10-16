@@ -185,6 +185,28 @@ class CompanyWalletController extends Controller
             ]);
         });
 
+        // Notify Admin of repayment
+        \App\Services\NotificationDispatcherService::dispatch(
+            'admin.task_repayment_confirmed',
+            "سداد مديونية: {$company->company_name}",
+            "قامت الشركة اللوجستية ({$company->company_name}) بسداد دفعة قدرها " . number_format($repaidAmount, 2) . " ر.س مقابل التزام السند #{$debt->withdrawal_request_id} مع إرفاق الإيصال البنكي.",
+            route('admin.withdrawals.index', [], false),
+            ['debt_id' => $debt->id, 'amount' => $repaidAmount, 'company_id' => $company->id],
+            null,
+            'success'
+        );
+
+        // Notify Company
+        \App\Services\NotificationDispatcherService::dispatch(
+            'company.repayment_confirmed',
+            "تأكيد استلام سداد المهمة",
+            "تم تسجيل وقيد إيصال السداد بمبلغ " . number_format($repaidAmount, 2) . " ر.س وتحديث رصيد التزاماتكم بنجاح.",
+            route('company.wallet.debt', [], false),
+            ['debt_id' => $debt->id, 'amount' => $repaidAmount],
+            $user,
+            'success'
+        );
+
         return back()->with('success', 'تم تسجيل إيصال السداد وتحديث رصيد الالتزام بنجاح.');
     }
 }

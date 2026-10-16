@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, router, useForm, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
+import { useTranslation } from '../../../Utils/i18n';
 import StatCard from '../../../Components/StatCard';
 import SearchableSelect from '../../../Components/SearchableSelect';
 import DatePicker from '../../../Components/DatePicker';
@@ -28,9 +29,13 @@ import {
     Percent,
     Building2,
     RefreshCw,
+    FileText,
+    Clock,
 } from 'lucide-react';
 
 export default function AdminInvestors({ investors, stats, filters }) {
+    const { t, locale } = useTranslation();
+    const isAr = locale === 'ar';
     const [search, setSearch] = useState(filters?.search || '');
     const [status, setStatus] = useState(filters?.status || '');
     const [dateFrom, setDateFrom] = useState(filters?.date_from || '');
@@ -58,7 +63,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
         phone: '',
         password: '',
         national_id: '',
-        bank_name: 'مصرف الراجحي',
+        bank_name: t('admin.investors.bank_alrajhi'),
         bank_iban: '',
         platform_commission_share_rate: '70',
         status: 'active',
@@ -140,7 +145,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
             country_code: inv.country_code || '+966',
             phone: inv.phone || '',
             national_id: inv.investor_profile?.national_id || '',
-            bank_name: inv.investor_profile?.bank_name || 'مصرف الراجحي',
+            bank_name: inv.investor_profile?.bank_name || t('admin.investors.bank_alrajhi'),
             bank_iban: inv.investor_profile?.bank_iban || '',
             platform_commission_share_rate: inv.investor_profile?.platform_commission_share_rate || '70',
             status: inv.status || 'active',
@@ -191,37 +196,37 @@ export default function AdminInvestors({ investors, stats, filters }) {
     };
 
     const statusOptions = [
-        { value: '', label: 'جميع الحالات' },
-        { value: 'active', label: 'نشط (Active)' },
-        { value: 'suspended', label: 'موقوف (Suspended)' },
-        { value: 'pending', label: 'معلق (Pending)' },
-        { value: 'inactive', label: 'غير مفعل (Inactive)' },
+        { value: '', label: t('admin.investors.filter_all_statuses') },
+        { value: 'active', label: t('admin.investors.filter_status_active') },
+        { value: 'suspended', label: t('admin.investors.filter_status_suspended') },
+        { value: 'pending', label: t('admin.investors.filter_status_pending') },
+        { value: 'inactive', label: t('admin.investors.filter_status_inactive') },
     ];
 
     const bankOptions = [
-        { value: 'مصرف الراجحي', label: 'مصرف الراجحي (Al Rajhi Bank)' },
-        { value: 'البنك الأهلي السعودي (SNB)', label: 'البنك الأهلي السعودي (SNB)' },
-        { value: 'بنك الرياض', label: 'بنك الرياض (Riyad Bank)' },
-        { value: 'مصرف الإنماء', label: 'مصرف الإنماء (Alinma Bank)' },
-        { value: 'البنك السعودي الأول (SAB)', label: 'البنك السعودي الأول (SAB)' },
-        { value: 'البنك العربي الوطني (ANB)', label: 'البنك العربي الوطني (ANB)' },
-        { value: 'بنك البلاد', label: 'بنك البلاد (Bank Albilad)' },
-        { value: 'بنك الجزيرة', label: 'بنك الجزيرة (Bank AlJazira)' },
+        { value: t('admin.investors.bank_alrajhi'), label: `${t('admin.investors.bank_alrajhi')} (Al Rajhi Bank)` },
+        { value: t('admin.investors.bank_snb'), label: t('admin.investors.bank_snb') },
+        { value: t('admin.investors.bank_riyad'), label: t('admin.investors.bank_riyad') },
+        { value: t('admin.investors.bank_alinma'), label: t('admin.investors.bank_alinma') },
+        { value: t('admin.investors.bank_sab'), label: t('admin.investors.bank_sab') },
+        { value: t('admin.investors.bank_anb'), label: t('admin.investors.bank_anb') },
+        { value: t('admin.investors.bank_albilad'), label: t('admin.investors.bank_albilad') },
+        { value: t('admin.investors.bank_aljazira'), label: t('admin.investors.bank_aljazira') },
     ];
 
     return (
-        <AuthenticatedLayout title="إدارة المستثمرين والمحافظ المالية">
-            <Head title="إدارة المستثمرين" />
+        <AuthenticatedLayout title={t('admin.investors.page_title')}>
+            <Head title={t('admin.investors.page_title')} />
 
             {/* Professional Page Header */}
             <AdminPageHeader
-                title="إدارة المستثمرين"
-                subtitle="متابعة حسابات المستثمرين، نسب توزيع الأرباح، شحن المحافظ، وسجل العمليات المالية المباشرة"
+                title={t('admin.investors.header_title')}
+                subtitle={t('admin.investors.header_subtitle')}
                 icon={Users}
                 iconColor="text-violet-400"
                 iconBg="bg-violet-500/10 border-violet-500/20"
-                breadcrumbs={[{ label: 'المستثمرون' }]}
-                badge={`${stats?.total || 0} مستثمر`}
+                breadcrumbs={[{ label: t('admin.nav.items.investors') }]}
+                badge={t('admin.investors.badge_total', { count: stats?.total || 0 })}
                 actions={
                     <button
                         type="button"
@@ -229,7 +234,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
                         className="px-4 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-2xl text-xs font-bold transition-all shadow-md shadow-violet-600/30 flex items-center gap-2 cursor-pointer"
                     >
                         <PlusCircle className="w-4 h-4" />
-                        <span>إضافة مستثمر جديد</span>
+                        <span>{t('admin.investors.btn_create')}</span>
                     </button>
                 }
             />
@@ -237,30 +242,30 @@ export default function AdminInvestors({ investors, stats, filters }) {
             {/* Stat Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <StatCard
-                    title="إجمالي المستثمرين"
+                    title={t('admin.investors.stat_total')}
                     value={stats?.total || 0}
-                    subtitle={`منهم ${stats?.active || 0} نشطين`}
+                    subtitle={t('admin.investors.stat_active_subtitle', { count: stats?.active || 0 })}
                     icon={Users}
                     color="brand"
                 />
                 <StatCard
-                    title="المستثمرون الموقوفون"
+                    title={t('admin.investors.stat_pending')}
                     value={stats?.suspended || 0}
-                    subtitle="حسابات تحتاج مراجعة أو تفعيل"
+                    subtitle={t('admin.investors.stat_pending_subtitle')}
                     icon={ShieldAlert}
                     color="amber"
                 />
                 <StatCard
-                    title="إجمالي أرصدة الاستثمار"
-                    value={`${parseFloat(stats?.total_investment_balance || 0).toLocaleString('en-US')} ر.س`}
-                    subtitle="جاهزة لتمويل المهام اللوجستية"
+                    title={t('admin.investors.stat_total_balance')}
+                    value={`${parseFloat(stats?.total_investment_balance || 0).toLocaleString('en-US')} ${t('common.sar')}`}
+                    subtitle={t('admin.investors.stat_ready_subtitle')}
                     icon={Wallet}
                     color="cyan"
                 />
                 <StatCard
-                    title="إجمالي أرباح العمولات"
-                    value={`${parseFloat(stats?.total_commission_balance || 0).toLocaleString('en-US')} ر.س`}
-                    subtitle="أرباح مستحقة ومودعة للمستثمرين"
+                    title={t('admin.investors.stat_total_profit')}
+                    value={`${parseFloat(stats?.total_commission_balance || 0).toLocaleString('en-US')} ${t('common.sar')}`}
+                    subtitle={t('admin.investors.stat_total_profit_subtitle')}
                     icon={TrendingUp}
                     color="purple"
                 />
@@ -271,14 +276,14 @@ export default function AdminInvestors({ investors, stats, filters }) {
                 <form onSubmit={handleFilter} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
                     {/* Search Input */}
                     <div className="lg:col-span-2 space-y-1.5">
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400">البحث السريع</label>
+                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400">{t('admin.investors.filter_search_label')}</label>
                         <div className="relative">
                             <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute start-3.5 top-3" />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="ابحث بالاسم، البريد، الهاتف، أو الآيبان..."
+                                placeholder={t('admin.investors.filter_search_ph')}
                                 className="w-full ps-10 pe-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all"
                             />
                         </div>
@@ -286,19 +291,19 @@ export default function AdminInvestors({ investors, stats, filters }) {
 
                     {/* Status Filter (SearchableSelect) */}
                     <SearchableSelect
-                        label="الحالة"
+                        label={t('admin.investors.filter_status_label')}
                         options={statusOptions}
                         value={status}
                         onChange={(val) => setStatus(val)}
-                        placeholder="جميع الحالات"
+                        placeholder={t('admin.investors.filter_all_statuses')}
                     />
 
                     {/* Date From */}
                     <DatePicker
-                        label="من تاريخ"
+                        label={t('admin.investors.filter_date_from')}
                         value={dateFrom}
                         onChange={(val) => setDateFrom(val)}
-                        placeholder="من تاريخ..."
+                        placeholder={t('admin.investors.filter_date_from_ph')}
                     />
 
                     {/* Actions */}
@@ -308,14 +313,14 @@ export default function AdminInvestors({ investors, stats, filters }) {
                             className="flex-1 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-2xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                             <Search className="w-3.5 h-3.5" />
-                            <span>تصفية</span>
+                            <span>{t('admin.investors.btn_filter')}</span>
                         </button>
                         {(search || status || dateFrom || dateTo) && (
                             <button
                                 type="button"
                                 onClick={handleClearFilters}
                                 className="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-2xl text-xs transition-colors cursor-pointer"
-                                title="إعادة تعيين الفلاتر"
+                                title={t('admin.investors.btn_reset_filters')}
                             >
                                 <RefreshCw className="w-4 h-4" />
                             </button>
@@ -330,14 +335,15 @@ export default function AdminInvestors({ investors, stats, filters }) {
                     <table className="w-full text-start text-xs text-slate-300">
                         <thead>
                             <tr className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-bold">
-                                <th className="p-4 text-start">المستثمر</th>
-                                <th className="p-4 text-start">رقم الجوال</th>
-                                <th className="p-4 text-start">رصيد الاستثمار</th>
-                                <th className="p-4 text-start">رصيد العمولات</th>
-                                <th className="p-4 text-start">نسبة الأرباح</th>
-                                <th className="p-4 text-start">المهام الممولة</th>
-                                <th className="p-4 text-start">الحالة</th>
-                                <th className="p-4 text-center">الإجراءات</th>
+                                <th className="p-4 text-start">{t('admin.investors.table_investor')}</th>
+                                <th className="p-4 text-start">{t('admin.investors.table_phone')}</th>
+                                <th className="p-4 text-start">{t('admin.investors.table_invest_balance')}</th>
+                                <th className="p-4 text-start">{t('admin.investors.table_profit_balance')}</th>
+                                <th className="p-4 text-start">{t('admin.investors.table_profit_rate')}</th>
+                                <th className="p-4 text-start">{t('admin.investors.table_funded_tasks')}</th>
+                                <th className="p-4 text-start">{t('admin.investors.table_status')}</th>
+                                <th className="p-4 text-start">{t('admin.investors.table_kyc_contract')}</th>
+                                <th className="p-4 text-center">{t('admin.investors.table_actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/50">
@@ -369,10 +375,10 @@ export default function AdminInvestors({ investors, stats, filters }) {
                                                 <PhoneDisplay countryCode={inv.country_code} phone={inv.phone} />
                                             </td>
                                             <td className="p-4 font-mono font-bold text-violet-400">
-                                                {parseFloat(invWallet?.balance || 0).toLocaleString('en-US')} ر.س
+                                                {parseFloat(invWallet?.balance || 0).toLocaleString('en-US')} {t('common.sar')}
                                             </td>
                                             <td className="p-4 font-mono font-bold text-blue-400">
-                                                {parseFloat(commWallet?.balance || 0).toLocaleString('en-US')} ر.س
+                                                {parseFloat(commWallet?.balance || 0).toLocaleString('en-US')} {t('common.sar')}
                                             </td>
                                             <td className="p-4">
                                                 <span className="font-mono font-bold text-violet-400 bg-violet-500/10 px-2.5 py-1 rounded-xl border border-violet-500/20">
@@ -384,11 +390,41 @@ export default function AdminInvestors({ investors, stats, filters }) {
                                                 <Badge status={inv.status} />
                                             </td>
                                             <td className="p-4">
+                                                <div className="flex flex-col gap-1 items-start">
+                                                    {inv.agreement_signed_at ? (
+                                                        <Link
+                                                            href={inv.contracts?.[0]?.id ? route('admin.contracts.show', inv.contracts[0].id) : route('admin.investors.show', inv.id)}
+                                                            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#6320EE]/10 hover:bg-[#6320EE]/20 text-[#6320EE] dark:text-violet-300 border border-violet-500/20 text-[11px] font-bold transition-colors cursor-pointer"
+                                                            title={t('admin.investors.contract_signed_on', { date: new Date(inv.agreement_signed_at).toLocaleDateString(isAr ? 'ar-SA' : 'en-US') })}
+                                                        >
+                                                            <CheckCircle2 className="w-3.5 h-3.5 text-[#6320EE]" />
+                                                            <span>{t('admin.investors.contract_signed', { number: inv.contracts?.[0]?.contract_number ? `#${inv.contracts[0].contract_number}` : '' })}</span>
+                                                        </Link>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-orange-500/10 text-orange-500 border border-orange-500/20 text-[11px] font-medium">
+                                                            <Clock className="w-3 h-3 text-orange-500" />
+                                                            <span>{t('admin.investors.contract_pending')}</span>
+                                                        </span>
+                                                    )}
+
+                                                    {inv.form_template_id || (inv.additional_data && Object.keys(inv.additional_data).length > 0) ? (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-bold">
+                                                            <CheckCircle2 className="w-2.5 h-2.5" />
+                                                            <span>{t('admin.investors.kyc_complete')}</span>
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-800 text-slate-400 text-[10px]">
+                                                            <span>{t('admin.investors.kyc_incomplete')}</span>
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="p-4">
                                                 <div className="flex items-center justify-center gap-1.5">
                                                     <Link
                                                         href={route('admin.investors.show', inv.id)}
                                                         className="p-2 rounded-xl text-slate-400 hover:text-violet-400 hover:bg-violet-500/10 transition-colors"
-                                                        title="عرض الملف التفصيلي والمحافظ"
+                                                        title={t('admin.investors.btn_view_profile')}
                                                     >
                                                         <Eye className="w-4 h-4" />
                                                     </Link>
@@ -396,7 +432,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
                                                         type="button"
                                                         onClick={() => handleOpenEditModal(inv)}
                                                         className="p-2 rounded-xl text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
-                                                        title="تعديل البيانات والنسبة"
+                                                        title={t('admin.investors.btn_edit_profile')}
                                                     >
                                                         <Edit3 className="w-4 h-4" />
                                                     </button>
@@ -404,7 +440,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
                                                         type="button"
                                                         onClick={() => handleOpenResetPassModal(inv)}
                                                         className="p-2 rounded-xl text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors"
-                                                        title="إعادة تعيين كلمة المرور"
+                                                        title={t('admin.investors.btn_reset_pass')}
                                                     >
                                                         <Key className="w-4 h-4" />
                                                     </button>
@@ -416,7 +452,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
                                                                 ? 'text-slate-400 hover:text-rose-400 hover:bg-rose-500/10'
                                                                 : 'text-slate-400 hover:text-violet-400 hover:bg-violet-500/10'
                                                         }`}
-                                                        title={inv.status === 'active' ? 'إيقاف الحساب' : 'تفعيل الحساب'}
+                                                        title={inv.status === 'active' ? t('admin.investors.btn_suspend_account') : t('admin.investors.btn_activate_account')}
                                                     >
                                                         <Power className="w-4 h-4" />
                                                     </button>
@@ -428,7 +464,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
                             ) : (
                                 <tr>
                                     <td colSpan={8} className="p-8 text-center text-slate-500">
-                                        لا يوجد مستثمرون يطابقون معايير البحث.
+                                        {t('admin.investors.empty_investors')}
                                     </td>
                                 </tr>
                             )}
@@ -453,18 +489,18 @@ export default function AdminInvestors({ investors, stats, filters }) {
             <Modal
                 isOpen={createModalOpen}
                 onClose={() => setCreateModalOpen(false)}
-                title="إضافة مستثمر جديد إلى المنصة"
+                title={t('admin.investors.create_modal_title')}
                 maxWidth="max-w-2xl"
             >
                 <form onSubmit={handleCreateSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">اسم المستثمر الرباعي *</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_investor_name')}</label>
                             <input
                                 type="text"
                                 value={createData.name}
                                 onChange={(e) => setCreateData('name', e.target.value)}
-                                placeholder="محمد عبد الله القحطاني"
+                                placeholder={t('admin.investors.ph_investor_name')}
                                 className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500"
                                 required
                             />
@@ -472,7 +508,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">البريد الإلكتروني *</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_email')}</label>
                             <input
                                 type="email"
                                 value={createData.email}
@@ -487,7 +523,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <PhoneInput
-                            label="رقم الهاتف الجوال"
+                            label={t('admin.investors.field_phone')}
                             countryCode={createData.country_code}
                             onCountryCodeChange={(code) => setCreateData('country_code', code)}
                             value={createData.phone}
@@ -497,7 +533,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
                         />
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">كلمة المرور الابتدائية *</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_initial_pass')}</label>
                             <input
                                 type="password"
                                 value={createData.password}
@@ -512,7 +548,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">رقم الهوية الوطنية / الإقامة</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_national_id')}</label>
                             <input
                                 type="text"
                                 value={createData.national_id}
@@ -523,17 +559,17 @@ export default function AdminInvestors({ investors, stats, filters }) {
                         </div>
 
                         <SearchableSelect
-                            label="اسم البنك المعتمد"
+                            label={t('admin.investors.field_bank_name')}
                             options={bankOptions}
                             value={createData.bank_name}
                             onChange={(val) => setCreateData('bank_name', val)}
-                            placeholder="اختر البنك..."
+                            placeholder={t('admin.investors.ph_select_bank')}
                         />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">رقم الآيبان البنكي (IBAN)</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_iban')}</label>
                             <input
                                 type="text"
                                 dir="ltr"
@@ -546,7 +582,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">نسبة حصة المستثمر من الأرباح (%) *</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_profit_share')}</label>
                             <div className="relative">
                                 <Percent className="w-4 h-4 text-violet-400 absolute end-3.5 top-3" />
                                 <input
@@ -568,15 +604,13 @@ export default function AdminInvestors({ investors, stats, filters }) {
                             type="button"
                             onClick={() => setCreateModalOpen(false)}
                             className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium"
-                        >
-                            إلغاء
-                        </button>
+                        >{t('common.cancel')}</button>
                         <button
                             type="submit"
                             disabled={createProcessing}
                             className="px-6 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-xl text-xs font-bold transition-colors disabled:opacity-50"
                         >
-                            {createProcessing ? 'جاري الإنشاء...' : 'إنشاء حساب المستثمر'}
+                            {createProcessing ? t('admin.investors.creating_in_progress') : t('admin.investors.btn_submit_create')}
                         </button>
                     </div>
                 </form>
@@ -588,13 +622,13 @@ export default function AdminInvestors({ investors, stats, filters }) {
             <Modal
                 isOpen={editModalOpen}
                 onClose={() => setEditModalOpen(false)}
-                title={`تعديل بيانات المستثمر: ${selectedInvestor?.name || ''}`}
+                title={t('admin.investors.edit_modal_title', { name: selectedInvestor?.name || '' })}
                 maxWidth="max-w-2xl"
             >
                 <form onSubmit={handleEditSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">الاسم الرباعي *</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_investor_name')}</label>
                             <input
                                 type="text"
                                 value={editData.name}
@@ -606,7 +640,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">البريد الإلكتروني *</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_email')}</label>
                             <input
                                 type="email"
                                 value={editData.email}
@@ -620,7 +654,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <PhoneInput
-                            label="رقم الهاتف الجوال"
+                            label={t('admin.investors.field_phone')}
                             countryCode={editData.country_code}
                             onCountryCodeChange={(code) => setEditData('country_code', code)}
                             value={editData.phone}
@@ -630,17 +664,17 @@ export default function AdminInvestors({ investors, stats, filters }) {
                         />
 
                         <SearchableSelect
-                            label="حالة الحساب"
+                            label={t('admin.investors.field_account_status')}
                             options={statusOptions.filter((o) => o.value !== '')}
                             value={editData.status}
                             onChange={(val) => setEditData('status', val)}
-                            placeholder="اختر الحالة..."
+                            placeholder={t('admin.investors.ph_select_status')}
                         />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">رقم الهوية الوطنية / الإقامة</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_national_id')}</label>
                             <input
                                 type="text"
                                 value={editData.national_id}
@@ -650,17 +684,17 @@ export default function AdminInvestors({ investors, stats, filters }) {
                         </div>
 
                         <SearchableSelect
-                            label="اسم البنك المعتمد"
+                            label={t('admin.investors.field_bank_name')}
                             options={bankOptions}
                             value={editData.bank_name}
                             onChange={(val) => setEditData('bank_name', val)}
-                            placeholder="اختر البنك..."
+                            placeholder={t('admin.investors.ph_select_bank')}
                         />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">رقم الآيبان (IBAN)</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_iban')}</label>
                             <input
                                 type="text"
                                 dir="ltr"
@@ -671,7 +705,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">نسبة حصة الأرباح للمستثمر (%) *</label>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_profit_share')}</label>
                             <div className="relative">
                                 <Percent className="w-4 h-4 text-violet-400 absolute end-3.5 top-3" />
                                 <input
@@ -693,15 +727,13 @@ export default function AdminInvestors({ investors, stats, filters }) {
                             type="button"
                             onClick={() => setEditModalOpen(false)}
                             className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium"
-                        >
-                            إلغاء
-                        </button>
+                        >{t('common.cancel')}</button>
                         <button
                             type="submit"
                             disabled={editProcessing}
                             className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-colors disabled:opacity-50"
                         >
-                            {editProcessing ? 'جاري الحفظ...' : 'حفظ التعديلات'}
+                            {editProcessing ? t('admin.investors.saving_in_progress') : t('admin.investors.btn_submit_edit')}
                         </button>
                     </div>
                 </form>
@@ -713,16 +745,16 @@ export default function AdminInvestors({ investors, stats, filters }) {
             <Modal
                 isOpen={resetPassModalOpen}
                 onClose={() => setResetPassModalOpen(false)}
-                title={`إعادة تعيين كلمة المرور: ${selectedInvestor?.name || ''}`}
+                title={t('admin.investors.reset_pass_title', { name: selectedInvestor?.name || '' })}
                 maxWidth="max-w-md"
             >
                 <form onSubmit={handleResetPassSubmit} className="space-y-4">
                     <p className="text-xs text-slate-400">
-                        أدخل كلمة المرور الجديدة للمستثمر. سيتم تشفيرها وتحديث الحساب فوراً.
+                        {t('admin.investors.reset_pass_note')}
                     </p>
 
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">كلمة المرور الجديدة *</label>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_new_pass')}</label>
                         <input
                             type="password"
                             value={passData.password}
@@ -735,7 +767,7 @@ export default function AdminInvestors({ investors, stats, filters }) {
                     </div>
 
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">تأكيد كلمة المرور الجديدة *</label>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('admin.investors.field_confirm_pass')}</label>
                         <input
                             type="password"
                             value={passData.password_confirmation}
@@ -751,15 +783,13 @@ export default function AdminInvestors({ investors, stats, filters }) {
                             type="button"
                             onClick={() => setResetPassModalOpen(false)}
                             className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium"
-                        >
-                            إلغاء
-                        </button>
+                        >{t('common.cancel')}</button>
                         <button
                             type="submit"
                             disabled={passProcessing}
                             className="px-6 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold transition-colors disabled:opacity-50"
                         >
-                            {passProcessing ? 'جاري التحديث...' : 'تحديث كلمة المرور'}
+                            {passProcessing ? t('admin.investors.updating_in_progress') : t('admin.investors.btn_submit_pass')}
                         </button>
                     </div>
                 </form>
@@ -770,10 +800,10 @@ export default function AdminInvestors({ investors, stats, filters }) {
                 isOpen={!!confirmStatusTarget}
                 onClose={() => setConfirmStatusTarget(null)}
                 onConfirm={confirmToggleStatus}
-                title="تغيير حالة حساب المستثمر"
-                message={`هل أنت متأكد من رغبتك في تغيير حالة حساب المستثمر "${confirmStatusTarget?.name}"؟`}
-                confirmText="تأكيد تغيير الحالة"
-                cancelText="إلغاء"
+                title={t('admin.investors.status_dialog_title')}
+                message={t('admin.investors.status_dialog_msg', { name: confirmStatusTarget?.name })}
+                confirmText={t('admin.investors.status_dialog_confirm')}
+                cancelText={t('common.cancel')}
                 type="warning"
             />
         </AuthenticatedLayout>
