@@ -37,8 +37,41 @@ export default function CompanyApiSandbox({ company, apiKeys = [], apiBaseUrl, r
     const [selectedKeyPrefix, setSelectedKeyPrefix] = useState(
         apiKeys.length > 0 ? apiKeys[0].api_key_prefix : 'custom'
     );
-    const [customToken, setCustomToken] = useState('');
-    const [tokenToUse, setTokenToUse] = useState('');
+    // Initialize token from session if available
+    const [customToken, setCustomToken] = useState(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                return sessionStorage.getItem('last_api_key') || '';
+            } catch (e) {
+                return '';
+            }
+        }
+        return '';
+    });
+    const [tokenToUse, setTokenToUse] = useState(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                return (sessionStorage.getItem('last_api_key') || '').trim();
+            } catch (e) {
+                return '';
+            }
+        }
+        return '';
+    });
+
+    // Compute effective token
+    useEffect(() => {
+        const clean = customToken.trim();
+        setTokenToUse(clean);
+        if (clean && typeof window !== 'undefined') {
+            try {
+                sessionStorage.setItem('last_api_key', clean);
+                if (selectedKeyPrefix !== 'custom') {
+                    sessionStorage.setItem(`api_key_${selectedKeyPrefix}`, clean);
+                }
+            } catch (e) {}
+        }
+    }, [customToken, selectedKeyPrefix]);
 
     // Active Operation State
     const [activeOperationId, setActiveOperationId] = useState('post_task');
@@ -85,15 +118,6 @@ export default function CompanyApiSandbox({ company, apiKeys = [], apiBaseUrl, r
             description: t('company.sandbox.custom_token_desc'),
         }
     ], [apiKeys, t, locale]);
-
-    // Compute effective token
-    useEffect(() => {
-        if (selectedKeyPrefix === 'custom') {
-            setTokenToUse(customToken.trim());
-        } else {
-            setTokenToUse('');
-        }
-    }, [selectedKeyPrefix, customToken]);
 
     // Available API Operations Catalog
     const operationsCatalog = useMemo(() => [
@@ -324,15 +348,26 @@ export default function CompanyApiSandbox({ company, apiKeys = [], apiBaseUrl, r
             }
         }
 
+        let effectiveToken = (tokenToUse || customToken || '').trim();
+
+        if (!effectiveToken) {
+            setResponseStatus(400);
+            setResponseData({
+                success: false,
+                error: locale === 'ar'
+                    ? '⚠️ تنبيه: يرجى إدخال أو لصق مفتاح الـ API السري (يبدأ بـ gt_...) في حقل التفويض بالأعلى لتنفيذ العملية.'
+                    : '⚠️ Warning: Please enter or paste your secret API key token (starts with gt_...) in the authorization field above to execute the request.'
+            });
+            setIsExecuting(false);
+            return;
+        }
+
         const headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
+            'Authorization': `Bearer ${effectiveToken}`,
+            'X-Api-Key': effectiveToken,
         };
-
-        if (tokenToUse) {
-            headers['Authorization'] = `Bearer ${tokenToUse}`;
-            headers['X-Api-Key'] = tokenToUse;
-        }
 
         const startTime = performance.now();
 
@@ -470,15 +505,19 @@ export default function CompanyApiSandbox({ company, apiKeys = [], apiBaseUrl, r
                                 />
                             </div>
 
-                            {selectedKeyPrefix === 'custom' && (
+                            <div className="flex-1 min-w-[260px]">
                                 <input
                                     type="text"
                                     value={customToken}
                                     onChange={(e) => setCustomToken(e.target.value)}
-                                    placeholder={t('company.sandbox.custom_token_placeholder')}
-                                    className="flex-1 px-3 py-2 rounded-xl border border-slate-200 dark:border-violet-900/40 bg-slate-50 dark:bg-[#070A1E] text-slate-800 dark:text-slate-200 text-xs font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                    placeholder={
+                                        locale === 'ar'
+                                            ? 'الصق مفتاح الـ API السري هنا (gt_test_... أو gt_live_...)'
+                                            : 'Paste your secret API key token here (gt_test_... or gt_live_...)'
+                                    }
+                                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-violet-900/40 bg-slate-50 dark:bg-[#070A1E] text-slate-800 dark:text-slate-200 text-xs font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
                                 />
-                            )}
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-[#070A1E] px-3.5 py-2 rounded-xl border border-slate-200 dark:border-violet-900/30 shrink-0">

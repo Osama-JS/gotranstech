@@ -116,6 +116,9 @@ export default function CompanyApi({ company, apiKeys = [], apiBaseUrl, stats = 
     const handleCopy = (text, type = 'key') => {
         navigator.clipboard.writeText(text);
         if (type === 'key') {
+            try {
+                sessionStorage.setItem('last_api_key', text);
+            } catch (e) {}
             setCopiedKey(true);
             setTimeout(() => setCopiedKey(false), 2000);
         } else {
@@ -309,14 +312,23 @@ print_r(json_decode($response, true));`;
                         <span className="font-mono text-violet-700 dark:text-violet-300 font-bold text-sm select-all break-all">
                             {flash.generated_key}
                         </span>
-                        <button
-                            type="button"
-                            onClick={() => handleCopy(flash.generated_key, 'key')}
-                            className="px-5 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-md"
-                        >
-                            {copiedKey ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                            <span>{copiedKey ? t('company.api.copied_success') : t('company.api.btn_copy_key')}</span>
-                        </button>
+                        <div className="flex items-center gap-2 shrink-0">
+                            <button
+                                type="button"
+                                onClick={() => handleCopy(flash.generated_key, 'key')}
+                                className="px-5 py-2.5 bg-[#6320EE] hover:bg-[#5217D4] text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                            >
+                                {copiedKey ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                                <span>{copiedKey ? t('company.api.copied_success') : t('company.api.btn_copy_key')}</span>
+                            </button>
+                            <Link
+                                href={route('company.api.sandbox')}
+                                className="px-4 py-2.5 bg-violet-600/15 hover:bg-violet-600/25 border border-[#6320EE]/40 text-[#6320EE] dark:text-violet-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                            >
+                                <Play className="w-4 h-4" />
+                                <span>{t('company.api.btn_sandbox')}</span>
+                            </Link>
+                        </div>
                     </div>
                 </div>
             )}
