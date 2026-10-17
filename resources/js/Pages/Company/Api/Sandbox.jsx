@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout';
 import AdminPageHeader from '../../../Components/AdminPageHeader';
-import Select2 from '../../../Components/Select2';
 import { useTranslation } from '../../../Utils/i18n';
 import axios from 'axios';
 import {
@@ -33,21 +32,7 @@ import {
 export default function CompanyApiSandbox({ company, apiKeys = [], apiBaseUrl, recentTasks = [] }) {
     const { t, locale } = useTranslation();
 
-    // API Key State
-    const [selectedKeyPrefix, setSelectedKeyPrefix] = useState(
-        apiKeys.length > 0 ? apiKeys[0].api_key_prefix : 'custom'
-    );
-    // Initialize token from session if available
-    const [customToken, setCustomToken] = useState(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                return sessionStorage.getItem('last_api_key') || '';
-            } catch (e) {
-                return '';
-            }
-        }
-        return '';
-    });
+    // Secret API Key State (Pre-filled from session if available)
     const [tokenToUse, setTokenToUse] = useState(() => {
         if (typeof window !== 'undefined') {
             try {
@@ -58,20 +43,6 @@ export default function CompanyApiSandbox({ company, apiKeys = [], apiBaseUrl, r
         }
         return '';
     });
-
-    // Compute effective token
-    useEffect(() => {
-        const clean = customToken.trim();
-        setTokenToUse(clean);
-        if (clean && typeof window !== 'undefined') {
-            try {
-                sessionStorage.setItem('last_api_key', clean);
-                if (selectedKeyPrefix !== 'custom') {
-                    sessionStorage.setItem(`api_key_${selectedKeyPrefix}`, clean);
-                }
-            } catch (e) {}
-        }
-    }, [customToken, selectedKeyPrefix]);
 
     // Active Operation State
     const [activeOperationId, setActiveOperationId] = useState('post_task');
@@ -100,24 +71,6 @@ export default function CompanyApiSandbox({ company, apiKeys = [], apiBaseUrl, r
 
     // History Log
     const [requestHistory, setRequestHistory] = useState([]);
-
-    // Select2 Options for API Keys
-    const apiKeyOptions = useMemo(() => [
-        ...apiKeys.map((k) => ({
-            value: k.api_key_prefix,
-            label: `${k.key_name} (${k.api_key_prefix}••••)`,
-            description: t('company.sandbox.key_option_desc', {
-                prefix: k.api_key_prefix,
-                status: t('status.' + k.status),
-                date: new Date(k.created_at).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US')
-            }),
-        })),
-        {
-            value: 'custom',
-            label: t('company.sandbox.custom_token_option'),
-            description: t('company.sandbox.custom_token_desc'),
-        }
-    ], [apiKeys, t, locale]);
 
     // Available API Operations Catalog
     const operationsCatalog = useMemo(() => [
@@ -348,7 +301,7 @@ export default function CompanyApiSandbox({ company, apiKeys = [], apiBaseUrl, r
             }
         }
 
-        let effectiveToken = (tokenToUse || customToken || '').trim();
+        let effectiveToken = (tokenToUse || '').trim();
 
         if (!effectiveToken) {
             setResponseStatus(400);
@@ -487,36 +440,47 @@ export default function CompanyApiSandbox({ company, apiKeys = [], apiBaseUrl, r
                         </div>
                     </div>
 
-                    {/* Authentication Selector & Server Bar */}
+                    {/* Authentication Bar & Server Bar */}
                     <div className="mt-6 pt-5 border-t border-slate-100 dark:border-violet-900/30 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
                             <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0">
                                 <Key className="w-4 h-4 text-[#6320EE]" />
-                                <span>{t('company.sandbox.auth_label')}</span>
+                                <span>{locale === 'ar' ? 'مفتاح الـ API السري:' : 'Secret API Key:'}</span>
                             </div>
 
-                            <div className="w-full sm:w-80">
-                                <Select2
-                                    value={selectedKeyPrefix}
-                                    onChange={(val) => setSelectedKeyPrefix(val)}
-                                    options={apiKeyOptions}
-                                    placeholder={t('company.sandbox.auth_placeholder')}
-                                    searchPlaceholder={t('company.sandbox.auth_search_placeholder')}
-                                />
-                            </div>
-
-                            <div className="flex-1 min-w-[260px]">
+                            <div className="flex-1 relative">
                                 <input
                                     type="text"
-                                    value={customToken}
-                                    onChange={(e) => setCustomToken(e.target.value)}
+                                    value={tokenToUse}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setTokenToUse(val);
+                                        try {
+                                            sessionStorage.setItem('last_api_key', val.trim());
+                                        } catch (err) {}
+                                    }}
                                     placeholder={
                                         locale === 'ar'
-                                            ? 'الصق مفتاح الـ API السري هنا (gt_test_... أو gt_live_...)'
-                                            : 'Paste your secret API key token here (gt_test_... or gt_live_...)'
+                                            ? 'الصق مفتاح الـ API السري هنا (يبدأ بـ gt_test_... أو gt_live_...)'
+                                            : 'Paste your secret API key token here (starts with gt_test_... or gt_live_...)'
                                     }
-                                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-violet-900/40 bg-slate-50 dark:bg-[#070A1E] text-slate-800 dark:text-slate-200 text-xs font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-violet-900/40 bg-slate-50 dark:bg-[#070A1E] text-slate-800 dark:text-slate-200 text-xs font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 shadow-inner"
                                 />
+                                {tokenToUse && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setTokenToUse('');
+                                            try {
+                                                sessionStorage.removeItem('last_api_key');
+                                            } catch (err) {}
+                                        }}
+                                        className="absolute top-1/2 -translate-y-1/2 left-3 rtl:left-auto rtl:right-auto ltr:right-3 text-slate-400 hover:text-rose-500 text-xs cursor-pointer p-1"
+                                        title={locale === 'ar' ? 'مسح المفتاح' : 'Clear key'}
+                                    >
+                                        ✕
+                                    </button>
+                                )}
                             </div>
                         </div>
 
