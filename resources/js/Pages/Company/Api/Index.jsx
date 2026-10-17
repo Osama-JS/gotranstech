@@ -31,6 +31,7 @@ import {
     Play,
     Terminal,
     Wallet,
+    Code,
 } from 'lucide-react';
 
 export default function CompanyApi({ company, apiKeys = [], apiBaseUrl, stats = {} }) {
