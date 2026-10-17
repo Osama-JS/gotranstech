@@ -481,6 +481,12 @@ export default {
             revoke_modal_message: 'هل أنت متأكد من رغبتك في إلغاء تفعيل المفتاح ":name" (:prefix...)؟ ستتوقف أي خوادم أو أنظمة تستخدم هذا المفتاح عن الوصول إلى واجهة المنصة فوراً.',
             revoke_modal_confirm: 'نعم، إلغاء تفعيل المفتاح',
             revoke_modal_cancel: 'تراجع',
+            btn_revoke_tooltip: 'إلغاء تفعيل المفتاح',
+            btn_delete_tooltip: 'حذف المفتاح نهائياً',
+            delete_modal_title: 'حذف مفتاح الـ API نهائياً',
+            delete_modal_message: 'هل أنت متأكد من رغبتك في حذف المفتاح ":name" (:prefix...) نهائياً؟ سيتم مسح هذا المفتاح بالكامل من قاعدة البيانات ولا يمكن استعادته.',
+            delete_modal_confirm: 'نعم، حذف المفتاح نهائياً',
+            delete_modal_cancel: 'تراجع',
         },
 
         sandbox: {

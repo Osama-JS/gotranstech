@@ -481,6 +481,12 @@ export default {
             revoke_modal_message: 'Are you sure you want to revoke key ":name" (:prefix...)? Any servers or systems using this key will immediately lose access.',
             revoke_modal_confirm: 'Yes, Revoke Key',
             revoke_modal_cancel: 'Cancel',
+            btn_revoke_tooltip: 'Revoke API Key',
+            btn_delete_tooltip: 'Permanently delete key',
+            delete_modal_title: 'Permanently Delete API Key',
+            delete_modal_message: 'Are you sure you want to permanently delete key ":name" (:prefix...)? This key will be completely erased from the database and cannot be recovered.',
+            delete_modal_confirm: 'Yes, Delete Permanently',
+            delete_modal_cancel: 'Cancel',
         },
 
         sandbox: {

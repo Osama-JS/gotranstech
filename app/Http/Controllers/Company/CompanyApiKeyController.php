@@ -161,7 +161,7 @@ class CompanyApiKeyController extends Controller
             "توليد مفتاح API جديد ({$env}) بواسطة الشركة: {$result['model']->key_name}"
         );
 
-        return back()->with([
+        return redirect()->route('company.api.index')->with([
             'success' => 'تم إنشاء مفتاح API بنجاح. يرجى نسخه الآن وحفظه في بيئة آمنة حيث لن يظهر كاملاً بعد الآن.',
             'generated_key' => $result['plainTextToken'],
         ]);
@@ -180,7 +180,7 @@ class CompanyApiKeyController extends Controller
         if (!empty($newUrl)) {
             [$isUrlValid, $errorMsg] = \App\Services\UrlSecurityValidator::validateWebhookUrl($newUrl);
             if (!$isUrlValid) {
-                return back()->with('error', "رابط الـ Webhook غير مسموح به أمنياً: {$errorMsg}");
+                return redirect()->route('company.api.index')->with('error', "رابط الـ Webhook غير مسموح به أمنياً: {$errorMsg}");
             }
         }
 
@@ -192,19 +192,19 @@ class CompanyApiKeyController extends Controller
         }
         $company->save();
 
-        return back()->with('success', 'تم حفظ إعدادات الـ Webhook بنجاح وتأمينه بتشفير التوقيع الرقمي.');
+        return redirect()->route('company.api.index')->with('success', 'تم حفظ إعدادات الـ Webhook بنجاح وتأمينه بتشفير التوقيع الرقمي.');
     }
 
     public function testWebhook(Request $request)
     {
         $company = $this->getTargetCompany();
         if (empty($company->webhook_url)) {
-            return back()->with('error', 'يرجى إدخال رابط Webhook صالح وحفظه أولاً قبل إجراء الاختبار.');
+            return redirect()->route('company.api.index')->with('error', 'يرجى إدخال رابط Webhook صالح وحفظه أولاً قبل إجراء الاختبار.');
         }
 
         [$isUrlValid, $errorMsg] = \App\Services\UrlSecurityValidator::validateWebhookUrl($company->webhook_url);
         if (!$isUrlValid) {
-            return back()->with('error', "رابط الـ Webhook غير مسموح به أمنياً: {$errorMsg}");
+            return redirect()->route('company.api.index')->with('error', "رابط الـ Webhook غير مسموح به أمنياً: {$errorMsg}");
         }
 
         if (empty($company->webhook_secret)) {
@@ -242,12 +242,12 @@ class CompanyApiKeyController extends Controller
             $durationMs = round((microtime(true) - $startTime) * 1000);
 
             if ($response->successful()) {
-                return back()->with('success', "تم إرسال الإشعار التجريبي بنجاح! استجاب خادمكم بحالة {$response->status()} OK خلال {$durationMs}ms.");
+                return redirect()->route('company.api.index')->with('success', "تم إرسال الإشعار التجريبي بنجاح! استجاب خادمكم بحالة {$response->status()} OK خلال {$durationMs}ms.");
             } else {
-                return back()->with('error', "استجاب خادمكم بكود استجابة: {$response->status()} (استغرق {$durationMs}ms). يرجى التأكد من جهوزية نقطة الاستلام ومعالجة الطلب.");
+                return redirect()->route('company.api.index')->with('error', "استجاب خادمكم بكود استجابة: {$response->status()} (استغرق {$durationMs}ms). يرجى التأكد من جهوزية نقطة الاستلام ومعالجة الطلب.");
             }
         } catch (\Exception $e) {
-            return back()->with('error', "تعذر الاتصال بالرابط المحدد: " . $e->getMessage());
+            return redirect()->route('company.api.index')->with('error', "تعذر الاتصال بالرابط المحدد: " . $e->getMessage());
         }
     }
 
@@ -259,7 +259,7 @@ class CompanyApiKeyController extends Controller
         $apiKey->save();
 
         $this->auditLogService->log(
-            'deleted',
+            'updated',
             $apiKey,
             ['status' => 'active'],
             ['status' => 'revoked'],
@@ -277,6 +277,40 @@ class CompanyApiKeyController extends Controller
             'warning'
         );
 
-        return back()->with('success', 'تم إلغاء تفعيل المفتاح البرمجي.');
+        return redirect()->route('company.api.index')->with('success', 'تم إلغاء تفعيل المفتاح البرمجي.');
+    }
+
+    /**
+     * Permanently delete an API key from the database.
+     */
+    public function destroy(int $id)
+    {
+        $company = $this->getTargetCompany();
+        $apiKey = CompanyApiKey::where('company_id', $company->id)->findOrFail($id);
+
+        $keyName = $apiKey->key_name;
+        $keyId = $apiKey->id;
+        $apiKey->delete();
+
+        $this->auditLogService->log(
+            'deleted',
+            $apiKey,
+            ['status' => $apiKey->status],
+            [],
+            "حذف مفتاح API نهائياً #{$keyId} ({$keyName})"
+        );
+
+        // Security notification to company
+        \App\Services\NotificationDispatcherService::dispatch(
+            'company.api_key_deleted',
+            "تنبيه أمني: حذف مفتاح API نهائياً",
+            "تم حذف مفتاح الربط البرمجي ({$keyName}) نهائياً من قاعدة البيانات.",
+            route('company.api.index', [], false),
+            ['key_id' => $keyId],
+            Auth::user(),
+            'danger'
+        );
+
+        return redirect()->route('company.api.index')->with('success', 'تم حذف مفتاح الـ API نهائياً من النظام.');
     }
 }

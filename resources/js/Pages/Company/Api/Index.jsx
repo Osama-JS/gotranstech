@@ -32,6 +32,7 @@ import {
     Terminal,
     Wallet,
     Code,
+    ShieldAlert,
 } from 'lucide-react';
 
 export default function CompanyApi({ company, apiKeys = [], apiBaseUrl, stats = {} }) {
@@ -41,6 +42,11 @@ export default function CompanyApi({ company, apiKeys = [], apiBaseUrl, stats = 
     const [revokeModalOpen, setRevokeModalOpen] = useState(false);
     const [selectedKeyToRevoke, setSelectedKeyToRevoke] = useState(null);
     const [revokeLoading, setRevokeLoading] = useState(false);
+
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [selectedKeyToDelete, setSelectedKeyToDelete] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
     const [copiedKey, setCopiedKey] = useState(false);
     const [copiedBaseUrl, setCopiedBaseUrl] = useState(false);
     const [activeLangTab, setActiveLangTab] = useState('curl');
@@ -71,6 +77,7 @@ export default function CompanyApi({ company, apiKeys = [], apiBaseUrl, stats = 
     const handleCreateKey = (e) => {
         e.preventDefault();
         postKey(route('company.api.generate'), {
+            preserveScroll: true,
             onSuccess: () => {
                 setCreateKeyModal(false);
                 resetKey();
@@ -80,7 +87,9 @@ export default function CompanyApi({ company, apiKeys = [], apiBaseUrl, stats = 
 
     const handleUpdateWebhook = (e) => {
         e.preventDefault();
-        postWh(route('company.api.webhook'));
+        postWh(route('company.api.webhook'), {
+            preserveScroll: true,
+        });
     };
 
     const handleTestWebhook = () => {
@@ -103,12 +112,30 @@ export default function CompanyApi({ company, apiKeys = [], apiBaseUrl, stats = 
     const handleConfirmRevoke = () => {
         if (!selectedKeyToRevoke) return;
         setRevokeLoading(true);
-        router.delete(route('company.api.revoke', selectedKeyToRevoke.id), {
+        router.post(route('company.api.revoke', selectedKeyToRevoke.id), {}, {
             preserveScroll: true,
             onFinish: () => {
                 setRevokeLoading(false);
                 setRevokeModalOpen(false);
                 setSelectedKeyToRevoke(null);
+            },
+        });
+    };
+
+    const handleOpenDelete = (key) => {
+        setSelectedKeyToDelete(key);
+        setDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (!selectedKeyToDelete) return;
+        setDeleteLoading(true);
+        router.delete(route('company.api.destroy', selectedKeyToDelete.id), {
+            preserveScroll: true,
+            onFinish: () => {
+                setDeleteLoading(false);
+                setDeleteModalOpen(false);
+                setSelectedKeyToDelete(null);
             },
         });
     };
@@ -530,16 +557,26 @@ print_r(json_decode($response, true));`;
                                             </div>
                                         </div>
 
-                                        {key.status === 'active' && (
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                            {key.status === 'active' && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleOpenRevoke(key)}
+                                                    className="p-2 text-amber-500 hover:bg-amber-500/10 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-amber-500/20"
+                                                    title={t('company.api.btn_revoke_tooltip')}
+                                                >
+                                                    <ShieldAlert className="w-4 h-4" />
+                                                </button>
+                                            )}
                                             <button
                                                 type="button"
-                                                onClick={() => handleOpenRevoke(key)}
+                                                onClick={() => handleOpenDelete(key)}
                                                 className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-rose-500/20"
-                                                title={t('company.api.btn_revoke_tooltip')}
+                                                title={t('company.api.btn_delete_tooltip')}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
-                                        )}
+                                        </div>
                                     </div>
                                 ))
                             ) : (
@@ -812,7 +849,7 @@ print_r(json_decode($response, true));`;
                 onClose={() => setRevokeModalOpen(false)}
                 onConfirm={handleConfirmRevoke}
                 isLoading={revokeLoading}
-                type="danger"
+                type="warning"
                 title={t('company.api.revoke_modal_title')}
                 message={t('company.api.revoke_modal_message', {
                     name: selectedKeyToRevoke?.key_name || '',
@@ -820,6 +857,22 @@ print_r(json_decode($response, true));`;
                 })}
                 confirmText={t('company.api.revoke_modal_confirm')}
                 cancelText={t('company.api.revoke_modal_cancel')}
+            />
+
+            {/* Permanent Delete Key Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                isLoading={deleteLoading}
+                type="danger"
+                title={t('company.api.delete_modal_title')}
+                message={t('company.api.delete_modal_message', {
+                    name: selectedKeyToDelete?.key_name || '',
+                    prefix: selectedKeyToDelete?.api_key_prefix || ''
+                })}
+                confirmText={t('company.api.delete_modal_confirm')}
+                cancelText={t('company.api.delete_modal_cancel')}
             />
         </AuthenticatedLayout>
     );

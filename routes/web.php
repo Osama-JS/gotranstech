@@ -233,7 +233,9 @@ Route::middleware(['auth', 'user.company'])->prefix('company')->name('company.')
     Route::post('/api-settings/generate', [CompanyApiKeyController::class, 'generate'])->name('api.generate');
     Route::post('/api-settings/webhook', [CompanyApiKeyController::class, 'updateWebhook'])->name('api.webhook');
     Route::post('/api-settings/webhook/test', [CompanyApiKeyController::class, 'testWebhook'])->name('api.webhook.test');
-    Route::delete('/api-settings/{id}', [CompanyApiKeyController::class, 'revoke'])->name('api.revoke');
+    Route::post('/api-settings/{id}/revoke', [CompanyApiKeyController::class, 'revoke'])->name('api.revoke');
+    Route::delete('/api-settings/{id}/revoke', [CompanyApiKeyController::class, 'revoke']);
+    Route::delete('/api-settings/{id}', [CompanyApiKeyController::class, 'destroy'])->name('api.destroy');
 
     // Wallets (Separated: Funding Disbursal vs Debt Obligations)
     Route::get('/wallets/funding', [CompanyWalletController::class, 'fundingWallet'])->name('wallet.funding');
