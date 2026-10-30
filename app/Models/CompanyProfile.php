@@ -21,6 +21,12 @@ class CompanyProfile extends Model
         'contact_phone',
         'city',
         'address',
+        'bank_id',
+        'bank_name',
+        'bank_iban',
+        'account_holder_name',
+        'bank_city',
+        'bank_country',
         'website',
         'webhook_url',
         'webhook_secret',
@@ -58,6 +64,11 @@ class CompanyProfile extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function bank(): BelongsTo
+    {
+        return $this->belongsTo(Bank::class);
     }
 
     public function apiKeys(): HasMany

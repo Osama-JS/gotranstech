@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\Investor;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bank;
+use App\Models\BankAccountChangeRequest;
 use App\Models\BankDeposit;
+use App\Models\HyperpayPayout;
+use App\Models\HyperpayTransaction;
 use App\Models\TaskInvestment;
 use App\Models\WalletTransaction;
 use App\Services\EncryptedSettingService;
+use App\Services\HyperPayPayoutService;
 use App\Services\HyperPayService;
 use App\Services\ArabicPdfHelper;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -73,6 +78,13 @@ class InvestorWalletController extends Controller
             'account_holder' => EncryptedSettingService::get('bank_account_holder', 'شركة جو تك لتقنية المعلومات والحلول المالية'),
         ];
 
+        $hpConfig = EncryptedSettingService::getHyperPayConfig();
+        $enabledPaymentMethods = [
+            'MADA' => $hpConfig['enable_mada'],
+            'VISA' => $hpConfig['enable_visa_master'],
+            'APPLEPAY' => $hpConfig['enable_apple_pay'],
+        ];
+
         return Inertia::render('Investor/Wallet/InvestmentWallet', [
             'wallet' => $investmentWallet,
             'commissionWallet' => $user->commission_wallet,
@@ -89,6 +101,7 @@ class InvestorWalletController extends Controller
             'transactions' => $transactions,
             'bankDeposits' => $bankDeposits,
             'platformBankInfo' => $platformBankInfo,
+            'enabledPaymentMethods' => $enabledPaymentMethods,
         ]);
     }
 
@@ -121,6 +134,21 @@ class InvestorWalletController extends Controller
 
         $avgProfitPerTask = $tasksRewardedCount > 0 ? round($totalEarned / $tasksRewardedCount, 2) : 0;
 
+        $activeBanks = Bank::active()->select('id', 'name', 'name_en', 'code')->orderBy('name')->get();
+        $payouts = HyperpayPayout::where('user_id', $user->id)
+            ->with('bank')
+            ->latest()
+            ->take(15)
+            ->get();
+
+        $pendingBankChangeRequest = BankAccountChangeRequest::with(['currentBank', 'newBank'])
+            ->where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
+
+        $investorProfile = $user->investorProfile?->load('bank');
+
         return Inertia::render('Investor/Wallet/CommissionWallet', [
             'wallet' => $commissionWallet,
             'investmentWallet' => $user->investment_wallet,
@@ -134,17 +162,35 @@ class InvestorWalletController extends Controller
                 'commission_share_rate' => $user->investorProfile?->platform_commission_share_rate ?? 70,
             ],
             'transactions' => $transactions,
-            'investorProfile' => $user->investorProfile,
+            'investorProfile' => $investorProfile,
+            'pendingBankChangeRequest' => $pendingBankChangeRequest,
+            'banks' => $activeBanks,
+            'payouts' => $payouts,
         ]);
     }
 
     /**
-     * Request Commission Profit Withdrawal (طلب سحب أرباح)
+     * Request Commission Profit Withdrawal (طلب سحب أرباح فوري عبر HyperPay Payout)
+     * strictly uses the approved locked bank account on file.
      */
     public function requestCommissionWithdrawal(Request $request): RedirectResponse
     {
         $user = Auth::user();
         $commissionWallet = $user->commission_wallet;
+        $profile = $user->investorProfile?->load('bank');
+
+        if (!$profile || empty($profile->bank_id) || empty($profile->bank_iban)) {
+            return back()->withErrors([
+                'general' => 'لم تقم بتسجيل حسابك البنكي المعتمد بعد. يرجى تسجيل وتأكيد حسابك البنكي أولاً لتتمكن من تقديم طلب سحب الأرباح.'
+            ]);
+        }
+
+        $bank = $profile->bank ?? Bank::find($profile->bank_id);
+        if (!$bank || !$bank->is_active) {
+            return back()->withErrors([
+                'general' => "حسابك البنكي المعتمد مرتبط ببنك (" . ($bank->name ?? 'غير معروف') . ") غير متاح للتحويلات حالياً من قبل الإدارة. يرجى تقديم طلب تغيير حساب بنكي."
+            ]);
+        }
 
         $validated = $request->validate([
             'amount' => [
@@ -153,40 +199,71 @@ class InvestorWalletController extends Controller
                 'min:50',
                 'max:' . ($commissionWallet->available_balance ?? 0),
             ],
-            'bank_name' => 'required|string|max:100',
-            'iban' => 'required|string|max:50',
-            'account_holder' => 'required|string|max:150',
         ], [
+            'amount.required' => 'يرجى إدخال المبلغ المطلوب سحبه.',
             'amount.min' => 'الحد الأدنى لطلب سحب الأرباح هو 50 ر.س.',
             'amount.max' => 'المبلغ المطلوب يتجاوز الرصيد المتاح في محفظة الأرباح.',
-            'iban.required' => 'يرجى إدخال رقم الآيبان البنكي للسحب.',
         ]);
 
+        $cleanIban = strtoupper(str_replace([' ', '-', '.'], '', trim($profile->bank_iban)));
+        $accountHolder = $profile->account_holder_name ?: $user->name;
+        $city = $profile->bank_city ?: 'Riyadh';
+        $country = $profile->bank_country ?: 'SA';
         $amount = (float) $validated['amount'];
 
-        DB::transaction(function () use ($user, $commissionWallet, $amount, $validated) {
+        DB::transaction(function () use ($user, $commissionWallet, $amount, $bank, $cleanIban, $accountHolder, $city, $country) {
             $balanceBefore = (float) $commissionWallet->balance;
             $commissionWallet->balance -= $amount;
             $commissionWallet->save();
 
-            WalletTransaction::create([
-                'wallet_id' => $commissionWallet->id,
-                'user_id' => $user->id,
+            // Unique reference for payout: IPW-{user_id}-{timestamp}
+            $referenceId = 'IPW-' . $user->id . '-' . time();
+
+            $payout = HyperpayPayout::create([
+                'reference_id' => $referenceId,
+                'payout_type'  => 'investor_commission',
+                'user_id'      => $user->id,
+                'wallet_id'    => $commissionWallet->id,
+                'bank_id'      => $bank->id,
+                'amount'       => $amount,
+                'currency'     => 'SAR',
+                'beneficiary_details' => [
+                    'beneficiary_name' => $accountHolder,
+                    'bank_name'        => $bank->name,
+                    'bank_id'          => $bank->id,
+                    'bic'              => $bank->code,
+                    'iban'             => $cleanIban,
+                    'city'             => $city,
+                    'country'          => $country,
+                ],
+                'status'     => 'pending_approval',
+                'created_by' => $user->id,
+            ]);
+
+            $tx = WalletTransaction::create([
+                'wallet_id'        => $commissionWallet->id,
+                'user_id'          => $user->id,
                 'transaction_type' => 'debit',
-                'amount' => -$amount,
-                'balance_before' => $balanceBefore,
-                'balance_after' => $commissionWallet->balance,
-                'reference_type' => 'commission_withdrawal',
-                'reference_id' => null,
-                'description' => "طلب سحب أرباح إلى حساب بنك {$validated['bank_name']} (آيبان: {$validated['iban']})",
-                'status' => 'pending',
-                'metadata' => [
-                    'bank_name' => $validated['bank_name'],
-                    'iban' => $validated['iban'],
-                    'account_holder' => $validated['account_holder'],
-                    'requested_at' => now()->toIso8601String(),
+                'amount'           => -$amount,
+                'balance_before'   => $balanceBefore,
+                'balance_after'    => $commissionWallet->balance,
+                'reference_type'   => 'commission_withdrawal',
+                'reference_id'     => $payout->id,
+                'description'      => "طلب سحب أرباح إلى حسابك البنكي المعتمد لدى {$bank->name} (آيبان: {$cleanIban}) - مرجع: {$referenceId}",
+                'status'           => 'pending',
+                'metadata'         => [
+                    'bank_id'        => $bank->id,
+                    'bank_name'      => $bank->name,
+                    'bank_code'      => $bank->code,
+                    'iban'           => $cleanIban,
+                    'account_holder' => $accountHolder,
+                    'payout_id'      => $payout->id,
+                    'reference_id'   => $referenceId,
+                    'requested_at'   => now()->toIso8601String(),
                 ],
             ]);
+
+            $payout->update(['wallet_transaction_id' => $tx->id]);
         });
 
         // Notify Admin of Investor Withdrawal Request
@@ -194,14 +271,14 @@ class InvestorWalletController extends Controller
         \App\Services\NotificationDispatcherService::dispatch(
             $isLargeAmount ? 'admin.large_amount_withdrawal_requested' : 'admin.investor_withdrawal_requested',
             "طلب سحب أرباح مستثمر: {$user->name}",
-            "تقدم المستثمر ({$user->name}) بطلب سحب أرباح بمبلغ " . number_format($amount, 2) . " ر.س إلى بنك {$validated['bank_name']}.",
-            route('admin.investors.index', [], false),
+            "تقدم المستثمر ({$user->name}) بطلب سحب أرباح بمبلغ " . number_format($amount, 2) . " ر.س إلى حسابه البنكي المعتمد لدى {$bank->name} بانتظار الاعتماد المالي والصرف عبر سريع.",
+            route('admin.payouts.index', [], false),
             ['investor_id' => $user->id, 'amount' => $amount],
             null,
             $isLargeAmount ? 'urgent' : 'warning'
         );
 
-        return back()->with('success', 'تم تقديم طلب سحب الأرباح بنجاح، سيتم مراجعته والتحويل لحسابك البنكي المعتمد.');
+        return back()->with('success', 'تم تقديم طلب سحب الأرباح بنجاح وتم فحص الآيبان، سيتم اعتماد صرف الحوالة البنكية الفورية لحسابك.');
     }
 
     public function submitBankDeposit(Request $request): RedirectResponse
@@ -258,13 +335,27 @@ class InvestorWalletController extends Controller
             'payment_brand' => 'required|in:MADA,VISA,MASTER,APPLEPAY',
         ]);
 
+        $brand = strtoupper($validated['payment_brand']);
+        $hpConfig = EncryptedSettingService::getHyperPayConfig();
+        $isEnabled = match($brand) {
+            'MADA' => $hpConfig['enable_mada'],
+            'APPLEPAY' => $hpConfig['enable_apple_pay'],
+            default => $hpConfig['enable_visa_master'],
+        };
+
+        if (!$isEnabled) {
+            return response()->json([
+                'error' => 'وسيلة الدفع المحددة معطلة حالياً من قبل إدارة المنصة.'
+            ], 422);
+        }
+
         $user = Auth::user();
 
         try {
             $checkoutData = $this->hyperPayService->prepareCheckout(
                 $user,
                 (float) $validated['amount'],
-                $validated['payment_brand']
+                $brand
             );
 
             return response()->json($checkoutData);
@@ -273,10 +364,46 @@ class InvestorWalletController extends Controller
         }
     }
 
+    /**
+     * Show dedicated HyperPay secure checkout page.
+     */
+    public function showCheckout(Request $request, string $checkoutId)
+    {
+        $user = Auth::user();
+
+        $transaction = HyperpayTransaction::where('checkout_id', $checkoutId)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+
+        if ($transaction->status === 'paid') {
+            return redirect()->route('investor.wallet.investment')->with('info', 'تم دفع وشحن هذه المعاملة مسبقاً.');
+        }
+
+        $isMock = str_starts_with($checkoutId, 'MOCK_');
+        $config = EncryptedSettingService::getHyperPayConfig();
+        $cleanBase = rtrim($config['base_url'], '/');
+        $scriptUrl = $cleanBase . "/v1/paymentWidgets.js?checkoutId={$checkoutId}";
+        $brands = $this->hyperPayService->getBrandsForWidget($transaction->payment_brand);
+
+        return view('payments.hyperpay_checkout', [
+            'transaction' => $transaction,
+            'isMock' => $isMock,
+            'scriptUrl' => $scriptUrl,
+            'brands' => $brands,
+        ]);
+    }
+
     public function hyperPayCallback(Request $request)
     {
         $checkoutId = $request->input('id') ?? $request->input('checkout_id');
         $resourcePath = $request->input('resourcePath');
+
+        // Extract checkout ID from resourcePath if not directly provided
+        if (!$checkoutId && $resourcePath) {
+            if (preg_match('/checkouts\/([^\/]+)\/payment/', $resourcePath, $matches)) {
+                $checkoutId = $matches[1];
+            }
+        }
 
         if (!$checkoutId) {
             return redirect()->route('investor.wallet.investment')->with('error', 'معرّف عملية الدفع غير متوفر.');

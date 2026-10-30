@@ -77,15 +77,25 @@ class EncryptedSettingService
 
     public static function getHyperPayConfig(): array
     {
+        $mode = self::get('hyperpay_environment', self::get('hyperpay_mode', 'test'));
+        $defaultBaseUrl = strtolower($mode) === 'live' ? 'https://oppwa.com' : 'https://test.oppwa.com';
+        $customBaseUrl = self::get('hyperpay_base_url');
+
+        $baseUrl = !empty($customBaseUrl) ? rtrim($customBaseUrl, '/') : $defaultBaseUrl;
+        // Clean trailing /v1 or /v2 so endpoints don't end up with /v1/v1
+        $cleanBaseUrl = preg_replace('/\/v[0-9]+\/?$/', '', $baseUrl);
+
         return [
             'entity_id_mada' => self::get('hyperpay_entity_id_mada', ''),
             'entity_id_visa_master' => self::get('hyperpay_entity_id_visa_master', ''),
-            'entity_id_apple_pay' => self::get('hyperpay_entity_id_apple_pay', ''),
+            'entity_id_apple_pay' => self::get('hyperpay_entity_id_applepay', self::get('hyperpay_entity_id_apple_pay', '')),
             'access_token' => self::get('hyperpay_access_token', ''),
-            'base_url' => self::get('hyperpay_environment', 'test') === 'live' 
-                ? 'https://oppwa.com' 
-                : 'https://test.oppwa.com',
+            'base_url' => $cleanBaseUrl,
+            'mode' => strtolower($mode),
             'currency' => self::get('hyperpay_currency', 'SAR'),
+            'enable_mada' => in_array(self::get('hyperpay_enable_mada', 'yes'), ['yes', 'true', '1', 1, true], true),
+            'enable_visa_master' => in_array(self::get('hyperpay_enable_visa_master', 'yes'), ['yes', 'true', '1', 1, true], true),
+            'enable_apple_pay' => in_array(self::get('hyperpay_enable_apple_pay', 'yes'), ['yes', 'true', '1', 1, true], true),
         ];
     }
 

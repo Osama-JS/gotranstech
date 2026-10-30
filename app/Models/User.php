@@ -142,6 +142,11 @@ class User extends Authenticatable
         return $this->hasMany(AppNotification::class);
     }
 
+    public function bankAccountChangeRequests(): HasMany
+    {
+        return $this->hasMany(BankAccountChangeRequest::class);
+    }
+
     public function unreadNotificationsCount(): int
     {
         return $this->appNotifications()->where('is_read', false)->count();

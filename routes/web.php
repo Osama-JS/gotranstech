@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\AdminSystemHealthController;
 use App\Http\Controllers\Admin\AdminTaskController;
 use App\Http\Controllers\Admin\AdminWithdrawalController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BankAccountChangeRequestController;
 use App\Http\Controllers\Company\CompanyAnalyticsController;
 use App\Http\Controllers\Company\CompanyApiKeyController;
 use App\Http\Controllers\Company\CompanyDashboardController;
@@ -51,6 +52,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+    // Bank Account Management (Initial Registration & Change Requests)
+    Route::post('/bank-account/initial', [BankAccountChangeRequestController::class, 'storeInitial'])->name('bank-account.initial');
+    Route::post('/bank-account/change-request', [BankAccountChangeRequestController::class, 'requestChange'])->name('bank-account.change-request');
+    Route::get('/bank-account/certificate/{id}', [BankAccountChangeRequestController::class, 'viewCertificate'])->name('bank-account.certificate.view');
 });
 
 // Shared User Onboarding Routes (Investors & Companies)
@@ -104,7 +110,19 @@ Route::middleware(['auth', 'user.admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/withdrawals/{id}', [AdminWithdrawalController::class, 'show'])->name('withdrawals.show');
     Route::post('/withdrawals/{id}/approve', [AdminWithdrawalController::class, 'approve'])->name('withdrawals.approve');
     Route::post('/withdrawals/{id}/reject', [AdminWithdrawalController::class, 'reject'])->name('withdrawals.reject');
+    Route::post('/withdrawals/{id}/dispatch-payout', [AdminWithdrawalController::class, 'dispatchPayout'])->name('withdrawals.dispatch-payout');
     Route::get('/withdrawals/{id}/pdf', [AdminWithdrawalController::class, 'downloadPdf'])->name('withdrawals.pdf');
+
+    // HyperPay Instant Payouts Hub (التحويلات البنكية الفورية للمستثمرين والشركات)
+    Route::get('/payouts', [\App\Http\Controllers\Admin\AdminPayoutController::class, 'index'])->name('payouts.index');
+    Route::post('/payouts/{id}/approve', [\App\Http\Controllers\Admin\AdminPayoutController::class, 'approve'])->name('payouts.approve');
+    Route::post('/payouts/{id}/reject', [\App\Http\Controllers\Admin\AdminPayoutController::class, 'reject'])->name('payouts.reject');
+    Route::post('/payouts/{id}/check-status', [\App\Http\Controllers\Admin\AdminPayoutController::class, 'checkStatus'])->name('payouts.check-status');
+
+    // Bank Account Change Requests (طلبات تغيير الحسابات البنكية)
+    Route::get('/bank-change-requests', [BankAccountChangeRequestController::class, 'adminIndex'])->name('bank-change-requests.index');
+    Route::post('/bank-change-requests/{id}/approve', [BankAccountChangeRequestController::class, 'adminApprove'])->name('bank-change-requests.approve');
+    Route::post('/bank-change-requests/{id}/reject', [BankAccountChangeRequestController::class, 'adminReject'])->name('bank-change-requests.reject');
 
     // Contracts
     Route::get('/contracts', [AdminContractController::class, 'index'])->name('contracts.index');
@@ -139,6 +157,10 @@ Route::middleware(['auth', 'user.admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
     Route::post('/settings/test-email', [AdminSettingsController::class, 'testEmail'])->name('settings.test-email');
+    Route::post('/settings/banks', [AdminSettingsController::class, 'storeBank'])->name('settings.banks.store');
+    Route::put('/settings/banks/{id}', [AdminSettingsController::class, 'updateBank'])->name('settings.banks.update');
+    Route::post('/settings/banks/{id}/toggle', [AdminSettingsController::class, 'toggleBankStatus'])->name('settings.banks.toggle');
+    Route::delete('/settings/banks/{id}', [AdminSettingsController::class, 'deleteBank'])->name('settings.banks.delete');
 
     // Landing Page CMS & Platform Branding
     Route::get('/cms', [AdminLandingCmsController::class, 'index'])->name('cms.index');
@@ -204,6 +226,7 @@ Route::middleware(['auth', 'user.investor'])->prefix('investor')->name('investor
     Route::post('/wallet/deposit-bank', [InvestorWalletController::class, 'submitBankDeposit'])->name('wallet.deposit.bank');
     Route::get('/wallet/deposits/{id}/receipt', [InvestorWalletController::class, 'viewReceipt'])->name('wallet.deposits.receipt');
     Route::post('/wallet/hyperpay/checkout', [InvestorWalletController::class, 'prepareHyperPay'])->name('wallet.hyperpay.checkout');
+    Route::get('/wallet/hyperpay/checkout/{checkoutId}', [InvestorWalletController::class, 'showCheckout'])->name('wallet.hyperpay.checkout.show');
     Route::post('/wallet/commission/withdraw', [InvestorWalletController::class, 'requestCommissionWithdrawal'])->name('wallet.commission.withdraw');
 
     // Contracts

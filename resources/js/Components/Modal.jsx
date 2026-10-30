@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
-export default function Modal({ isOpen, onClose, title, children, maxWidth = '2xl' }) {
+export default function Modal({ isOpen, show, onClose, title, children, maxWidth = '2xl' }) {
+    const isModalOpen = isOpen ?? show ?? false;
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -12,12 +13,12 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = '2x
 
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.key === 'Escape' && isOpen) {
+            if (e.key === 'Escape' && isModalOpen) {
                 onClose();
             }
         };
 
-        if (isOpen) {
+        if (isModalOpen) {
             document.body.style.overflow = 'hidden';
             window.addEventListener('keydown', handleKeyDown);
         } else {
@@ -28,9 +29,9 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = '2x
             document.body.style.overflow = 'unset';
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [isOpen, onClose]);
+    }, [isModalOpen, onClose]);
 
-    if (!isOpen || !mounted || typeof document === 'undefined') return null;
+    if (!isModalOpen || !mounted || typeof document === 'undefined') return null;
 
     const maxWidthClasses = {
         sm: 'max-w-sm',

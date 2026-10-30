@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import AdminPageHeader from '@/Components/AdminPageHeader';
 import LegalAgreementModal from '@/Components/LegalAgreementModal';
@@ -605,6 +605,23 @@ export default function ProfileShow({
                                 />
                             </div>
                         </div>
+
+                        {isLockedAccount && (
+                            <div className="p-3.5 rounded-xl bg-violet-500/10 border border-violet-500/20 text-xs text-violet-700 dark:text-violet-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                <div className="flex items-center gap-2">
+                                    <Lock className="w-4 h-4 text-violet-500 shrink-0" />
+                                    <span>البيانات البنكية الرسمية مقفلة لحماية الحساب. لتعديل الحساب البنكي، يرجى تقديم طلب رسمي للإدارة ليتم تدقيقه واعتماده.</span>
+                                </div>
+                                {user.user_type === 'investor' && (
+                                    <Link
+                                        href={route('investor.wallet.commission')}
+                                        className="px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-bold text-[11px] shrink-0 transition-colors"
+                                    >
+                                        إدارة وسحب الأرباح / تغيير الحساب
+                                    </Link>
+                                )}
+                            </div>
+                        )}
 
                         <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
                             <button

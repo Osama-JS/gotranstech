@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use App\Models\Bank;
+use App\Models\BankAccountChangeRequest;
 use App\Models\Contract;
 use App\Services\AuditLogService;
 use Illuminate\Http\RedirectResponse;
@@ -22,7 +24,7 @@ class ProfileController extends Controller
     public function show(): Response
     {
         $user = Auth::user();
-        $user->load(['investorProfile', 'companyProfile', 'wallets', 'formTemplate.fields']);
+        $user->load(['investorProfile.bank', 'companyProfile.bank', 'wallets', 'formTemplate.fields']);
 
         $activeContract = Contract::where(function ($query) use ($user) {
             $query->where('user_id', $user->id)
@@ -40,12 +42,22 @@ class ProfileController extends Controller
             ->take(5)
             ->get();
 
+        $pendingBankChangeRequest = BankAccountChangeRequest::with(['currentBank', 'newBank'])
+            ->where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
+
+        $banks = Bank::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code']);
+
         return Inertia::render('Profile/Show', [
             'user' => $user,
             'activeContract' => $activeContract,
             'recentActivities' => $recentActivities,
             'roles' => $user->roles->pluck('name'),
             'permissions' => $user->getAllPermissions()->pluck('name'),
+            'pendingBankChangeRequest' => $pendingBankChangeRequest,
+            'banks' => $banks,
         ]);
     }
 

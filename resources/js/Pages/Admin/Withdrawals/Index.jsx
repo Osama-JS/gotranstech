@@ -9,6 +9,7 @@ import DatePicker from '../../../Components/DatePicker';
 import Pagination from '../../../Components/Pagination';
 import Modal from '../../../Components/Modal';
 import Badge from '../../../Components/Badge';
+import Select2 from '../../../Components/Select2';
 import {
     ArrowDownToLine,
     Download,
@@ -24,10 +25,12 @@ import {
     Clock,
     DollarSign,
     Building2,
-    Layers
+    Layers,
+    Zap,
+    Lock
 } from 'lucide-react';
 
-export default function AdminWithdrawals({ withdrawals, stats, companies = [], filters = {} }) {
+export default function AdminWithdrawals({ withdrawals, stats, companies = [], banks = [], filters = {} }) {
     const { t, locale } = useTranslation();
     const isAr = locale === 'ar';
     const [search, setSearch] = useState(filters?.search || '');
@@ -44,6 +47,42 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
     const [adminNotes, setAdminNotes] = useState('');
     const [rejectionReason, setRejectionReason] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // HyperPay Payout Modal States
+    const [payoutModalOpen, setPayoutModalOpen] = useState(false);
+    const [payoutBankId, setPayoutBankId] = useState(banks.length > 0 ? String(banks[0].id) : '');
+    const [payoutIban, setPayoutIban] = useState('');
+    const [payoutHolder, setPayoutHolder] = useState('');
+    const [payoutPassword, setPayoutPassword] = useState('');
+    const [dispatchingPayout, setDispatchingPayout] = useState(false);
+
+    const handleOpenPayout = (w) => {
+        setSelectedWithdrawal(w);
+        const comp = w.company || {};
+        setPayoutBankId(comp.bank_id ? String(comp.bank_id) : (banks.length > 0 ? String(banks[0].id) : ''));
+        setPayoutIban(comp.bank_iban || '');
+        setPayoutHolder(comp.account_holder_name || comp.company_name || '');
+        setPayoutPassword('');
+        setPayoutModalOpen(true);
+    };
+
+    const handleConfirmPayout = (e) => {
+        e.preventDefault();
+        if (!selectedWithdrawal) return;
+        setDispatchingPayout(true);
+
+        router.post(route('admin.withdrawals.dispatch-payout', selectedWithdrawal.id), {
+            bank_id: payoutBankId,
+            iban: payoutIban,
+            account_holder: payoutHolder,
+            password: payoutPassword,
+        }, {
+            onFinish: () => {
+                setDispatchingPayout(false);
+                setPayoutModalOpen(false);
+            }
+        });
+    };
 
     const handleFilter = (e) => {
         if (e) e.preventDefault();
@@ -326,9 +365,20 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                                                             </button>
                                                         </div>
                                                     ) : w.status === 'approved' ? (
-                                                        <div className="text-violet-600 dark:text-violet-400 text-[11px] font-medium flex items-center justify-center gap-1">
-                                                            <ShieldCheck className="w-3.5 h-3.5" />
-                                                            <span>{t('admin.withdrawals.approved_and_signed')}</span>
+                                                        <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+                                                            <div className="text-violet-600 dark:text-violet-400 text-[11px] font-medium flex items-center justify-center gap-1">
+                                                                <ShieldCheck className="w-3.5 h-3.5" />
+                                                                <span>{t('admin.withdrawals.approved_and_signed')}</span>
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleOpenPayout(w)}
+                                                                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold shadow-md shadow-emerald-600/20 flex items-center gap-1 cursor-pointer"
+                                                                title="صرف فوري لحساب الشركة عبر سريع"
+                                                            >
+                                                                <Zap className="w-3 h-3" />
+                                                                <span>صرف فوري HyperPay</span>
+                                                            </button>
                                                         </div>
                                                     ) : (
                                                         <span className="text-[11px] text-rose-400">
@@ -438,6 +488,124 @@ export default function AdminWithdrawals({ withdrawals, stats, companies = [], f
                         </button>
                     </div>
                 </form>
+            </Modal>
+
+            {/* HyperPay Payout Dispatch Modal */}
+            <Modal
+                isOpen={payoutModalOpen}
+                onClose={() => setPayoutModalOpen(false)}
+                title="صرف تمويل فوري عبر HyperPay Payout (سريع IPS)"
+                maxWidth="md"
+            >
+                {selectedWithdrawal && (
+                    <form onSubmit={handleConfirmPayout} className="space-y-4">
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
+                            <div className="flex justify-between text-slate-300">
+                                <span>الشركة المستفيدة:</span>
+                                <span className="font-bold text-white">{selectedWithdrawal.company?.company_name}</span>
+                            </div>
+                            <div className="flex justify-between text-slate-300">
+                                <span>رقم طلب السحب:</span>
+                                <span className="font-mono text-blue-400 font-bold">{selectedWithdrawal.request_number}</span>
+                            </div>
+                            <div className="flex justify-between text-slate-300 pt-2 border-t border-slate-800">
+                                <span className="font-bold">المبلغ المطلوب صرفه:</span>
+                                <span className="font-black text-emerald-400 text-sm">
+                                    {Number(selectedWithdrawal.requested_amount).toLocaleString()} SAR
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Select Bank */}
+                        <div>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                                البنك المستلم (المعتمد في النظام) *
+                            </label>
+                            <Select2
+                                value={payoutBankId}
+                                onChange={(val) => setPayoutBankId(val)}
+                                options={banks.map(b => ({
+                                    value: String(b.id),
+                                    label: `${b.name} (${b.code})`,
+                                }))}
+                                placeholder="اختر البنك..."
+                            />
+                        </div>
+
+                        {/* IBAN */}
+                        <div>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                                رقم الآيبان البنكي للشركة (Saudi IBAN) *
+                            </label>
+                            <input
+                                type="text"
+                                maxLength={24}
+                                required
+                                value={payoutIban}
+                                onChange={(e) => setPayoutIban(e.target.value.toUpperCase())}
+                                placeholder="SA0000000000000000000000"
+                                className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono tracking-wider focus:outline-none focus:border-emerald-500 uppercase"
+                            />
+                        </div>
+
+                        {/* Beneficiary Name */}
+                        <div>
+                            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                                اسم صاحب الحساب / الشركة المسجل في البنك *
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                value={payoutHolder}
+                                onChange={(e) => setPayoutHolder(e.target.value)}
+                                placeholder="اسم الشركة أو المفوض بالحساب"
+                                className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                            />
+                        </div>
+
+                        {/* Manager Password */}
+                        <div className="pt-2 border-t border-slate-800/80 space-y-1.5">
+                            <label className="block text-xs font-semibold text-amber-400">
+                                كلمة مرور المشرف للتفويض الأمني *
+                            </label>
+                            <div className="relative">
+                                <Lock className="w-4 h-4 text-slate-500 absolute right-3.5 top-3" />
+                                <input
+                                    type="password"
+                                    required
+                                    value={payoutPassword}
+                                    onChange={(e) => setPayoutPassword(e.target.value)}
+                                    placeholder="أدخل كلمة مرورك الإدارية..."
+                                    className="w-full bg-slate-900 border border-slate-700 rounded-xl pr-10 pl-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 pt-3 border-t border-slate-800">
+                            <button
+                                type="button"
+                                onClick={() => setPayoutModalOpen(false)}
+                                className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
+                            >
+                                إلغاء
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={dispatchingPayout || !payoutPassword || !payoutIban || !payoutBankId}
+                                className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                            >
+                                {dispatchingPayout ? (
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                    <>
+                                        <Zap className="w-3.5 h-3.5" />
+                                        <span>تأكيد والصرف عبر سريع</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </form>
+                )}
             </Modal>
 
             {/* Reject Modal */}

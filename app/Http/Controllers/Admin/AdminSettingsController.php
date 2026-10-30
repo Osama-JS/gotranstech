@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bank;
 use App\Models\SystemSetting;
 use App\Services\AuditLogService;
 use App\Services\EncryptedSettingService;
@@ -60,7 +61,13 @@ class AdminSettingsController extends Controller
                 'key' => 'hyperpay',
                 'label_ar' => 'بوابة الدفع HyperPay',
                 'label_en' => 'HyperPay Gateway',
-                'desc' => 'إعدادات بطاقات مدى، فيزا/ماستركارد، Apple Pay، والبيئة التجريبية والإنتاجية',
+                'desc' => 'إعدادات بطاقات مدى، فيزا/ماستركارد، Apple Pay، الصرف الفوري Payout، والبيئة التجريبية والإنتاجية',
+            ],
+            [
+                'key' => 'banks',
+                'label_ar' => 'إدارة البنوك وأكواد BIC المعتمدة',
+                'label_en' => 'Supported Banks & BIC Codes',
+                'desc' => 'تحديد البنوك المسموح بالتحويل إليها وإدارة أكواد السويفت ورمز البنك الرسمي للتحويلات الفورية',
             ],
             [
                 'key' => 'mail',
@@ -100,10 +107,13 @@ class AdminSettingsController extends Controller
             ],
         ];
 
+        $banks = Bank::orderBy('id', 'asc')->get();
+
         return Inertia::render('Admin/Settings/Index', [
             'settings' => $settings,
             'currentGroup' => $group,
             'groups' => $groups,
+            'banks' => $banks,
         ]);
     }
 
@@ -165,6 +175,124 @@ class AdminSettingsController extends Controller
         }
     }
 
+    /**
+     * Store a new supported bank
+     */
+    public function storeBank(Request $request)
+    {
+        $validated = $request->validate([
+            'name'      => 'required|string|max:150',
+            'name_en'   => 'nullable|string|max:150',
+            'code'      => 'required|string|max:20|unique:banks,code',
+            'is_active' => 'boolean',
+            'notes'     => 'nullable|string|max:255',
+        ], [
+            'name.required' => 'اسم البنك بالعربية مطلوب.',
+            'code.required' => 'كود السويفت/BIC البنكي مطلوب.',
+            'code.unique'   => 'كود السويفت/BIC هذا مسجل مسبقاً لبنك آخر.',
+        ]);
+
+        $bank = Bank::create([
+            'name'      => $validated['name'],
+            'name_en'   => $validated['name_en'] ?? null,
+            'code'      => strtoupper(trim($validated['code'])),
+            'is_active' => $request->boolean('is_active', true),
+            'notes'     => $validated['notes'] ?? null,
+        ]);
+
+        $this->auditLogService->log(
+            'bank_created',
+            $bank,
+            [],
+            ['bank_name' => $bank->name, 'code' => $bank->code],
+            "إضافة بنك جديد ({$bank->name} - {$bank->code}) للبنوك المعتمدة للتحويلات الفورية"
+        );
+
+        return back()->with('success', "تمت إضافة البنك ({$bank->name}) بنجاح.");
+    }
+
+    /**
+     * Update an existing supported bank
+     */
+    public function updateBank(Request $request, int $id)
+    {
+        $bank = Bank::findOrFail($id);
+
+        $validated = $request->validate([
+            'name'      => 'required|string|max:150',
+            'name_en'   => 'nullable|string|max:150',
+            'code'      => 'required|string|max:20|unique:banks,code,' . $bank->id,
+            'is_active' => 'boolean',
+            'notes'     => 'nullable|string|max:255',
+        ], [
+            'name.required' => 'اسم البنك بالعربية مطلوب.',
+            'code.required' => 'كود السويفت/BIC البنكي مطلوب.',
+            'code.unique'   => 'كود السويفت/BIC هذا مسجل مسبقاً لبنك آخر.',
+        ]);
+
+        $oldData = $bank->toArray();
+
+        $bank->update([
+            'name'      => $validated['name'],
+            'name_en'   => $validated['name_en'] ?? null,
+            'code'      => strtoupper(trim($validated['code'])),
+            'is_active' => $request->boolean('is_active', true),
+            'notes'     => $validated['notes'] ?? null,
+        ]);
+
+        $this->auditLogService->log(
+            'bank_updated',
+            $bank,
+            $oldData,
+            $bank->toArray(),
+            "تحديث بيانات البنك ({$bank->name})"
+        );
+
+        return back()->with('success', "تم تحديث بيانات البنك ({$bank->name}) بنجاح.");
+    }
+
+    /**
+     * Toggle active status of a bank
+     */
+    public function toggleBankStatus(int $id)
+    {
+        $bank = Bank::findOrFail($id);
+        $bank->is_active = !$bank->is_active;
+        $bank->save();
+
+        $statusText = $bank->is_active ? 'تفعيل' : 'تعطيل';
+
+        $this->auditLogService->log(
+            'bank_status_toggled',
+            $bank,
+            [],
+            ['is_active' => $bank->is_active],
+            "{$statusText} البنك ({$bank->name}) للتحويلات الفورية"
+        );
+
+        return back()->with('success', "تم {$statusText} البنك ({$bank->name}) بنجاح.");
+    }
+
+    /**
+     * Delete a bank
+     */
+    public function deleteBank(int $id)
+    {
+        $bank = Bank::findOrFail($id);
+        $name = $bank->name;
+        $bank->delete();
+
+        $this->auditLogService->log(
+            'bank_deleted',
+            null,
+            ['bank_name' => $name],
+            [],
+            "حذف البنك ({$name}) من قائمة البنوك المعتمدة"
+        );
+
+        return back()->with('success', "تم حذف البنك ({$name}) بنجاح.");
+    }
+
     protected function ensureDefaultSettingsExist(): void
     {
         $defaults = [
@@ -175,6 +303,19 @@ class AdminSettingsController extends Controller
             ['key' => 'hyperpay_entity_id_visa_master', 'value' => '8a8294174d0595be014d05d82eef0017', 'group' => 'hyperpay', 'label' => 'معرف كيان Visa / MasterCard', 'is_encrypted' => true],
             ['key' => 'hyperpay_entity_id_applepay', 'value' => '8a8294174d0595be014d05d82eef0018', 'group' => 'hyperpay', 'label' => 'معرف كيان Apple Pay', 'is_encrypted' => true],
             ['key' => 'hyperpay_mode', 'value' => 'test', 'group' => 'hyperpay', 'label' => 'بيئة العمل (test / live)', 'is_encrypted' => false],
+            ['key' => 'hyperpay_enable_mada', 'value' => 'yes', 'group' => 'hyperpay', 'label' => 'تفعيل الدفع عبر بطاقات مدى (MADA)', 'is_encrypted' => false],
+            ['key' => 'hyperpay_enable_visa_master', 'value' => 'yes', 'group' => 'hyperpay', 'label' => 'تفعيل الدفع عبر Visa / MasterCard', 'is_encrypted' => false],
+            ['key' => 'hyperpay_enable_apple_pay', 'value' => 'yes', 'group' => 'hyperpay', 'label' => 'تفعيل الدفع عبر Apple Pay', 'is_encrypted' => false],
+
+            // HyperPay Instant Payout (التحويلات البنكية الفورية)
+            ['key' => 'hyperpay_payout_enabled', 'value' => 'yes', 'group' => 'hyperpay', 'label' => 'تفعيل خدمة التحويلات البنكية الفورية (HyperPay Payout)', 'is_encrypted' => false],
+            ['key' => 'hyperpay_payout_url', 'value' => 'https://gateway.sandbox.hyperpay.com/payouts', 'group' => 'hyperpay', 'label' => 'رابط API للتحويلات البنكية (Payout URL)', 'is_encrypted' => false],
+            ['key' => 'hyperpay_payout_username', 'value' => 'sandbox_payout_user', 'group' => 'hyperpay', 'label' => 'اسم مستخدم Payout (Username)', 'is_encrypted' => true],
+            ['key' => 'hyperpay_payout_password', 'value' => 'sandbox_payout_pass', 'group' => 'hyperpay', 'label' => 'كلمة مرور Payout (Password)', 'is_encrypted' => true],
+            ['key' => 'hyperpay_payout_merchant_id', 'value' => '8a8294174d0595be014d05d82eef0016', 'group' => 'hyperpay', 'label' => 'معرف التاجر للصرف (Merchant ID)', 'is_encrypted' => true],
+            ['key' => 'hyperpay_payout_source_id', 'value' => 'SRC_GOTECH_01', 'group' => 'hyperpay', 'label' => 'رقم حساب المصدر في البنك (Source ID)', 'is_encrypted' => true],
+            ['key' => 'hyperpay_payout_webhook_token', 'value' => 'gotech_secure_payout_token_2026', 'group' => 'hyperpay', 'label' => 'رمز توكن الحماية لـ Webhook Payout', 'is_encrypted' => true],
+            ['key' => 'hyperpay_payout_purpose', 'value' => 'BA', 'group' => 'hyperpay', 'label' => 'رمز الغرض البنكي للتحويل (Purpose Code: BA أو SALA)', 'is_encrypted' => false],
 
             // SMTP Mail
             ['key' => 'mail_mailer', 'value' => 'smtp', 'group' => 'mail', 'label' => 'بروتوكول الإرسال (Mailer)', 'is_encrypted' => false],

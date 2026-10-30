@@ -42,3 +42,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/webhooks/events', [WebhookApiController::class, 'events'])->name('api.v1.webhooks.events');
     });
 });
+
+// HyperPay Payout Webhook (S2S)
+Route::post('/webhooks/hyperpay/payout', [\App\Http\Controllers\Api\HyperPayPayoutWebhookController::class, 'handle'])
+    ->name('api.webhooks.hyperpay.payout');
+

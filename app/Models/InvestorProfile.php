@@ -15,9 +15,13 @@ class InvestorProfile extends Model
         'user_id',
         'national_id',
         'investor_type',
+        'bank_id',
         'bank_name',
         'bank_iban',
         'bank_account_number',
+        'account_holder_name',
+        'bank_city',
+        'bank_country',
         'platform_commission_share_rate',
         'status',
     ];
@@ -32,6 +36,11 @@ class InvestorProfile extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function bank(): BelongsTo
+    {
+        return $this->belongsTo(Bank::class);
     }
 
     public function contracts(): HasMany

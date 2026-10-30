@@ -33,6 +33,7 @@ import {
     Bell,
     Database,
     Terminal,
+    Landmark,
 } from 'lucide-react';
 import Toast from '../Components/Toast';
 import ThemeToggle from '../Components/ThemeToggle';
@@ -75,6 +76,8 @@ export default function AuthenticatedLayout({ children, title }) {
                 { name: t('admin.nav.items.tasks'), href: route('admin.tasks.index'), icon: Truck, routeKey: 'admin.tasks.*' },
                 { name: t('admin.nav.items.deposits'), href: route('admin.deposits.index'), icon: Receipt, routeKey: 'admin.deposits.*' },
                 { name: t('admin.nav.items.withdrawals'), href: route('admin.withdrawals.index'), icon: ArrowDownToLine, routeKey: 'admin.withdrawals.*' },
+                { name: isAr ? 'التحويلات الفورية (Payout)' : 'Instant Payouts', href: route('admin.payouts.index'), icon: Zap, routeKey: 'admin.payouts.*' },
+                { name: isAr ? 'تغيير الحسابات البنكية' : 'Bank Change Requests', href: route('admin.bank-change-requests.index'), icon: Landmark, routeKey: 'admin.bank-change-requests.*' },
                 { name: t('admin.nav.items.contracts'), href: route('admin.contracts.index'), icon: FileText, routeKey: 'admin.contracts.*' },
             ],
         },
