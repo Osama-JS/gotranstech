@@ -5,10 +5,10 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
-    const assetUrl = env.ASSET_URL ;
+    const assetUrl = env.ASSET_URL || '';
 
     return {
-        base: `${assetUrl.replace(/\/$/, '')}/build/`,
+        base: assetUrl ? `${assetUrl.replace(/\/$/, '')}/build/` : '/build/',
         plugins: [
             laravel({
                 input: ['resources/css/app.css', 'resources/js/app.jsx'],
