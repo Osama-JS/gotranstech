@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
-    const assetUrl = env.ASSET_URL || '/go-tech/go-tech/public';
+    const assetUrl = env.ASSET_URL ;
 
     return {
         base: `${assetUrl.replace(/\/$/, '')}/build/`,
