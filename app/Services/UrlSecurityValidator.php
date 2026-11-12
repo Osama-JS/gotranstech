@@ -64,7 +64,9 @@ class UrlSecurityValidator
 
         // Check for disallowed hostnames
         if (in_array($host, ['localhost', '127.0.0.1', '::1', '0.0.0.0', 'metadata.google.internal', 'instance-data'])) {
-            return [false, 'العنوان المدخل يشير إلى خادم داخلي محظور.', null];
+            if (!$isLocal) {
+                return [false, 'العنوان المدخل يشير إلى خادم داخلي محظور.', null];
+            }
         }
 
         // Port restriction: allow 80 (if local http), 443, 8443

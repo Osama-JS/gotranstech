@@ -38,21 +38,42 @@ class TestTask extends Model
         'metadata',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'funding_amount' => 'decimal:2',
+        'company_commission_rate' => 'decimal:2',
+        'platform_commission_amount' => 'decimal:2',
+        'pickup_lat' => 'decimal:7',
+        'pickup_lng' => 'decimal:7',
+        'dropoff_lat' => 'decimal:7',
+        'dropoff_lng' => 'decimal:7',
+        'expires_at' => 'datetime',
+        'mock_funded_at' => 'datetime',
+        'is_mock_funded' => 'boolean',
+        'metadata' => 'array',
+    ];
+
+    protected $appends = [
+        'funded_by_investor',
+        'withdrawal_request',
+        'withdrawal_request_id',
+    ];
+
+    public function getFundedByInvestorAttribute()
     {
-        return [
-            'funding_amount' => 'decimal:2',
-            'company_commission_rate' => 'decimal:2',
-            'platform_commission_amount' => 'decimal:2',
-            'pickup_lat' => 'decimal:7',
-            'pickup_lng' => 'decimal:7',
-            'dropoff_lat' => 'decimal:7',
-            'dropoff_lng' => 'decimal:7',
-            'expires_at' => 'datetime',
-            'mock_funded_at' => 'datetime',
-            'is_mock_funded' => 'boolean',
-            'metadata' => 'array',
-        ];
+        if ($this->is_mock_funded || $this->mock_investor_name) {
+            return (object) ['name' => $this->mock_investor_name ?: 'مستثمر تجريبي (Sandbox)'];
+        }
+        return null;
+    }
+
+    public function getWithdrawalRequestAttribute()
+    {
+        return null;
+    }
+
+    public function getWithdrawalRequestIdAttribute()
+    {
+        return null;
     }
 
     public function company(): BelongsTo

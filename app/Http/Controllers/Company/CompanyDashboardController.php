@@ -7,6 +7,7 @@ use App\Models\CompanyDebt;
 use App\Models\CompanyProfile;
 use App\Models\FormTemplate;
 use App\Models\Task;
+use App\Models\TestTask;
 use App\Models\WithdrawalRequest;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -37,21 +38,34 @@ class CompanyDashboardController extends Controller
         $fundingWallet = $user->company_funding_wallet;
         $debtWallet = $user->company_debt_wallet;
 
+        $isTestMode = $company->isTestMode();
+        $taskModel = $isTestMode ? TestTask::class : Task::class;
+
+        $totalTasksCount = $taskModel::where('company_id', $company->id)->count();
+        $fundedTasksCount = $taskModel::where('company_id', $company->id)->where('status', 'funded')->count();
+        $availableTasksCount = $taskModel::where('company_id', $company->id)->where('status', 'available')->count();
+
         $stats = [
             'funding_balance' => (float) ($fundingWallet?->balance ?? 0),
             'funding_available' => (float) ($fundingWallet?->available_balance ?? 0),
             'locked_in_withdrawals' => (float) ($fundingWallet?->locked_balance ?? 0),
             'total_debt_outstanding' => (float) CompanyDebt::where('company_id', $company->id)->where('status', '!=', 'paid')->sum('remaining_amount'),
-            'total_tasks_count' => Task::where('company_id', $company->id)->count(),
-            'funded_tasks_count' => Task::where('company_id', $company->id)->where('status', 'funded')->count(),
-            'available_tasks_count' => Task::where('company_id', $company->id)->where('status', 'available')->where('expires_at', '>', now())->count(),
+            'total_tasks_count' => $totalTasksCount,
+            'funded_tasks_count' => $fundedTasksCount,
+            'available_tasks_count' => $availableTasksCount,
+            'is_test_mode' => $isTestMode,
         ];
 
-        $recentTasks = Task::where('company_id', $company->id)
-            ->with('fundedByInvestor')
-            ->latest()
-            ->take(6)
-            ->get();
+        $recentTasks = $isTestMode
+            ? TestTask::where('company_id', $company->id)
+                ->latest()
+                ->take(6)
+                ->get()
+            : Task::where('company_id', $company->id)
+                ->with('fundedByInvestor')
+                ->latest()
+                ->take(6)
+                ->get();
 
         $recentWithdrawals = WithdrawalRequest::where('company_id', $company->id)
             ->latest()

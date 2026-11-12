@@ -460,6 +460,13 @@ class TaskApiController extends BaseApiController
             );
         }
 
+        // Dispatch webhook to client system
+        try {
+            $this->webhookService->dispatchTaskCancelled($task, 'cancelled_via_api');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("TaskApiController Webhook dispatch error: " . $e->getMessage());
+        }
+
         return $this->success(
             $this->formatTaskResponse($task),
             "تم إلغاء المهمة #{$task->task_number} بنجاح وسحبها من سوق التمويل."

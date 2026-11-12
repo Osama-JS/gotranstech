@@ -33,7 +33,7 @@ export default function CompanyTasks({ tasks, stats = {}, filters = {} }) {
 
     const handleFilter = (e) => {
         e.preventDefault();
-        router.get(route('company.tasks.index'), { search, status }, { preserveState: true });
+        router.get(route('company.tasks.index'), { search, status, mode: filters?.mode || stats?.current_mode || 'test' }, { preserveState: true });
     };
 
     const handleOpenCancel = (task) => {
@@ -89,6 +89,40 @@ export default function CompanyTasks({ tasks, stats = {}, filters = {} }) {
                     },
                 ]}
             />
+
+            {/* Environment Tabs (Live vs Sandbox) */}
+            <div className="flex items-center gap-2 mb-6 p-1.5 bg-slate-100 dark:bg-slate-900/60 rounded-2xl w-fit border border-slate-200 dark:border-slate-800">
+                <button
+                    type="button"
+                    onClick={() => router.get(route('company.tasks.index'), { search, status, mode: 'test' }, { preserveState: true })}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                        (filters?.mode === 'test' || (!filters?.mode && stats?.current_mode === 'test'))
+                            ? 'bg-amber-500 text-white shadow-md'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                >
+                    <span className="w-2 h-2 rounded-full bg-amber-200 animate-pulse"></span>
+                    <span>بيئة الاختبار (Sandbox)</span>
+                    <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20">
+                        {stats?.test_tasks_count ?? 0}
+                    </span>
+                </button>
+                <button
+                    type="button"
+                    onClick={() => router.get(route('company.tasks.index'), { search, status, mode: 'live' }, { preserveState: true })}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                        (filters?.mode === 'live' || (!filters?.mode && stats?.current_mode === 'live'))
+                            ? 'bg-[#6320EE] text-white shadow-md'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                >
+                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span>المهام الحية (Live)</span>
+                    <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-white/20">
+                        {stats?.live_tasks_count ?? 0}
+                    </span>
+                </button>
+            </div>
 
             {/* 4 Financial & Operational KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
